@@ -1,5 +1,9 @@
-import type { RendezVous, WebdevRendezVous } from "./types";
-import { format } from 'date-fns'
+
+
+interface APIErreur {
+    erreur: string;
+}
+
 
 export function generateTimeSlots(startHour: number, endHour: number, intervalMinutes: number) {
     const slots: string[] = [];
@@ -100,3 +104,4 @@ export function getCalendarEndBound() {
     date.setDate(date.getDate() + 8)
     return date
 }
+

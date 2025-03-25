@@ -1,15 +1,39 @@
 <script lang="ts">
     import { superForm } from "sveltekit-superforms";
     import SuperDebug from "sveltekit-superforms";
-    import type { Motif, RendezVous } from "$lib/utils/types";
+    import type { Motif, RendezVous, WebdevRendezVous } from "$lib/utils/types";
     import Pikaday from "../Pikaday.svelte";
-    import { generateTimeSlots, getCalendarEndBound } from "$lib/utils/date"
+    import { generateTimeSlots } from "$lib/utils/date";
+    import { format } from "date-fns";
 
-    const endBound = getCalendarEndBound()
+    const allTimeSlots: string[] = generateTimeSlots(8, 10, 15);
 
-    const { formProps, motifs } : { formProps : any, motifs: Motif[] } = $props();
+    const { formProps, motifs }: { formProps: any; motifs: Motif[] } = $props();
     const { form, errors, constraints, message, enhance } =
         superForm<RendezVous>(formProps);
+
+    $effect(() => {
+        //We fetch the current rdv to a local svetelkit api route as a proxy to avoid fetching on the client (sensitive .env info)
+        async function fetchRdvForDate() {
+            try {
+                const formattedDate = format(
+                    $form.appointmentDate,
+                    "yyyy-MM-dd"
+                );
+                const response = await fetch(`/api/rdv?date=${formattedDate}`);
+                const data: WebdevRendezVous[] | [] = await response.json();
+
+
+                //TODO filter and format dates for input
+
+            } catch (error) {
+                console.error("Error fetching RDVs:", error);
+            }
+        }
+        if ($form.appointmentDate) {
+            fetchRdvForDate();
+        }
+    });
 </script>
 
 {#if $message}
@@ -23,7 +47,6 @@
 <form method="POST" use:enhance class="w-full px-8">
     <fieldset class="fieldset gap-8">
         <div class="grid grid-cols-2 gap-8 items-end">
-
             <!-- MARQUE -->
             <div>
                 <label class="fieldset-label text-info" for="brand"
@@ -114,12 +137,9 @@
                 <option disabled selected>Choisir une catégorie</option>
 
                 {#each motifs as motif}
-              {#if motif.NomActivité === $form.rdvCategory}
-              <option value={motif.Motif}>{motif.Motif}</option>
-
-              {/if}
-              
-                   
+                    {#if motif.NomActivité === $form.rdvCategory}
+                        <option value={motif.Motif}>{motif.Motif}</option>
+                    {/if}
                 {/each}
             </select>
             {#if $errors.task}
@@ -212,9 +232,7 @@
                                 value="manual"
                                 bind:group={$form.rentalDrive}
                             />
-                            <label for="userCategory"
-                                >Manuelle</label
-                            >
+                            <label for="userCategory">Manuelle</label>
                         </div>
 
                         <div>
@@ -225,9 +243,7 @@
                                 value="auto"
                                 bind:group={$form.rentalDrive}
                             />
-                            <label for="userCategory">
-                               Automatique</label
-                            >
+                            <label for="userCategory"> Automatique</label>
                         </div>
                     </div>
                     {#if $errors.rentalCategory}
@@ -242,7 +258,12 @@
             <label class="fieldset-label text-info" for="plateNumber"
                 >Date du RDV</label
             >
-            <Pikaday bind:value={$form.appointmentDate} name="appointmentDate" ariaInvalid={$errors.plateNumber ? "true" : undefined}  {...$constraints.plateNumber}/>
+            <Pikaday
+                bind:value={$form.appointmentDate}
+                name="appointmentDate"
+                ariaInvalid={$errors.plateNumber ? "true" : undefined}
+                {...$constraints.plateNumber}
+            />
             {#if $errors.appointmentDate}
                 <span class="invalid">{$errors.appointmentDate}</span>
             {/if}
@@ -260,16 +281,14 @@
             >
                 <option disabled selected>Choisir une catégorie</option>
                 <!-- <option value=""></option> -->
-
             </select>
             {#if $errors.task}
                 <span class="invalid">{$errors.task}</span>
             {/if}
         </div>
 
-
-          <!-- Type de transmission -->
-          <div>
+        <!-- Type de transmission -->
+        <div>
             <label class="fieldset-label text-info" for="contactless"
                 >Dépôt du véhicule</label
             >
@@ -293,7 +312,9 @@
                         value="false"
                         bind:group={$form.contactless}
                     />
-                    <label for="userCategory">Sur nos horaires d'ouverture</label>
+                    <label for="userCategory"
+                        >Sur nos horaires d'ouverture</label
+                    >
                 </div>
             </div>
             {#if $errors.contactless}
@@ -301,7 +322,9 @@
             {/if}
         </div>
 
-        <button class="btn btn-info mt-4 rounded-full">Voir le résumé et confirmer</button>
+        <button class="btn btn-info mt-4 rounded-full"
+            >Voir le résumé et confirmer</button
+        >
     </fieldset>
 </form>
 
