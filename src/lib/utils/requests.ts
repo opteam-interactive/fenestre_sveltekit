@@ -1,4 +1,4 @@
-import { encodeBase64, fetchToApi } from "./utils"
+import { encodeBase64, fetchToApi } from "$lib/utils/utils"
 import { getCalendarEndBound } from "./date"
 
 export const fetchTestRequest = 'U0VMRUNUIFVUSUxJU0FURVVSLkRyb2l0cyBGUk9NIFVUSUxJU0FURVVSIFdIRVJFIFVUSUxJU0FURVVSLlV0aWxpc2F0ZXVyID0gJ0Fybm9sZEgnIEFORCBVVElMSVNBVEVVUi5Nb3REZVBhc3NlID0gJ1NlY3VSaXR5NzYhJw=='
@@ -9,6 +9,7 @@ export const fetchTestRequest = 'U0VMRUNUIFVUSUxJU0FURVVSLkRyb2l0cyBGUk9NIFVUSUx
 export async function getMotifs() {
     const motifRequest = "U0VMRUNUICogRlJPTSBtb3RpZnJkdg=="
     const motifList = await fetchToApi(motifRequest)
+
     return motifList.data
 }
 

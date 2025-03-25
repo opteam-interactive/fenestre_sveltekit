@@ -2,14 +2,20 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { rdvSchema } from '$lib/utils/zod';
 import { type Infer, message } from 'sveltekit-superforms';
+import { getMotifs } from '$lib/utils/requests';
+
 import { fail } from '@sveltejs/kit';
+import type { Motif } from '$lib/utils/types';
 type Message = { status: 'error' | 'success' | 'warning'; text: string };
 
 
 // Initialize superforms
 export const load = async () => {
     const form = await superValidate<Infer<typeof rdvSchema>, Message>(zod(rdvSchema));
-    return { form };
+
+    const motifs: Motif[] = await getMotifs();
+    
+    return { form, motifs };
 };
 
 //POST_ACTION

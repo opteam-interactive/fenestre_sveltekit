@@ -16,7 +16,7 @@ let { data } = $props();
     </div>
 
     <FormWrapper title='Votre RDV' customClass='md:w-2/3 lg:w-1/2 my-8'>
-        <RdvForm formProps={data.form}/>
+        <RdvForm formProps={data.form} motifs={data.motifs}/>
     </FormWrapper>
 
 

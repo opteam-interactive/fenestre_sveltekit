@@ -52,11 +52,11 @@ export const rdvSchema = z.object({
   //see about type for date and time
   appointmentDate: z.date(),
   appointmentTime: z.string(),
-  rdvCategory: z.enum(["AtelierP", "CarrosserieP"]).nullable(),
+  rdvCategory: z.enum(["AtelierP", "CarrosserieP"]).nullable().default("AtelierP"),
   rental: z.boolean(),
-  rentalCategory: z.enum(['eco', 'standard']).nullable(),
-  rentalDrive: z.enum(['manual', 'auto']).nullable(),
-  contactless: z.enum(['true', 'false']).nullable(),
+  rentalCategory: z.enum(['eco', 'standard']).default('eco').nullable(),
+  rentalDrive: z.enum(['manual', 'auto']).default('manual').nullable(),
+  contactless: z.enum(['true', 'false']).nullable().default("false"),
   chiffrage: z.boolean()
   //Complete with more info
 })

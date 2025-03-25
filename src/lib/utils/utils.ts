@@ -1,10 +1,13 @@
+import { API_URL, API_TOKEN } from '$env/static/private';
+
+
 import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+// import { twMerge } from "tailwind-merge"
 
 // function from Shadcn
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
+// export function cn(...inputs: ClassValue[]) {
+//   return twMerge(clsx(inputs))
+// }
 
 // Take a string and encode it in 64 to send to windev64
 export function encodeBase64(input: string) {
@@ -26,18 +29,18 @@ export function decodeBase64(input: string) {
 
 export async function fetchTest() {
   try {
-    const url = process.env.API_URL
+    const url = API_URL
     if (url == null) return
 
     const SQL = "U0VMRUNUICogRlJPTSBtb3RpZnJkdiBXSEVSRSBOb21BY3Rpdml06SA9ICdBdGVsaWVyUCc="
     // const encodedSQL = encodeBase64(SQL)
-    console.log('OKOKOKOOK')
+ 
 
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         "Content-Type": "application/json",
-        "token": 'mls5df5435fv3qvdfvqdfvd5fv5fkdgpvmjg'
+        "token": API_TOKEN
       },
       body: JSON.stringify({ request: SQL }),
     })
@@ -53,11 +56,12 @@ export async function fetchTest() {
 
 // Take a SQL request and send it to the API
 export const fetchToApi = async (sqlRequest: string) => {
+  console.log()
   try {
-    const url = process.env.API_URL || 'http://localhost:8024/Requete'
+    const url = API_URL || 'http://localhost:8024/Requete'
     const headers = {
       'Content-Type': 'application/json',
-      'token': process.env.API_TOKEN || '',
+      'token': API_TOKEN || '',
 
     }
 
