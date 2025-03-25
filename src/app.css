@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+@plugin "daisyui";
+@plugin "daisyui/theme" {
+  name: "light";
+  default: true;
+  --color-info:  #00549E;
+  --color-info-content: #FFF;
+  --color-success: #00A99D;
+  --color-success-content: #FFF;
+}
+
+@font-face {
+    font-family: TerminaRegular;
+    font-weight: normal;
+    font-style: normal;
+    src: url("$lib/assets/fonts/termina-regular.otf") format("opentype");
+  }
+
+@font-face {
+    font-family: TerminaBold;
+    font-weight: bold;
+    font-style: bold;
+    src: url("$lib/assets/fonts/termina-bold.otf") format("opentype");
+  }
+
+@theme {
+    --color-customblue: #00549E;
+    --color-lightblue: #E8EFF1;
+    --color-lightblue2: #87BCEB;
+    --color-customgreen: #00A99D;
+    --color-customyellow: #F2A712;
+
+    --font-poppins: "Poppins", sans-serif; 
+    --font-termina: "TerminaRegular", serif; 
+    --font-terminaBold: "TerminaBold", serif; 
+  }
