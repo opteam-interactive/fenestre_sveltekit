@@ -16,7 +16,6 @@ export const load = async () => {
 export const actions = {
     default: async ({ request }) => {
         const form = await superValidate(request, zod(userSchema));
-        console.log(form);
 
         if (!form.valid) {
             // Return { form } and things will just work.

@@ -35,9 +35,9 @@
 
         <div class="navbar-center hidden lg:flex">
             <ul class="menu menu-horizontal px-1">
-                <li><a href="/clients">Mon compte</a></li>
-                <li><a href="/clients/prendre-rdv">Prendre RDV</a></li>
-                <li><a href="/clients/mes-rdv">Mes RDV</a></li>
+                <li><a href="/espace-client">Mon compte</a></li>
+                <li><a href="/espace-client/prendre-rdv">Prendre RDV</a></li>
+                <li><a href="/espace-client/mes-rdv">Mes RDV</a></li>
             </ul>
         </div>
         <div class="navbar-end">

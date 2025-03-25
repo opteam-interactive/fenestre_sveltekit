@@ -102,7 +102,7 @@
                             type="radio"
                             class="radio radio-sm radio-info"
                             placeholder="Identifiant"
-                            name="userCategory"
+                            name="category"
                             value="societe"
                             bind:group={$form.category}
                         />

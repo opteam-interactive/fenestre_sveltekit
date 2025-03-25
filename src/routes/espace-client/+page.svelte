@@ -17,7 +17,6 @@
         </h2>
     </div>
     <FormWrapper title="Je gère mon compte" customClass="md:2/3 lg:w-1/2 my-8">
-        <p>TEST_CLIENT</p>
          <RegisterForm formProps={data.form}/> 
     </FormWrapper>
 </section>
