@@ -2,14 +2,35 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { userSchema } from '$lib/utils/zod';
 import { type Infer, message } from 'sveltekit-superforms';
-import { fail } from '@sveltejs/kit';
+import { getUser } from '$lib/utils/auth.js';
+import type { User } from '$lib/utils/types.js';
+
+
 type Message = { status: 'error' | 'success' | 'warning'; text: string };
 
-
 // Initialize superforms
-export const load = async () => {
-    const form = await superValidate<Infer<typeof userSchema>, Message>(zod(userSchema));
-    return { form };
+export async function load({ cookies, parent}) {
+    
+    const webDevUser = await getUser(cookies)
+
+    const user: User = {
+        id: webDevUser ? webDevUser?.IDUtilisateur : 0,
+        password : "",
+        passwordConfirm : "" ,
+        category :webDevUser?.Société === "" ? "particulier" : "societe",
+        email: webDevUser ? webDevUser?.Email : "" ,
+        societe: webDevUser ? webDevUser?.Société :"",
+        lastName: webDevUser ? webDevUser?.Nom :"",
+        firstName: webDevUser ? webDevUser?.Prénom :"",
+        telephone:webDevUser ?  webDevUser?.Téléphone :"",
+        address: webDevUser ? webDevUser?.Adresse:"", 
+        zipcode: webDevUser ? webDevUser?.cp : "",
+        city: webDevUser ? webDevUser?.Ville : "",
+    }
+
+    //Initiate form
+    const form = await superValidate<Infer<typeof userSchema>, Message>(user, zod(userSchema));
+    return { form, user };
 };
 
 //POST_ACTION

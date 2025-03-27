@@ -9,7 +9,7 @@
 <section class="flex flex-col items-center gap-4 p-12">
     <div class="text-center">
         <h1 class="mb-2 uppercase font-terminaBold text-customblue">
-            Votre Espace
+            Votre Espace - 
         </h1>
         <h2 class="font-semibold text-customyellow">
             Attention, si vous avez plusieurs travaux à effectuer, <br />
@@ -17,7 +17,7 @@
         </h2>
     </div>
     <FormWrapper title="Je gère mon compte" customClass="md:2/3 lg:w-1/2 my-8">
-         <RegisterForm formProps={data.form}/> 
+         <RegisterForm  /> 
     </FormWrapper>
 </section>
 

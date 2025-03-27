@@ -1,11 +1,11 @@
 <script lang="ts">
     import { superForm } from "sveltekit-superforms";
     import SuperDebug from "sveltekit-superforms";
-    import type { User } from "$lib/utils/types";
-    const { formProps } = $props();
+    import type { User, WebdevUser } from "$lib/utils/types";
+	import { page } from '$app/state';
 
     const { form, errors, constraints, message, enhance } =
-        superForm<User>(formProps);
+        superForm<User>(page.data.form);
 
 </script>
 
@@ -21,9 +21,7 @@
     <fieldset class="fieldset gap-4">
         <!-- Email -->
         <div>
-            <label class="fieldset-label text-info" for="email"
-                >Email</label
-            >
+            <label class="fieldset-label text-info" for="email">Email</label>
             <input
                 type="email"
                 class="input w-full rounded-full"
@@ -255,8 +253,6 @@
     </fieldset>
 </form>
 <SuperDebug data={$form} />
-
-
 
 <style>
 </style>

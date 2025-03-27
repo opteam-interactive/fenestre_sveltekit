@@ -1,4 +1,7 @@
 <script lang="ts">
+    const logout = () => {
+        
+    }
 </script>
 
 <div>
@@ -41,7 +44,7 @@
             </ul>
         </div>
         <div class="navbar-end">
-            <a href="/logout" class="btn rounded-full">Deconnexion</a>
+            <button onclick={logout} class="btn rounded-full">Deconnexion</button>
         </div>
     </div>
 </div>

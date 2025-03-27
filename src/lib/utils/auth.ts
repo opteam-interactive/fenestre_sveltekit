@@ -1,4 +1,4 @@
-import { jwtVerify } from "jose";
+import { jwtVerify, decodeJwt } from "jose";
 import { fail, redirect } from '@sveltejs/kit';
 import { JWT_SECRET } from '$env/static/private';
 import type { Cookies } from "@sveltejs/kit";
@@ -12,12 +12,22 @@ export async function getToken(cookies: Cookies) {
 
 }
 
-export async function getUserData(cookies: Cookies): Promise<WebdevUser | null> {
-    if (!(await isLoggedIn())) {
+export async function getUserData(token :string): Promise<WebdevUser | null> {
+
+    if (!token) return null;
+
+    try {
+        const { payload } = await jwtVerify(token, secretKey);
+        return payload as WebdevUser; // Cast payload to your user type
+    } catch (error) {
+        console.error("JWT verification failed:", error);
         return null;
     }
+}
 
-    const token = await getToken(cookies);
+export async function getUser(cookies :Cookies): Promise<WebdevUser | null> {
+    const token = cookies.get("auth_token");
+
     if (!token) return null;
 
     try {
@@ -38,6 +48,19 @@ export async function getUserOrRedirect() {
     return user;
 }
 
-export async function isLoggedIn(): Promise<boolean> {
-    return !!(await getToken()); // Check if token exists
+
+export function isTokenExpired(token: string): boolean {
+    try {
+        // Decode the token without verifying the signature
+        const decoded = decodeJwt(token);
+
+        // Get the expiration time from the decoded token (exp is in seconds)
+        const expirationTime = decoded.exp;
+
+        // Check if the token is expired (current time in seconds)
+        return expirationTime < Math.floor(Date.now() / 1000);
+    } catch (error) {
+        console.error('Failed to decode token', error);
+        return true; // If there's an error decoding, consider it expired
+    }
 }

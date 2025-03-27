@@ -1,16 +1,18 @@
 import { redirect } from "@sveltejs/kit";
 import type { LayoutServerLoad } from './$types';
-
+import { getUser, isTokenExpired } from "$lib/utils/auth";
 
 export const load: LayoutServerLoad = async ({ cookies, url }) => {
-    const token = cookies.get("auth_token");
-
     const isLoginRoute = url.pathname == "/";
+    let user = null
+    const token = cookies.get("auth_token");
+    if (!token || isTokenExpired(token)) {
+        if (!isLoginRoute) {
+            redirect(303, "/");
+        }
+    } 
+    user = getUser(cookies)
+    
 
-
-    if (!token && !isLoginRoute ) {
-         redirect(303, "/");
-    }
-
-    return { userAuthenticated: !!token };
+    return { user };
 }
