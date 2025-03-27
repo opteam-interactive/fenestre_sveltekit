@@ -5,34 +5,30 @@
     import Pikaday from "../Pikaday.svelte";
     import { generateTimeSlots } from "$lib/utils/date";
     import { format } from "date-fns";
+    import { fetchRdvForDate } from "$lib/utils/date";
+    import { slide } from "svelte/transition";
 
     const allTimeSlots: string[] = generateTimeSlots(8, 10, 15);
 
     const { formProps, motifs }: { formProps: any; motifs: Motif[] } = $props();
     const { form, errors, constraints, message, enhance } =
         superForm<RendezVous>(formProps);
+    let availableTimeSlots = $state(allTimeSlots);
 
     $effect(() => {
-        //We fetch the current rdv to a local svetelkit api route as a proxy to avoid fetching on the client (sensitive .env info)
-        async function fetchRdvForDate() {
-            try {
-                const formattedDate = format(
-                    $form.appointmentDate,
-                    "yyyy-MM-dd"
+        //On Mount and when date is modified, fetch available time slots
+        const fetchAvailableTimeSlots = async () => {
+            if ($form.appointmentDate) {
+                const remainingTimeSlots = await fetchRdvForDate(
+                    allTimeSlots,
+                    $form.appointmentDate
                 );
-                const response = await fetch(`/api/rdv?date=${formattedDate}`);
-                const data: WebdevRendezVous[] | [] = await response.json();
-
-
-                //TODO filter and format dates for input
-
-            } catch (error) {
-                console.error("Error fetching RDVs:", error);
+                if (remainingTimeSlots) {
+                    availableTimeSlots = remainingTimeSlots;
+                }
             }
-        }
-        if ($form.appointmentDate) {
-            fetchRdvForDate();
-        }
+        };
+        fetchAvailableTimeSlots();
     });
 </script>
 
@@ -138,7 +134,7 @@
 
                 {#each motifs as motif}
                     {#if motif.NomActivité === $form.rdvCategory}
-                        <option value={motif.Motif}>{motif.Motif}</option>
+                        <option value={motif.IDMotifRDV}>{motif.Motif}</option>
                     {/if}
                 {/each}
             </select>
@@ -181,7 +177,7 @@
 
         {#if $form.rental}
             <!-- Type de location -->
-            <div>
+            <div class="flex gap-8" transition:slide>
                 <div>
                     <label class="fieldset-label text-info" for="category"
                         >Type de location</label
@@ -271,19 +267,21 @@
 
         <!-- HEURE_DU_RDV -->
         <div>
-            <label class="fieldset-label text-info" for="task"
+            <label class="fieldset-label text-info" for="appointmentTime"
                 >Heure du RDV</label
             >
             <select
                 class="select w-full rounded-full"
-                name="task"
-                bind:value={$form.task}
+                name="appointmentTime"
+                bind:value={$form.appointmentTime}
             >
                 <option disabled selected>Choisir une catégorie</option>
-                <!-- <option value=""></option> -->
+                {#each availableTimeSlots as timeSlot}
+                    <option value={timeSlot}>{timeSlot}</option>
+                {/each}
             </select>
-            {#if $errors.task}
-                <span class="invalid">{$errors.task}</span>
+            {#if $errors.appointmentTime}
+                <span class="invalid">{$errors.appointmentTime}</span>
             {/if}
         </div>
 

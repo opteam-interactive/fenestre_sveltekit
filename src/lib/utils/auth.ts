@@ -1,52 +1,43 @@
-import jwt, { JwtPayload } from "jsonwebtoken";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import { WebdevUser } from "./types";
+import { jwtVerify } from "jose";
+import { fail, redirect } from '@sveltejs/kit';
+import { JWT_SECRET } from '$env/static/private';
+import type { Cookies } from "@sveltejs/kit";
 
+import type { WebdevUser } from "$lib/utils/types";
 
-export async function getToken() {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("auth_token")?.value;
-    return token;
+const secretKey = new TextEncoder().encode(JWT_SECRET); // Convert secret to Uint8Array
+
+export async function getToken(cookies: Cookies) {
+    return cookies.get("auth_token") || null;
+
 }
 
-export async function getUserData() {
-    const JWT_SECRET = process.env.JWT_SECRET || "your_super_secret_key";
-
-    const logStatus: boolean = await isLoggedIn();
-    if (!logStatus) {
+export async function getUserData(cookies: Cookies): Promise<WebdevUser | null> {
+    if (!(await isLoggedIn())) {
         return null;
     }
 
-    const token = await getToken();
-    if (!token) {
-        return null;
-    }
+    const token = await getToken(cookies);
+    if (!token) return null;
+
     try {
-        const decodedToken = jwt.verify(token, JWT_SECRET);
-        const user = decodedToken as WebdevUser;
-
-        return user;
+        const { payload } = await jwtVerify(token, secretKey);
+        return payload as WebdevUser; // Cast payload to your user type
     } catch (error) {
+        console.error("JWT verification failed:", error);
         return null;
     }
 }
 
 export async function getUserOrRedirect() {
-    const jwtPayload = await getUserData();
-    if (!jwtPayload) {
-        return redirect("/");
+    const user = await getUserData();
+    if (!user) {
+        redirect("/"); // Next.js `redirect()` auto-throws
     }
-    console.log(jwtPayload);
-    return jwtPayload
+    console.log(user);
+    return user;
 }
-export async function isLoggedIn() {
 
-    const token = await getToken();
-
-    if (token) {
-        return true;
-    }
-
-    return false;
+export async function isLoggedIn(): Promise<boolean> {
+    return !!(await getToken()); // Check if token exists
 }

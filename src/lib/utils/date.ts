@@ -1,5 +1,5 @@
-
-
+import {format} from "date-fns"
+import type { WebdevRendezVous } from "./types";
 interface APIErreur {
     erreur: string;
 }
@@ -105,3 +105,34 @@ export function getCalendarEndBound() {
     return date
 }
 
+export async function fetchRdvForDate(allTimeSlots: string[], selectedDate: Date) {
+
+
+    try {
+        const formattedDate = format(
+            selectedDate,
+            "yyyy-MM-dd"
+        );
+
+        //Get all rdvs for the selected date
+        const response = await fetch(`/api/rdv?date=${formattedDate}`);
+        const data: WebdevRendezVous[] | APIErreur | [] = await response.json();
+
+
+        //Extract rdv times
+        if ('erreur' in data) {
+            return allTimeSlots
+          }
+        const formattedData = data.map((rdv) => {
+            const rdvTime = format(rdv.DateRécept, "HH:mm");
+            return rdvTime
+        })
+        //Remove rdv times from availableTimeSlots
+        const availableTimeSlots = allTimeSlots.filter((timeSlot) => !formattedData.includes(timeSlot))
+
+
+        return availableTimeSlots
+    } catch (error) {
+        console.error("Error fetching RDVs:", error);
+    }
+}

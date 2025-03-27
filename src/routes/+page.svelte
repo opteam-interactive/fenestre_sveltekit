@@ -22,9 +22,9 @@
             <LoginForm formProps={data.form} />
 
         </div>
-        <button class="btn btn-success w-64 mt-4 rounded-full"
+        <a href="/register"  class="btn btn-success w-64 mt-4 rounded-full"
             >Créer un compte
-        </button>
+        </a>
     </section>
 </div>
 

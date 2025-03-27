@@ -20,7 +20,7 @@
 {/if}
 
 <form method="POST" use:enhance class="w-full px-8">
-    <fieldset class="fieldset">
+    <fieldset class="fieldset gap-4">
         <div>
             <label class="fieldset-label" for="userName">Nom d'utilisateur</label>
             <input

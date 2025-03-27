@@ -44,13 +44,26 @@ export const userSchema = z.object({
     message: 'Mot de passe ou confirmation incorrect',
   })
 
+  const motifSchema = z.object({
+
+      IDMotifRDV:z.number(),
+      Cat: z.string(),
+      Motif: z.string(),
+      TempsEstimé: z.string(),
+      MemoDesConditions: z.string(),
+      CaseLibre: z.string(),
+      DemandeChiffrageON: z.boolean(),
+      NomActivité: z.enum(['AtelierP','CarrosserieP']) ,
+      NbRDVParJour: z.number()
+
+  })
 export const rdvSchema = z.object({
   brand: z.string().min(2).max(20),
   model: z.string().min(2).max(20),
   plateNumber: z.string().min(2).max(20),
-  task: z.string().min(1).max(50),
+  task: z.number(),
   //see about type for date and time
-  appointmentDate: z.date(),
+  appointmentDate: z.date().default(new Date()),
   appointmentTime: z.string(),
   rdvCategory: z.enum(["AtelierP", "CarrosserieP"]).nullable().default("AtelierP"),
   rental: z.boolean(),
