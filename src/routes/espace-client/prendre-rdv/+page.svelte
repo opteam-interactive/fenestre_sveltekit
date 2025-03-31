@@ -1,6 +1,6 @@
 <script lang="ts">
 import FormWrapper from "$lib/components/FormWrapper.svelte";
-import RdvForm from "$lib/components/forms/RdvForm.svelte";
+import RdvForm from "./RdvForm.svelte";
 
 let { data } = $props();
 

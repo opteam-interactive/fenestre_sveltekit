@@ -1,6 +1,6 @@
 <script lang="ts">
     import logo from "$lib/assets/images/logo_peugeot.png";
-    import LoginForm from "$lib/components/forms/LoginForm.svelte";
+    import LoginForm from "./LoginForm.svelte";
 
     let { data } = $props();
 </script>

@@ -1,7 +1,7 @@
 <script lang="ts">
-    const logout = () => {
-        
-    }
+    	import { enhance } from '$app/forms';
+
+   
 </script>
 
 <div>
@@ -44,7 +44,11 @@
             </ul>
         </div>
         <div class="navbar-end">
-            <button onclick={logout} class="btn rounded-full">Deconnexion</button>
+            <!-- Call the "logout method of the espace-client page" -->
+            <form action="/espace-client?/logout" method="POST" use:enhance>
+                <button type="submit" class="btn rounded-full">Deconnexion</button>
+            </form>
+            
         </div>
     </div>
 </div>

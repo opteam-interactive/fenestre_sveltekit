@@ -1,6 +1,6 @@
 <script lang="ts">
 import FormWrapper from "$lib/components/FormWrapper.svelte";
-import RegisterForm from "$lib/components/forms/RegisterForm.svelte";
+import RegisterForm from "./RegisterForm.svelte";
 
 let { data } = $props();
 

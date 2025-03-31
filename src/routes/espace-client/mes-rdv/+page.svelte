@@ -1,4 +1,9 @@
 <script lang="ts">
+    import { format } from "date-fns";
+    
+    let {data } = $props();
+    let userRdvs = data.userRdvs as WebdevRendezVous[];
+    
 </script>
 
 <div>
@@ -50,8 +55,6 @@
                         </h2>
                         <p>{rdv.Travaux.replace("â‚¬", "€")}</p>
                     </div>
-
-                    ))
                 {/each}
             </div>
         {/if}

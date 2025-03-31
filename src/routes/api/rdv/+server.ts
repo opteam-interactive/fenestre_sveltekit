@@ -1,11 +1,11 @@
-import type { WebdevRendezVous } from "$lib/utils/types";
+import type { WebdevRendezVous } from "$lib/types/types";
 import { fetchToApi, encodeBase64 } from "$lib/utils/utils"; // Your existing fetch function
 import type { RequestHandler } from '@sveltejs/kit';
 
 interface Erreur {
     erreur: string;
 }
-export  const GET: RequestHandler = async ({url}) => {
+export const GET: RequestHandler = async ({ url }) => {
 
     const date = String(url.searchParams.get('date') ?? '');
     if (!date) {
@@ -24,15 +24,15 @@ export  const GET: RequestHandler = async ({url}) => {
         // Fetch RDVs only for the selected date
         const SQL = `SELECT RendezVous.IDRendezVous, RendezVous.DateRécept, RendezVous.DateRestit, RendezVous.IDMotifRDV, RendezVous.Etat FROM RendezVous WHERE  ( RendezVous.DateRécept >= '${startDate}' AND RendezVous.DateRécept <= '${endDate}' )`;
         const encodedSQL = encodeBase64(SQL);
-       
+
         const response = await fetchToApi(encodedSQL);
-       
+
         if (!response.success) {
             return Response.json({ error: response.error }, { status: 500 });
         }
 
-        let responseData: WebdevRendezVous[] | Erreur  = response.data
-    
+        let responseData: WebdevRendezVous[] | Erreur = response.data
+
         return Response.json(responseData, { status: 200 });
     } catch (error) {
         console.error("Error fetching RDVs:", error);

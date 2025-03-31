@@ -1,5 +1,5 @@
-import {format} from "date-fns"
-import type { WebdevRendezVous } from "./types";
+import { format } from "date-fns"
+import type { WebdevRendezVous } from "../types/types";
 interface APIErreur {
     erreur: string;
 }
@@ -122,7 +122,7 @@ export async function fetchRdvForDate(allTimeSlots: string[], selectedDate: Date
         //Extract rdv times
         if ('erreur' in data) {
             return allTimeSlots
-          }
+        }
         const formattedData = data.map((rdv) => {
             const rdvTime = format(rdv.DateRécept, "HH:mm");
             return rdvTime

@@ -1,8 +1,10 @@
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { userSchema } from '$lib/utils/zod';
+import { userSchema } from '$lib/types/zod';
 import { type Infer, message } from 'sveltekit-superforms';
 import { fail } from '@sveltejs/kit';
+import { register } from '$lib/server/auth';
+import { redirect } from '@sveltejs/kit';
 type Message = { status: 'error' | 'success' | 'warning'; text: string };
 
 
@@ -14,27 +16,36 @@ export const load = async () => {
 
 //POST_ACTION
 export const actions = {
-    default: async ({ request }) => {
+    register: async ({ request }) => {
+        console.log("register")
+        //Validate on the client
         const form = await superValidate(request, zod(userSchema));
-        console.log(form);
+
 
         if (!form.valid) {
-            // Return { form } and things will just work.
-            // return message(form, {
-            //     status: 'error',
-            //     text: 'La création de compte a échoué'
-            // });
             return fail(400, { form });
-
-
         }
 
-        // TODO: Do something with the validated form.data
+
+        try {
+            const response = await register(form.data)
+
+            if (!response.success) {
+                return message(form, {
+                    status: "error",
+                    text: response.error // Show the appropriate error message
+                });
+            }
+        } catch (error) {
+            console.error("Unexpected error:", error);
+            return message(form, {
+                status: "error",
+                text: "Une erreur est survenue. Veuillez réessayer."
+            });
+        }
 
         // Return the form with a status message
-        return message(form, {
-            status: 'success',
-            text: 'Création de compte réussie ! '
-        });
+        redirect(303, "/espace-client");
+
     }
 };

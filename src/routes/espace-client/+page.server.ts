@@ -1,58 +1,28 @@
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { userSchema } from '$lib/utils/zod';
-import { type Infer, message } from 'sveltekit-superforms';
-import { getUser } from '$lib/utils/auth.js';
-import type { User } from '$lib/utils/types.js';
+import { userSchema } from '$lib/types/zod';
+import { redirect } from '@sveltejs/kit';
+import { checkAuth } from '$lib/server/jwt.js';
+import { webDevUserToUser } from '$lib/utils/convertTypes';
+import type { WebdevUser, User } from '$lib/types/types';
 
-
-type Message = { status: 'error' | 'success' | 'warning'; text: string };
 
 // Initialize superforms
-export async function load({ cookies, parent}) {
-    
-    const webDevUser = await getUser(cookies)
+export async function load({ cookies, parent, request }) {
+    const { user } = await checkAuth(cookies) ;
 
-    const user: User = {
-        id: webDevUser ? webDevUser?.IDUtilisateur : 0,
-        password : "",
-        passwordConfirm : "" ,
-        category :webDevUser?.Société === "" ? "particulier" : "societe",
-        email: webDevUser ? webDevUser?.Email : "" ,
-        societe: webDevUser ? webDevUser?.Société :"",
-        lastName: webDevUser ? webDevUser?.Nom :"",
-        firstName: webDevUser ? webDevUser?.Prénom :"",
-        telephone:webDevUser ?  webDevUser?.Téléphone :"",
-        address: webDevUser ? webDevUser?.Adresse:"", 
-        zipcode: webDevUser ? webDevUser?.cp : "",
-        city: webDevUser ? webDevUser?.Ville : "",
-    }
+    const webdevUser: User = webDevUserToUser(user) ;
 
     //Initiate form
-    const form = await superValidate<Infer<typeof userSchema>, Message>(user, zod(userSchema));
-    return { form, user };
+    const form = await superValidate(webdevUser, zod(userSchema));
+    return { form: webdevUser ? webdevUser : form };
 };
 
 //POST_ACTION
 export const actions = {
-    default: async ({ request }) => {
-        const form = await superValidate(request, zod(userSchema));
 
-        if (!form.valid) {
-            // Return { form } and things will just work.
-            return message(form, {
-                status: 'error',
-                text: 'La création de compte a echoué'
-            });
-
-        }
-
-        // TODO: Do something with the validated form.data
-
-        // Return the form with a status message
-        return message(form, {
-            status: 'success',
-            text: 'Création de compte reussie !'
-        });
+    logout: async ({ cookies }) => {
+        cookies.delete('auth_token', { path: '/' });
+        throw redirect(303, '/');
     }
 };

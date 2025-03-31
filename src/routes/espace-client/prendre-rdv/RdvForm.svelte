@@ -2,7 +2,7 @@
     import { superForm } from "sveltekit-superforms";
     import SuperDebug from "sveltekit-superforms";
     import type { Motif, RendezVous, WebdevRendezVous } from "$lib/utils/types";
-    import Pikaday from "../Pikaday.svelte";
+    import Pikaday from "../../../lib/components/Pikaday.svelte";
     import { generateTimeSlots } from "$lib/utils/date";
     import { format } from "date-fns";
     import { fetchRdvForDate } from "$lib/utils/date";
