@@ -39,7 +39,7 @@ export async function login(userName: string, password: string, cookies: Cookies
             .sign(secretKey); // Sign with key
 
         // 🔹 Set JWT token in cookie
-        invalidateAll();
+        
         cookies.set("auth_token", token, {
             path: "/",
             httpOnly: true,

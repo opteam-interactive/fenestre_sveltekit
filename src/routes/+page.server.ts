@@ -19,23 +19,27 @@ export const load = async () => {
 
 //POST_ACTION
 export const actions = {
+
     default: async ({ request, cookies }) => {
+       
         const form = await superValidate(request, zod(loginSchema));
 
         if (!form.valid) {
             return fail(400, { form });
         }
-
+       
         try {
             loginSchema.safeParse(form.data)
             const response = await login(form.data.userName, form.data.password, cookies)
+
+           
             if (!response.success) {
                 return message(form, {
                     status: "error",
                     text: response.error // Show the appropriate error message
                 });
             }
-
+           
             // If you ever need to return instead of redirect
             // return message(form, {
             //     status: "success",
@@ -49,7 +53,7 @@ export const actions = {
                 text: "Une erreur est survenue. Veuillez réessayer."
             });
         }
-
+       
         // If all successful, redirect
         redirect(303, "/espace-client");
 

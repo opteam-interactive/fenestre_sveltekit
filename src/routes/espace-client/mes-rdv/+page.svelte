@@ -19,7 +19,6 @@
             <div class="grid md:grid-cols-2 lg:grid-cols-4">
                 {#each userRdvs as rdv}
                     <div
-                        key={rdv.IDRendezVous}
                         class="flex flex-col gap-4 p-12 rounded-md shadow m-8 bg-white border hover:-translate-0.5 transition"
                     >
                         <h2>

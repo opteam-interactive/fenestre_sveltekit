@@ -1,19 +1,22 @@
 import nodemailer from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
+import { EMAIL_HOST, EMAIL_PORT, EMAIL_USER, EMAIL_PASSWORD } from '$env/static/private';
 
-export async function POST(request: Request) {
+
+
+export async function sendEmail(request: Request) {
     //Get info from request
     const { email, name, message } = await request.json();
 
     // create transporter
     const transporter = nodemailer.createTransport({
-        host: 'smtp.ethereal.email',
-        port: 587,
+        host: EMAIL_HOST,
+        port: EMAIL_PORT,
         auth: {
-            user: 'theo.harber@ethereal.email',
-            pass: 'mqj4PTQxh68sGaQwb1'
+            user: EMAIL_USER,
+            pass: EMAIL_PASSWORD
         }
-    });
+    } as nodemailer.TransportOptions);
 
     //set up mail options
     const mailOptions: Mail.Options = {
@@ -30,6 +33,6 @@ export async function POST(request: Request) {
         return Response.json({ message: 'Email sent' });
     } catch (error) {
         console.error('Error sending email:', error);
-        return Response.json({ error: error.message }, { status: 500 });
+        return Response.json({ error: 'Failed to send email' }, { status: 500 });
     }
 }
