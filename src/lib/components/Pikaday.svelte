@@ -36,6 +36,7 @@
                     console.log("UTC Midnight:", utcMidnight.toISOString()); // Log ISO string
                     value = format(utcMidnight, "yyyy-MM-dd");
                     console.log("Stored Date (yyyy-MM-dd):", value);
+                    localValue = format(utcMidnight, "dd/MM/yyyy");
                 },
                 firstDay: 1,
                 disableDayFn: (date: Date) => {

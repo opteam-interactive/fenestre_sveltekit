@@ -52,21 +52,15 @@ export const actions = {
 
             // Get DateRecept in UTC time
             const formattedDateRecept = convertUtfToLocale(form.data.appointmentDate, form.data.appointmentTime)
-            console.log("formattedDateRecept", formattedDateRecept)
 
             // Set DateRestit to 18:00:00.000
             const formattedDateRestit = convertUtfToLocale(form.data.appointmentDate, "18:00")
-            console.log("formattedDateRestit", formattedDateRestit)
-          
-
 
             // Format Travaux description
             const formattedTravaux = `${selectedMotif?.Motif} - PRET VEHICULE = ${form.data.rental ? "OUI" : "NON"
                 } - CHIFFRAGE = ${form.data.chiffrage ? "OUI" : "NON"} - TYPE DE VEHICULE SOUHAITE = ${form.data.rentalCategory ?? "SANS OBJET"
                 } - TYPE DE TRANSMISSION SOUHAITEE = ${form.data.rentalDrive ?? "SANS OBJET"
                 } - SANS CONTACT = ${form.data.contactless === "true" ? "OUI" : "NON"}`;
-
-
 
 
             // Build RDV Object
@@ -105,7 +99,6 @@ export const actions = {
                 Blacklistage: ""
 
             };
-            console.log(rdv);
 
             // Validate Data with ZOD
             rdvWebdevSchema.parse(rdv);
@@ -151,11 +144,9 @@ export const actions = {
     ${rdv.Blacklistage === "" ? "NULL" : `'${rdv.Blacklistage}'`}
 );
 `;
-            console.log(SQL)
 
 
             const encodedSQL = encodeBase64(SQL);
-            console.log(encodedSQL)
 
             const apiResponse = await fetchToApi(encodedSQL);
             console.log(apiResponse)
@@ -179,8 +170,6 @@ export const actions = {
             })
 
         }
-
-        // Return the form with a status message
 
     }
 };

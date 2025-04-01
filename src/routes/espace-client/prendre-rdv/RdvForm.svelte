@@ -7,7 +7,9 @@
     import { format } from "date-fns";
     import { fetchRdvForDate } from "$lib/utils/date";
     import { slide } from "svelte/transition";
+    import ModalRdv from "$lib/components/ModalRdv.svelte";
 
+    let isModalVisible = $state(false);
     const allTimeSlots: string[] = generateTimeSlots(8, 10, 15);
 
     const { formProps, motifs }: { formProps: any; motifs: Motif[] } = $props();
@@ -319,9 +321,17 @@
             {/if}
         </div>
 
-        <button class="btn btn-info mt-4 rounded-full"
-            >Voir le résumé et confirmer</button
+
+        <!-- MODAL_DE_VALIDATION -->
+        <button
+            type="button"
+            class="btn btn-info mt-4 rounded-full"
+            onclick={() => (isModalVisible = !isModalVisible)}>Voir le résumé et confirmer</button
         >
+        {#if isModalVisible}
+          <ModalRdv onclick={() => (isModalVisible = !isModalVisible)} form={$form} motifs={motifs}/>
+        {/if}
+
     </fieldset>
 </form>
 

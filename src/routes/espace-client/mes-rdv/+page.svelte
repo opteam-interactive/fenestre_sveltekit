@@ -1,9 +1,8 @@
 <script lang="ts">
     import { format } from "date-fns";
-    
-    let {data } = $props();
+    import type { WebdevRendezVous } from "$lib/types/types";
+    let { data } = $props();
     let userRdvs = data.userRdvs as WebdevRendezVous[];
-    
 </script>
 
 <div>
@@ -25,9 +24,15 @@
                             <span class="font-bold text-customblue"
                                 >Date de dépot:</span
                             >
-                            {format(
-                                new Date(rdv.DateRécept),
-                                "dd/MM/yyyy à HH:mm"
+                            {new Date(rdv.DateRécept).toLocaleDateString(
+                                "fr-FR",
+                                {
+                                    day: "numeric",
+                                    month: "long",
+                                    year: "numeric",
+                                    hour: "numeric",
+                                    minute: "numeric",
+                                }
                             )}
                         </h2>
 
@@ -35,9 +40,15 @@
                             <span class="font-bold text-customblue"
                                 >Date de restitution:</span
                             >
-                            {format(
-                                new Date(rdv.DateRestit),
-                                "dd/MM/yyyy à HH:mm"
+                            {new Date(rdv.DateRestit).toLocaleDateString(
+                                "fr-FR",
+                                {
+                                    day: "numeric",
+                                    month: "long",
+                                    year: "numeric",
+                                    hour: "numeric",
+                                    minute: "numeric",
+                                }
                             )}
                         </h2>
 
