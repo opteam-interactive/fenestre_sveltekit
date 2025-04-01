@@ -1,4 +1,6 @@
 import { format } from "date-fns"
+import { fr } from 'date-fns/locale/fr';
+
 import type { WebdevRendezVous } from "../types/types";
 interface APIErreur {
     erreur: string;
@@ -135,4 +137,18 @@ export async function fetchRdvForDate(allTimeSlots: string[], selectedDate: Date
     } catch (error) {
         console.error("Error fetching RDVs:", error);
     }
+}
+
+export const convertUtfToLocale = (date: Date, time: string) => {
+    // Convert UTC to local date (France)
+    const utcDate = new Date(date);
+
+    // Set the time from form input
+    const [hours, minutes] = time.split(":").map(Number);
+    utcDate.setHours(hours, minutes); // This modifies in local time
+
+    // Format properly for France (Local Time)
+    const formattedDate = format(utcDate, "yyyy-MM-dd'T'HH:mm:ss.SSS", { locale: fr });
+
+    return formattedDate
 }

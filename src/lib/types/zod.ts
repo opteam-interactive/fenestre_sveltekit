@@ -63,7 +63,7 @@ export const rdvSchema = z.object({
   plateNumber: z.string().min(2).max(20),
   task: z.number(),
   //see about type for date and time
-  appointmentDate: z.date().default(new Date()),
+  appointmentDate: z.date(),
   appointmentTime: z.string(),
   rdvCategory: z.enum(["AtelierP", "CarrosserieP"]).nullable().default("AtelierP"),
   rental: z.boolean(),
@@ -77,12 +77,14 @@ export const rdvSchema = z.object({
 export const rdvWebdevSchema = z.object({
   // IDRendezVous: z.number().nullable(),
   NomSite: z.enum(["PEUGEOT"]),
-  DateRécept: z.string().length(17).regex(/^\d+$/, {
-    message: "Invalid format. Use exactly 8 digits (yyyymmdd).",
-  }),
-  DateRestit: z.string().length(17).regex(/^\d+$/, {
-    message: "Invalid format. Use exactly 17 digits (yyyymmddhhmmssccc).",
-  }),
+  DateRécept : z.string(),
+  // DateRécept: z.string().length(17).regex(/^\d+$/, {
+  //   message: "Invalid format. Use exactly 8 digits (yyyymmdd).",
+  // }),
+  DateRestit: z.string(),
+  // DateRestit: z.string().length(17).regex(/^\d+$/, {
+  //   message: "Invalid format. Use exactly 17 digits (yyyymmddhhmmssccc).",
+  // }),
   Client: z.string(),
   Téléphone: z.string(),
   Mobile: z.string(),

@@ -25,9 +25,17 @@
                 disableWeekends: true,
 
                 onSelect: (date) => {
-                    value = picker.getDate();
-                    labelValue = picker.toString(); // Update bound value
-                    localValue = new Date(labelValue).toLocaleDateString("fr");
+                    console.log("Raw Selected Date (Local):", date);
+                    const utcMidnight = new Date(
+                        Date.UTC(
+                            date.getFullYear(),
+                            date.getMonth(),
+                            date.getDate()
+                        )
+                    );
+                    console.log("UTC Midnight:", utcMidnight.toISOString()); // Log ISO string
+                    value = format(utcMidnight, "yyyy-MM-dd");
+                    console.log("Stored Date (yyyy-MM-dd):", value);
                 },
                 firstDay: 1,
                 disableDayFn: (date: Date) => {

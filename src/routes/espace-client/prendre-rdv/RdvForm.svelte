@@ -264,7 +264,6 @@
                 <span class="invalid">{$errors.appointmentDate}</span>
             {/if}
         </div>
-
         <!-- HEURE_DU_RDV -->
         <div>
             <label class="fieldset-label text-info" for="appointmentTime"

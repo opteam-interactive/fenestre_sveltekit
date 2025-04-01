@@ -3,10 +3,8 @@ import Mail from 'nodemailer/lib/mailer';
 import { EMAIL_HOST, EMAIL_PORT, EMAIL_USER, EMAIL_PASSWORD } from '$env/static/private';
 
 
-
-export async function sendEmail(request: Request) {
-    //Get info from request
-    const { email, name, message } = await request.json();
+export async function sendEmail(email: string, name:string, message: string) {
+   
 
     // create transporter
     const transporter = nodemailer.createTransport({
@@ -30,9 +28,9 @@ export async function sendEmail(request: Request) {
     try {
         const info = await transporter.sendMail(mailOptions);
         console.log('Message sent: %s', info.messageId);
-        return Response.json({ message: 'Email sent' });
+        return { success: true, info };
     } catch (error) {
         console.error('Error sending email:', error);
-        return Response.json({ error: 'Failed to send email' }, { status: 500 });
+        return { success: false, error };
     }
 }

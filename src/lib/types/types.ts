@@ -1,4 +1,4 @@
-import { z, rdvSchema, userSchema } from "$lib/utils/zod"
+import { z, rdvSchema, userSchema, rdvWebdevSchema } from "$lib/types/zod"
 
 export type Message = { status: 'error' | 'success' | 'warning'; text: string };
 
@@ -14,40 +14,8 @@ export type Motif = {
     NbRDVParJour: number
 }
 export type RendezVous = z.infer<typeof rdvSchema>
+export type WebdevRendezVous = z.infer<typeof rdvWebdevSchema>
 
-export type WebdevRendezVous = {
-    IDRendezVous: number,
-    NomSite : 'PEUGEOT',
-    DateRécept : string,
-    DateRestit : string,
-    Client: string,
-    Téléphone: string,
-    Mobile: string,
-    ClientEmail: string,
-    ClientAdresse: string,
-    ClientCP: string,
-    ClientVille: string,
-    Marque: string,
-    Modèle: string,
-    Immatriculation: string,
-    Travaux: string,
-    NomActivité: string,
-    NbHeureTx: number,
-    Observations: string,
-    IDVoiturePret: 0,
-    ClientAssurance: string,
-    Cdé: false,
-    DépotSansContact: false,
-    CréateurDateh: string,
-    CréateurID: number,
-    ModifieurDateh: string,
-    ModifieurID: 0,
-    IDMotifRDV: number,
-    IDUtilisateur: number,
-    IDVéhicule: number,
-    SaisieDuClient: string,
-    Etat: 1
-}
 
 export type User = z.infer<typeof userSchema>
 
