@@ -22,18 +22,18 @@ export const loginSchema = z.object({
 })
 
 export const userSchema = z.object({
-  id: z.number().nullable(),
+  id: z.number().optional(),
   email: z.string().email().min(2).max(50).default(""),
-  password: z.string().min(6).max(50).default(""),
-  passwordConfirm: z.string().min(6).max(50).default(""),
+  password: z.string().min(6).max(50).default("").optional().nullable(),
+  passwordConfirm: z.string().min(6).max(50).default("").optional().nullable(),
   category: z.enum(['particulier', 'societe']).default("particulier"),
-  societe: z.string().nullable().default(""),
-  lastName: z.string().min(2).max(50).nullable().default(""),
-  firstName: z.string().min(2).max(50).nullable().default(""),
-  telephone: z.string().regex(new RegExp("^[0-9]*$")).min(6).max(12).nullable().default(""),
-  address: z.string().min(2).max(100).nullable().default(""),
-  zipcode: z.string().min(2).max(10).regex(new RegExp("^[0-9]*$")).nullable().default(""),
-  city: z.string().min(2).max(50).nullable().default(""),
+  societe: z.string().default("").optional().nullable(),
+  lastName: z.string().min(2).max(50).default("").optional().nullable(),
+  firstName: z.string().min(2).max(50).default("").optional().nullable(),
+  telephone: z.string().regex(new RegExp("^[0-9]*$")).min(6).max(12).default("").optional().nullable(),
+  address: z.string().min(2).max(100).default("").optional().nullable(),
+  zipcode: z.string().min(2).max(10).regex(new RegExp("^[0-9]*$")).default("").optional().nullable(),
+  city: z.string().min(2).max(50).default("").optional().nullable(),
 }).refine(data => {
   const valid = data.password === data.passwordConfirm;
   if (!valid) console.log("Password mismatch error triggered!");

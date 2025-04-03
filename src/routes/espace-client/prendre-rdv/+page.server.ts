@@ -10,6 +10,8 @@ import { fetchToApi, encodeBase64 } from '$lib/utils/utils.js';
 import { redirect } from '@sveltejs/kit';
 import type { Motif } from '$lib/types/types';
 import { checkAuth } from '$lib/server/jwt';
+import { sendRdvEmail } from '$lib/utils/emailTemplates.js';
+
 import { fr } from 'date-fns/locale/fr';
 type Message = { status: 'error' | 'success' | 'warning'; text: string };
 
@@ -81,7 +83,7 @@ export const actions = {
                 immatriculation: form.data.plateNumber,
                 Travaux: formattedTravaux,
                 NomActivité: form.data.rdvCategory || "AucunP",
-                NbHeureTx: parseFloat(parseFloat(selectedMotif?.TempsEstimé).toFixed(2)),
+                NbHeureTx: parseFloat(parseFloat(selectedMotif?.TempsEstimé!).toFixed(2)),
                 Observations: "",
                 IDVoiturePret: 0,
                 ClientAssurance: " ",
@@ -145,7 +147,6 @@ export const actions = {
 );
 `;
 
-
             const encodedSQL = encodeBase64(SQL);
 
             const apiResponse = await fetchToApi(encodedSQL);
@@ -157,6 +158,18 @@ export const actions = {
                     { status: apiResponse.status || 500 } // Utilisez le code d'état de l'API ou 500 par défaut
                 );
             }
+
+            //SEND_CONFIRMATION_EMAIL
+            const response = sendRdvEmail(webdevUser, form.data, selectedMotif!);
+
+            if (!response.success) {
+                return message(form, {
+                    status: 'error',
+                    text: response.error
+                });
+            }
+
+            redirect (303, '/espace-client/prendre-rdv');
             return message(form, {
                 status: 'success',
                 text: 'Prise de RDV reussie !'

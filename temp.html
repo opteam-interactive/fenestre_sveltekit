@@ -1,0 +1,33 @@
+<h2>Bonjour</h2>
+<h3>Vous venez de prendre rendez-vous avec le garage Fenestre.</h3>
+<h4>Votre rendez-vous est le {new Date(form.appointmentDate).toLocaleDateString("fr-FR")} - {form.appointmentTime}</h4>
+
+<p>Note : Si vous avez plusieurs travaux à effectuer, merci de nous contacter au 02 35 46 03 70.</p>
+<p>Pensez à prendre votre permis de conduire et votre carte grise</p>
+<p>Voici un résumé de votre rendez-vous :</p>
+
+<ul>
+    <li>Véhicule : {form.brand} - {form.model}</li>
+    <li>Immatriculation : {form.plateNumber}</li>
+    <li>Intervention :  {form.rdvCategory ===
+        "AtelierP"
+            ? "Mécanique"
+            : "Carrosserie"}</li>
+            <li> Travaux : {motifs.find(
+                (motif) =>
+                    motif.IDMotifRDV === form.task
+            )?.Motif || "Non défini"}
+            </li>
+            <li>Devis : {form.chiffrage ? "Oui" : "Non"}</li>
+            <li> Prêt : {form.rental ? "Oui" : "Non"}</li>
+            {}
+            <li>Type de location : {form.rentalCategory === "eco" ? "Eco" : "Standard"}</li>
+            <li> Transmission : {form.rentalDrive === "manual" ? "Manuelle" : "Automatique"}</li>
+            {}
+            <li> Date du RDV : {new Date(form.appointmentDate).toLocaleDateString("fr-FR")} - {form.appointmentTime}</li>
+            <li> Type de dépot :  {form.contactless
+                ? "Sans contact"
+                : "Sur horaires d'ouverture"} </li>
+
+</ul>
+

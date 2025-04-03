@@ -17,7 +17,7 @@
     </h3>
 {/if}
 
-<form action="?/register" method="POST" use:enhance class="w-full px-8">
+<form action="espace-client?/updateUser" method="POST" use:enhance class="w-full px-8">
     <fieldset class="fieldset gap-4">
         <!-- Email -->
         <div>
@@ -36,44 +36,62 @@
             {/if}
         </div>
 
-        <!-- PASSWORD -->
+        <!-- Category -->
         <div class="grid grid-cols-2 gap-8 items-end">
             <div>
-                <label class="fieldset-label text-info" for="password"
-                    >Mot de passe</label
+                <label class="fieldset-label text-info" for="category"
+                    >Vous êtes...</label
                 >
-                <input
-                    type="password"
-                    class="input w-full rounded-full"
-                    placeholder=""
-                    name="password"
-                    bind:value={$form.password}
-                    {...$constraints.password}
-                    aria-invalid={$errors.password ? "true" : undefined}
-                />
-                {#if $errors.password}
-                    <span class="invalid">{$errors.password}</span>
+                <div class="flex flex-col gap-2">
+                    <div>
+                        <input
+                            type="radio"
+                            class="radio radio-sm radio-info"
+                            placeholder="Identifiant"
+                            name="category"
+                            value="particulier"
+                            bind:group={$form.category}
+                        />
+                        <label for="userCategory">Un particulier</label>
+                    </div>
+
+                    <div>
+                        <input
+                            type="radio"
+                            class="radio radio-sm radio-info"
+                            placeholder="Identifiant"
+                            name="category"
+                            value="societe"
+                            bind:group={$form.category}
+                        />
+                        <label for="userCategory">Une entreprise</label>
+                    </div>
+                </div>
+                {#if $errors.category}
+                    <span class="invalid">{$errors.category}</span>
                 {/if}
             </div>
 
             <!-- SOCIETE -->
-            <div>
-                <label class="fieldset-label text-info" for="societe"
-                    >Nom de l'entreprise</label
-                >
-                <input
-                    type="text"
-                    class="input w-full rounded-full"
-                    placeholder="Nom de l'entreprise"
-                    name="societe"
-                    bind:value={$form.societe}
-                    {...$constraints.societe}
-                    aria-invalid={$errors.societe ? "true" : undefined}
-                />
-                {#if $errors.societe}
-                    <span class="invalid">{$errors.societe}</span>
-                {/if}
-            </div>
+            {#if $form.category == "societe"}
+                <div>
+                    <label class="fieldset-label text-info" for="societe"
+                        >Nom de l'entreprise</label
+                    >
+                    <input
+                        type="text"
+                        class="input w-full rounded-full"
+                        placeholder="Nom de l'entreprise"
+                        name="societe"
+                        bind:value={$form.societe}
+                        {...$constraints.societe}
+                        aria-invalid={$errors.societe ? "true" : undefined}
+                    />
+                    {#if $errors.societe}
+                        <span class="invalid">{$errors.societe}</span>
+                    {/if}
+                </div>
+            {/if}
         </div>
         <!-- NOM -->
         <div class="grid grid-cols-2 gap-8 items-end">

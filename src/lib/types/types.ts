@@ -56,3 +56,10 @@ export type WebdevUser = {
 //     other2: string,
 //     other3: string,
 // }
+
+
+export type ServerResponse<T> = {
+    success: boolean;
+    data?: T;
+    error?: string;
+};

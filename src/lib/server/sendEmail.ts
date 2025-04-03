@@ -3,7 +3,7 @@ import Mail from 'nodemailer/lib/mailer';
 import { EMAIL_HOST, EMAIL_PORT, EMAIL_USER, EMAIL_PASSWORD } from '$env/static/private';
 
 
-export async function sendEmail(email: string, name:string, message: string) {
+export async function sendEmail(email: string, name:string, html: string) {
    
 
     // create transporter
@@ -22,7 +22,7 @@ export async function sendEmail(email: string, name:string, message: string) {
         to: 'theo.harber@ethereal.email',
         // cc: email, (uncomment this line if you want to send a copy to the sender)
         subject: `Message from ${name} (${email})`,
-        text: message,
+        html: html,
     };
 
     try {

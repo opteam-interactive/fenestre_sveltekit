@@ -92,7 +92,7 @@
                 <div
                     class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 gap-2"
                 >
-                    <button type="submit" class="btn btn-success" {onclick}
+                    <button type="submit" class="btn btn-success" 
                         >Je valide ce rendez-vous</button
                     >
                     <button type="button" class="btn" {onclick}>Cancel</button>
