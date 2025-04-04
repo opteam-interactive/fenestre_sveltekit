@@ -1,0 +1,6 @@
+- check emails
+- check auth
+- check update
+- handle register more gracefully
+- handle rdv more gracefully
+- 

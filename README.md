@@ -16,3 +16,4 @@
 - $lib/types: types and ZOD objects (for validation) 
 - $lib/utils: reusable utility functions are in 
 - $lib/server : actions that need to be done on the server (auth, data management etc...)
+
