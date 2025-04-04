@@ -2,9 +2,10 @@
     import type { RendezVous, Motif } from "$lib/types/types";
     const {
         onclick,
+        afterSubmit,
         form,
         motifs,
-    }: { onclick: () => void; form: RendezVous; motifs: Motif[] } = $props();
+    }: { onclick: () => void; afterSubmit: () => void; form: RendezVous; motifs: Motif[] } = $props();
 </script>
 
 <div
@@ -92,7 +93,7 @@
                 <div
                     class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 gap-2"
                 >
-                    <button type="submit" class="btn btn-success" 
+                    <button type="submit" class="btn btn-success" onclick={afterSubmit}
                         >Je valide ce rendez-vous</button
                     >
                     <button type="button" class="btn" {onclick}>Cancel</button>

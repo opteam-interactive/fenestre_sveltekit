@@ -1,4 +1,4 @@
-import { z, rdvSchema, userSchema, rdvWebdevSchema } from "$lib/types/zod"
+import { z, rdvSchema, userSchema, rdvWebdevSchema, registerSchema } from "$lib/types/zod"
 
 export type Message = { status: 'error' | 'success' | 'warning'; text: string };
 
@@ -18,6 +18,7 @@ export type WebdevRendezVous = z.infer<typeof rdvWebdevSchema>
 
 
 export type User = z.infer<typeof userSchema>
+export type RegisterUser = z.infer<typeof registerSchema>
 
 
 export type WebdevUser = {
@@ -58,8 +59,13 @@ export type WebdevUser = {
 // }
 
 
-export type ServerResponse<T> = {
+export type ResponseWithData<T> = {
     success: boolean;
     data?: T;
+    error?: string;
+};
+
+export type ResponseNoData = {
+    success: boolean;
     error?: string;
 };

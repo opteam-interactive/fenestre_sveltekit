@@ -4,12 +4,13 @@ import { userSchema } from '$lib/types/zod';
 import { redirect } from '@sveltejs/kit';
 import { checkAuth } from '$lib/server/jwt.js';
 import { webDevUserToUser } from '$lib/utils/convertTypes';
-import type { WebdevUser, User, ServerResponse } from '$lib/types/types';
+import type { WebdevUser, User, ResponseWithData } from '$lib/types/types';
 import { register } from '$lib/server/auth';
 import { message } from 'sveltekit-superforms';
 import { fail } from '@sveltejs/kit';
 import { updateUser } from '$lib/server/user'
 import { error } from '@sveltejs/kit';
+import { invalidateAll } from '$app/navigation';
 
 // Initialize superforms
 export async function load({ cookies, parent, request }) {
@@ -25,11 +26,13 @@ export async function load({ cookies, parent, request }) {
 //POST_ACTION
 export const actions = {
 
+    //LOGOUT_ACTION
     logout: async ({ cookies }) => {
         cookies.delete('auth_token', { path: '/' });
         throw redirect(303, '/');
     },
 
+    //UPDATE_ACTION
     updateUser: async ({ request, cookies }) => {
        
         const form = await superValidate(request, zod(userSchema));
@@ -39,11 +42,9 @@ export const actions = {
             return fail(400, { form  });
         }
 
-
         try {
-            const response: ServerResponse<WebdevUser> = await updateUser(cookies, form.data)
+            const response: ResponseWithData<WebdevUser> = await updateUser(cookies, form.data)
             console.log("response", response)
-
             if (!response.success) {
                 throw error(400, response.error);
             }
@@ -56,7 +57,10 @@ export const actions = {
         }
         console.log("success !")
         // Return the form with a status message
-        redirect(303, "/espace-client");
+        return message(form, {
+            status: "success",
+            text: "Mise à jour effectuée !"
+        });
 
     }
 };

@@ -54,27 +54,3 @@ export async function login(userName: string, password: string, cookies: Cookies
         return { success: false, error: "An unexpected error occurred" };
     }
 }
-
-export async function register(formData: User) {
-    try {
-        //Set the role as user (default)
-        const defaultRole = 2
-
-        const SQL = `INSERT INTO UTILISATEUR (Utilisateur, MotDePasse, Nom, Prénom, Société, Adresse, Ville, cp, Téléphone, Email, Droits, Autre1, Autre2, Autre3) VALUES ('${formData.email || ''}','${formData.password || ''}', '${formData.lastName || ''}', '${formData.firstName || ''}','${formData.company || ''}', '${formData.address || ''}', '${formData.city || ''}', '${formData.zipcode || ''}', '${formData.phone || ''}', '${formData.email || ''}', '${defaultRole || ''}', '${formData.other1 || ''}', '${formData.other2 || ''}', '${formData.other3 || ''}')`;
-
-        const encodedSQL = encodeBase64(SQL);
-
-        // Fetch data from API
-        const userResponse = await fetchToApi(encodedSQL);
-
-        if (!userResponse.success) {
-            return { success: false, error: "API request failed" };
-        }
-
-        return { success: true, user: userResponse.data };
-
-    } catch (error) {
-        console.error("Error in register route:", error);
-        return { success: false, error: "Registration failed" };
-    }
-}

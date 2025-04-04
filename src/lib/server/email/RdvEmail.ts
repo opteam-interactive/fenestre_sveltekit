@@ -1,4 +1,4 @@
-import { sendEmail } from "$lib/server/sendEmail";
+import { sendEmail } from "$lib/server/email/sendEmail";
 import type { RendezVous, WebdevUser, Motif } from "$lib/types/types";
 
 export function sendRdvEmail(user: WebdevUser, rdv: RendezVous, motif: Motif) {

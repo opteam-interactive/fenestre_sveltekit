@@ -1,12 +1,13 @@
 <script lang="ts">
     import { superForm } from "sveltekit-superforms";
     import SuperDebug from "sveltekit-superforms";
-    import type { User, WebdevUser } from "$lib/types/types";
-	import { page } from '$app/state';
+    import { page } from "$app/state";
 
-    const { form, errors, constraints, message, enhance } =
-        superForm<User>(page.data.form);
+    import type { RegisterUser, WebdevUser } from "$lib/types/types";
 
+    const { form, errors, constraints, message, enhance } = superForm<RegisterUser>(
+        page.data.form
+    );
 </script>
 
 {#if $message}
@@ -17,7 +18,7 @@
     </h3>
 {/if}
 
-<form action="?/register" method="POST" use:enhance class="w-full px-8" >
+<form action="?/register" method="POST" class="w-full px-8">
     <fieldset class="fieldset gap-4">
         <!-- Email -->
         <div>

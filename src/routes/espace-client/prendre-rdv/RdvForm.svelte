@@ -1,7 +1,7 @@
 <script lang="ts">
     import { superForm } from "sveltekit-superforms";
     import SuperDebug from "sveltekit-superforms";
-    import type { Motif, RendezVous, WebdevRendezVous } from "$lib/utils/types";
+    import type { Motif, RendezVous } from "$lib/types/types";
     import Pikaday from "../../../lib/components/Pikaday.svelte";
     import { generateTimeSlots } from "$lib/utils/date";
     import { format } from "date-fns";
@@ -16,6 +16,12 @@
     const { form, errors, constraints, message, enhance } =
         superForm<RendezVous>(formProps);
     let availableTimeSlots = $state(allTimeSlots);
+    const afterSubmit = () => {
+        setTimeout(() => {
+            isModalVisible=false;
+        }, 500);
+        alert("Rendez-vous réservé avec succès");
+    }
 
     $effect(() => {
         //On Mount and when date is modified, fetch available time slots
@@ -32,6 +38,8 @@
         };
         fetchAvailableTimeSlots();
     });
+
+ 
 </script>
 
 {#if $message}
@@ -329,7 +337,7 @@
             onclick={() => (isModalVisible = !isModalVisible)}>Voir le résumé et confirmer</button
         >
         {#if isModalVisible}
-          <ModalRdv onclick={() => (isModalVisible = !isModalVisible)} form={$form} motifs={motifs}/>
+          <ModalRdv onclick={() => (isModalVisible = !isModalVisible)} form={$form} motifs={motifs} afterSubmit={afterSubmit}/>
         {/if}
 
     </fieldset>
