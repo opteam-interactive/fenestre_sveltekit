@@ -6,7 +6,7 @@
 </script>
 
 <div>
-    <section class="flex flex-col items-center gap-4 p-12">
+    <section class="flex flex-col items-center gap-4 md-p-12">
         <h1 class="mb-2 uppercase font-terminaBold text-customblue">
             Vos Rendez-vous
         </h1>

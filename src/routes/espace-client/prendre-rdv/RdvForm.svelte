@@ -52,9 +52,9 @@
     </h3>
 {/if}
 
-<form method="POST" use:enhance class="w-full px-8">
+<form method="POST" use:enhance class="w-full md-px-8">
     <fieldset class="fieldset gap-8">
-        <div class="grid grid-cols-2 gap-8 items-end">
+        <div class="grid md-grid-cols-2 gap-4 md-gap-8 items-end">
             <!-- MARQUE -->
             <div>
                 <label class="fieldset-label text-info" for="brand"
@@ -94,7 +94,7 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-8 items-end">
+        <div class="grid md-grid-cols-2 gap-4 md-gap-8 items-end">
             <!-- IMMATRICULATION -->
             <div>
                 <label class="fieldset-label text-info" for="plateNumber"
@@ -346,5 +346,5 @@
 
     </fieldset>
 </form>
-
-<SuperDebug data={$form} />
+<!-- 
+<SuperDebug data={$form} /> -->

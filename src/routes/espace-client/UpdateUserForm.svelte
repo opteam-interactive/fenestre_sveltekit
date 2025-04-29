@@ -23,7 +23,7 @@
     action="espace-client?/updateUser"
     method="POST"
     use:enhance
-    class="w-full px-8"
+    class="w-full md-px-8"
 >
     <fieldset class="fieldset gap-4">
         <!-- Email -->
@@ -44,7 +44,7 @@
         </div>
 
         <!-- Category -->
-        <div class="grid grid-cols-2 gap-8 items-end">
+        <div class="grid md-grid-cols-2 gap-4 md-gap-8 items-end">
             <div>
                 <label class="fieldset-label text-info" for="category"
                     >Vous êtes...</label
@@ -101,7 +101,7 @@
             {/if}
         </div>
         <!-- NOM -->
-        <div class="grid grid-cols-2 gap-8 items-end">
+        <div class="grid md-grid-cols-2 gap-4 md-gap-8 items-end">
             <div>
                 <label class="fieldset-label text-info" for="lastName"
                     >Nom</label
@@ -177,7 +177,7 @@
             {/if}
         </div>
 
-        <div class="grid grid-cols-2 gap-8 items-end">
+        <div class="grid md-grid-cols-2 gap-4 md-gap-8 items-end">
             <!-- CODE_POSTAL -->
             <div>
                 <label class="fieldset-label text-info" for="zipcode"
