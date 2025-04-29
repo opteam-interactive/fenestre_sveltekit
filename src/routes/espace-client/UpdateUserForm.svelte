@@ -3,6 +3,8 @@
     import SuperDebug from "sveltekit-superforms";
     import type { User, WebdevUser } from "$lib/types/types";
     import { page } from "$app/state";
+    import { invalidate, invalidateAll } from "$app/navigation";
+    import { applyAction } from "$app/forms";
 
     const { form, errors, constraints, message, enhance } = superForm<User>(
         page.data.form
@@ -17,7 +19,12 @@
     </h3>
 {/if}
 
-<form action="espace-client?/updateUser" method="POST" use:enhance class="w-full px-8">
+<form
+    action="espace-client?/updateUser"
+    method="POST"
+    use:enhance
+    class="w-full px-8"
+>
     <fieldset class="fieldset gap-4">
         <!-- Email -->
         <div>
@@ -208,10 +215,13 @@
             </div>
         </div>
 
-        <button class="btn btn-info mt-4 rounded-full">Créer mon compte</button>
+        <button class="btn btn-info mt-4 rounded-full"
+            >Mettre à jour mon compte</button
+        >
     </fieldset>
 </form>
-<SuperDebug data={$form} />
+
+<!-- <SuperDebug data={$form} /> -->
 
 <style>
 </style>

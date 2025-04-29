@@ -55,5 +55,5 @@
 
         <button class="btn btn-info mt-4 rounded-full">Login</button>
     </fieldset>
-    <SuperDebug data={$form} />
+    <!-- <SuperDebug data={$form} /> -->
 </form>

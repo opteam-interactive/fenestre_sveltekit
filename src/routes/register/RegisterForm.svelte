@@ -253,7 +253,7 @@
         <button class="btn btn-info mt-4 rounded-full">Créer mon compte</button>
     </fieldset>
 </form>
-<SuperDebug data={$form} />
+<!-- <SuperDebug data={$form} /> -->
 
 <style>
 </style>

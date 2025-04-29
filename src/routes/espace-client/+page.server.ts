@@ -23,7 +23,7 @@ export async function load({ cookies, parent, request }) {
     return { form: webdevUser ? webdevUser : form };
 };
 
-//POST_ACTION
+//POST_ACTIONS
 export const actions = {
 
     //LOGOUT_ACTION
@@ -56,6 +56,7 @@ export const actions = {
             });
         }
         console.log("success !")
+        
         // Return the form with a status message
         return message(form, {
             status: "success",

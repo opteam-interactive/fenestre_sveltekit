@@ -8,6 +8,7 @@
     import { fetchRdvForDate } from "$lib/utils/date";
     import { slide } from "svelte/transition";
     import ModalRdv from "$lib/components/ModalRdv.svelte";
+    import { goto } from "$app/navigation";
 
     let isModalVisible = $state(false);
     const allTimeSlots: string[] = generateTimeSlots(8, 10, 15);
@@ -20,7 +21,8 @@
         setTimeout(() => {
             isModalVisible=false;
         }, 500);
-        alert("Rendez-vous réservé avec succès");
+        goto("#top");
+        // alert("Rendez-vous réservé avec succès");
     }
 
     $effect(() => {
@@ -274,6 +276,8 @@
                 <span class="invalid">{$errors.appointmentDate}</span>
             {/if}
         </div>
+
+        
         <!-- HEURE_DU_RDV -->
         <div>
             <label class="fieldset-label text-info" for="appointmentTime"

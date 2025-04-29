@@ -98,5 +98,7 @@
     value={localValue}
     aria-invalid={ariaInvalid}
 />
+<input type="hidden" {name} value={value} />
+
 
 <!--     {...$constraints.plateNumber} -->

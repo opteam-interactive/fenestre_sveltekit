@@ -28,9 +28,9 @@
                     tabindex="-1"
                     class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
                 >
-                    <li><a>Mon compte</a></li>
-                    <li><a>Prendre RDV</a></li>
-                    <li><a>Mes RDV</a></li>
+                    <li><a href="/espace-client">Mon compte</a></li>
+                    <li><a href="/espace-client/prendre-rdv">Prendre RDV</a></li>
+                    <li><a href="/espace-client/mes-rdv">Mes RDV</a></li>
                 </ul>
             </div>
             <a href="/" class="btn btn-ghost text-xl">Garage Fenestre</a>

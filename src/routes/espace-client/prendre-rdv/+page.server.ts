@@ -35,10 +35,11 @@ export const actions = {
 
 
         if (!form.valid) {
+            console.log(form.errors)
             // Return { form } and things will just work.
             return message(form, {
                 status: 'error',
-                text: 'La prise de RDV a échoué'
+                text: 'Formulaire invalide'
             });
         }
 
@@ -53,7 +54,7 @@ export const actions = {
         if (!response.success) {
             return message(form, {
                 status: 'error',
-                text: 'La prise de RDV a échoué'
+                text: 'La création de RDV a échoué'
             });
         }
         return message(form, {
