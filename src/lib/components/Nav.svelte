@@ -51,7 +51,7 @@
         <div class="navbar-end">
             <!-- Call the "logout method of the espace-client page" -->
             <form action="/espace-client?/logout" method="POST" use:enhance>
-                <button type="submit" class="btn rounded-full p-2 text-xs"
+                <button type="submit" class="btn btn-error  text-white rounded-md p-2 text-xs"
                     >Deconnexion</button
                 >
             </form>
