@@ -19,3 +19,4 @@ export const load: LayoutServerLoad = async ({ cookies, url }) => {
 
     return { user };
 }
+

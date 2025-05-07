@@ -9,7 +9,12 @@
     import { slide } from "svelte/transition";
     import ModalRdv from "$lib/components/ModalRdv.svelte";
     import { goto } from "$app/navigation";
-
+    import InputText from "$lib/components/forms/InputText.svelte";
+    import FormColumns from "$lib/components/forms/FormColumns.svelte";
+    import InputSelect from "$lib/components/forms/InputSelect.svelte";
+    import InputCheckbox from "$lib/components/forms/InputCheckbox.svelte";
+    import InputRadio from "$lib/components/forms/InputRadio.svelte";
+    import FieldErrors from "$lib/components/forms/FieldErrors.svelte";
     let isModalVisible = $state(false);
     const allTimeSlots: string[] = generateTimeSlots(8, 10, 15);
 
@@ -19,11 +24,11 @@
     let availableTimeSlots = $state(allTimeSlots);
     const afterSubmit = () => {
         setTimeout(() => {
-            isModalVisible=false;
+            isModalVisible = false;
         }, 500);
         goto("#top");
         // alert("Rendez-vous réservé avec succès");
-    }
+    };
 
     $effect(() => {
         //On Mount and when date is modified, fetch available time slots
@@ -40,8 +45,6 @@
         };
         fetchAvailableTimeSlots();
     });
-
- 
 </script>
 
 {#if $message}
@@ -54,138 +57,80 @@
 
 <form method="POST" use:enhance class="w-full md-px-8">
     <fieldset class="fieldset gap-8">
-        <div class="grid md-grid-cols-2 gap-4 md-gap-8 items-end">
+        <FormColumns>
             <!-- MARQUE -->
-            <div>
-                <label class="fieldset-label text-info" for="brand"
-                    >Marque du véhicule</label
-                >
-                <input
-                    type="text"
-                    class="input w-full rounded-full"
-                    placeholder="Ex: Peugeot"
-                    name="brand"
-                    bind:value={$form.brand}
-                    {...$constraints.brand}
-                    aria-invalid={$errors.brand ? "true" : undefined}
-                />
-                {#if $errors.brand}
-                    <span class="invalid">{$errors.brand}</span>
-                {/if}
-            </div>
-
+            <InputText
+                label="Marque du véhicule"
+                placeholder="Ex: Peugeot"
+                name="brand"
+                bind:value={$form.brand}
+                fieldError={$errors.brand}
+                {...$constraints.brand}
+            />
             <!-- MODELE -->
-            <div>
-                <label class="fieldset-label text-info" for="model"
-                    >Modèle du véhicule</label
-                >
-                <input
-                    type="text"
-                    class="input w-full rounded-full"
-                    placeholder="Ex: 206"
-                    name="model"
-                    bind:value={$form.model}
-                    {...$constraints.model}
-                    aria-invalid={$errors.model ? "true" : undefined}
-                />
-                {#if $errors.model}
-                    <span class="invalid">{$errors.model}</span>
-                {/if}
-            </div>
-        </div>
+            <InputText
+                label="Modèle du véhicule"
+                placeholder="Ex: 206"
+                name="model"
+                bind:value={$form.model}
+                fieldError={$errors.model}
+                {...$constraints.model}
+            />
+        </FormColumns>
 
-        <div class="grid md-grid-cols-2 gap-4 md-gap-8 items-end">
+        <FormColumns>
             <!-- IMMATRICULATION -->
-            <div>
-                <label class="fieldset-label text-info" for="plateNumber"
-                    >Immatriculation</label
-                >
-                <input
-                    type="text"
-                    class="input w-full rounded-full"
-                    placeholder="Ex: 345FC34"
-                    name="plateNumber"
-                    bind:value={$form.plateNumber}
-                    {...$constraints.plateNumber}
-                    aria-invalid={$errors.plateNumber ? "true" : undefined}
-                />
-                {#if $errors.plateNumber}
-                    <span class="invalid">{$errors.plateNumber}</span>
-                {/if}
-            </div>
 
-            <div>
-                <label class="fieldset-label text-info" for="plateNumber"
-                    >Type d'intervention</label
-                >
-                <select
-                    class="select w-full rounded-full"
-                    name="rdvCategory"
-                    bind:value={$form.rdvCategory}
-                >
-                    <option value="AtelierP">Mécanique</option>
-                    <option value="CarrosserieP">Carrosserie</option>
-                </select>
-                {#if $errors.rdvCategory}
-                    <span class="invalid">{$errors.rdvCategory}</span>
-                {/if}
-            </div>
-        </div>
+            <InputText
+                label="Immatriculation"
+                placeholder="Ex: 345FC34"
+                name="plateNumber"
+                bind:value={$form.plateNumber}
+                fieldError={$errors.plateNumber}
+                {...$constraints.plateNumber}
+            />
+
+            <InputSelect
+                label="Type d'intervention"
+                placeholder="Type d'intervention"
+                name="rdvCategory"
+                bind:value={$form.rdvCategory}
+                fieldError={$errors.rdvCategory}
+            >
+                <option value="AtelierP">Mécanique</option>
+                <option value="CarrosserieP">Carrosserie</option>
+            </InputSelect>
+        </FormColumns>
 
         <!-- TRAVAUX -->
-        <div>
-            <label class="fieldset-label text-info" for="task"
-                >Travaux à effectuer</label
-            >
-            <select
-                class="select w-full rounded-full"
-                name="task"
-                bind:value={$form.task}
-            >
-                <option disabled selected>Choisir une catégorie</option>
-
-                {#each motifs as motif}
-                    {#if motif.NomActivité === $form.rdvCategory}
-                        <option value={motif.IDMotifRDV}>{motif.Motif}</option>
-                    {/if}
-                {/each}
-            </select>
-            {#if $errors.task}
-                <span class="invalid">{$errors.task}</span>
-            {/if}
-        </div>
+        <InputSelect
+            label="Travaux à effectuer"
+            placeholder="Travaux à effectuer"
+            name="task"
+            bind:value={$form.task}
+            fieldError={$errors.task}
+        >
+            {#each motifs as motif}
+                {#if motif.NomActivité === $form.rdvCategory}
+                    <option value={motif.IDMotifRDV}>{motif.Motif}</option>
+                {/if}
+            {/each}
+        </InputSelect>
 
         <!-- CHIFFRAGE_? -->
+        <InputCheckbox
+            label="Je souhaite un devis"
+            name="chiffrage"
+            bind:checked={$form.chiffrage}
+            fieldError={$errors.chiffrage}
+        />
 
-        <div>
-            <label class="fieldset-label text-info">
-                <input
-                    type="checkbox"
-                    class="checkbox"
-                    name="chiffrage"
-                    bind:checked={$form.chiffrage}
-                />
-                Je souhaite un devis
-            </label>
-            {#if $errors.chiffrage}
-                <span class="invalid">{$errors.chiffrage}</span>
-            {/if}
-        </div>
-
-        <div>
-            <label class="fieldset-label text-info">
-                <input
-                    type="checkbox"
-                    class="checkbox"
-                    name="rental"
-                    bind:checked={$form.rental}
-                />
-                Je souhaite un prêt de voiture
-            </label>
-            {#if $errors.rental}
-                <span class="invalid">{$errors.rental}</span>
-            {/if}
-        </div>
+        <InputCheckbox
+            label="Je souhaite un prêt de voiture"
+            name="rental"
+            bind:checked={$form.rental}
+            fieldError={$errors.rental}
+        />
 
         {#if $form.rental}
             <!-- Type de location -->
@@ -195,35 +140,23 @@
                         >Type de location</label
                     >
                     <div class="flex flex-col gap-2">
-                        <div>
-                            <input
-                                type="radio"
-                                class="radio radio-sm radio-info"
-                                name="rentalCategory"
-                                value="eco"
-                                bind:group={$form.rentalCategory}
-                            />
-                            <label for="userCategory"
-                                >Eco (5€/jour + 0.22€/km)</label
-                            >
-                        </div>
-
-                        <div>
-                            <input
-                                type="radio"
-                                class="radio radio-sm radio-info"
-                                name="rentalCategory"
-                                value="standard"
-                                bind:group={$form.rentalCategory}
-                            />
-                            <label for="userCategory">
-                                Standard (35€/jour + 0.22€/km)</label
-                            >
-                        </div>
+                        <InputRadio
+                            label="Eco (5€/jour + 0.22€/km)"
+                            name="rentalCategory"
+                            value="eco"
+                            bind:group={$form.rentalCategory}
+                            fieldError={$errors.rentalCategory}
+                        />
+                        <InputRadio
+                            label="Standard (35€/jour + 0.22€/km)"
+                            name="rentalCategory"
+                            value="standard"
+                            bind:group={$form.rentalCategory}
+                            fieldError={$errors.rentalCategory}
+                        />
                     </div>
-                    {#if $errors.rentalCategory}
-                        <span class="invalid">{$errors.rentalCategory}</span>
-                    {/if}
+                    <FieldErrors fieldError={$errors.rentalCategory} />
+                   
                 </div>
 
                 <!-- Type de transmission -->
@@ -232,31 +165,24 @@
                         >Transmission</label
                     >
                     <div class="flex flex-col gap-2">
-                        <div>
-                            <input
-                                type="radio"
-                                class="radio radio-sm radio-info"
-                                name="rentalDrive"
-                                value="manual"
-                                bind:group={$form.rentalDrive}
-                            />
-                            <label for="userCategory">Manuelle</label>
-                        </div>
+                        <InputRadio
+                            label="Manuelle"
+                            name="rentalDrive"
+                            value="manual"
+                            bind:group={$form.rentalDrive}
+                            fieldError={$errors.rentalDrive}
+                        />
 
-                        <div>
-                            <input
-                                type="radio"
-                                class="radio radio-sm radio-info"
-                                name="rentalDrive"
-                                value="auto"
-                                bind:group={$form.rentalDrive}
-                            />
-                            <label for="userCategory"> Automatique</label>
-                        </div>
+                        <InputRadio
+                            label="Automatique"
+                            name="rentalDrive"
+                            value="auto"
+                            bind:group={$form.rentalDrive}
+                            fieldError={$errors.rentalDrive}
+                        />
                     </div>
-                    {#if $errors.rentalCategory}
-                        <span class="invalid">{$errors.rentalCategory}</span>
-                    {/if}
+                    <FieldErrors fieldError={$errors.rentalDrive} />
+                  
                 </div>
             </div>
         {/if}
@@ -272,31 +198,23 @@
                 ariaInvalid={$errors.plateNumber ? "true" : undefined}
                 {...$constraints.plateNumber}
             />
-            {#if $errors.appointmentDate}
-                <span class="invalid">{$errors.appointmentDate}</span>
-            {/if}
+            <FieldErrors fieldError={$errors.appointmentDate} />
+          
         </div>
 
-        
         <!-- HEURE_DU_RDV -->
-        <div>
-            <label class="fieldset-label text-info" for="appointmentTime"
-                >Heure du RDV</label
-            >
-            <select
-                class="select w-full rounded-full"
-                name="appointmentTime"
-                bind:value={$form.appointmentTime}
-            >
-                <option disabled selected>Choisir une catégorie</option>
-                {#each availableTimeSlots as timeSlot}
-                    <option value={timeSlot}>{timeSlot}</option>
-                {/each}
-            </select>
-            {#if $errors.appointmentTime}
-                <span class="invalid">{$errors.appointmentTime}</span>
-            {/if}
-        </div>
+         <InputSelect
+            label="Heure du RDV"
+            placeholder="Heure du RDV"
+            name="appointmentTime"
+            bind:value={$form.appointmentTime}
+            fieldError={$errors.appointmentTime}
+        >
+            {#each availableTimeSlots as timeSlot}
+                <option value={timeSlot}>{timeSlot}</option>
+            {/each}
+        </InputSelect>
+       
 
         <!-- Type de transmission -->
         <div>
@@ -304,47 +222,44 @@
                 >Dépôt du véhicule</label
             >
             <div class="flex flex-col gap-2">
-                <div>
-                    <input
-                        type="radio"
-                        class="radio radio-sm radio-info"
-                        name="contactless"
-                        value="true"
-                        bind:group={$form.contactless}
-                    />
-                    <label for="userCategory">Dépôt sans contact</label>
-                </div>
+                <InputRadio
+                    label="Sur nos horaires d'ouverture"
+                    name="contactless"
+                    value="false"
+                    bind:group={$form.contactless}
+                    fieldError={$errors.contactless}
+                />
+               
+                <InputRadio
+                    label="Sans contact"
+                    name="contactless"
+                    value="true"
+                    bind:group={$form.contactless}
+                    fieldError={$errors.contactless}
+                />
 
-                <div>
-                    <input
-                        type="radio"
-                        class="radio radio-sm radio-info"
-                        name="contactless"
-                        value="false"
-                        bind:group={$form.contactless}
-                    />
-                    <label for="userCategory"
-                        >Sur nos horaires d'ouverture</label
-                    >
-                </div>
+              
             </div>
-            {#if $errors.contactless}
-                <span class="invalid">{$errors.contactless}</span>
-            {/if}
+            <FieldErrors fieldError={$errors.contactless} />
+           
         </div>
-
 
         <!-- MODAL_DE_VALIDATION -->
         <button
             type="button"
             class="btn btn-info mt-4 rounded-full"
-            onclick={() => (isModalVisible = !isModalVisible)}>Voir le résumé et confirmer</button
+            onclick={() => (isModalVisible = !isModalVisible)}
+            >Voir le résumé et confirmer</button
         >
         {#if isModalVisible}
-          <ModalRdv onclick={() => (isModalVisible = !isModalVisible)} form={$form} motifs={motifs} afterSubmit={afterSubmit}/>
+            <ModalRdv
+                onclick={() => (isModalVisible = !isModalVisible)}
+                form={$form}
+                {motifs}
+                {afterSubmit}
+            />
         {/if}
-
     </fieldset>
 </form>
-<!-- 
-<SuperDebug data={$form} /> -->
+
+<SuperDebug data={$form} />
