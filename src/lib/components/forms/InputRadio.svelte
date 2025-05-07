@@ -17,7 +17,7 @@
     }: Props = $props();
 </script>
 
-<div>
+<div >
     <input
         type="radio"
         class="radio radio-sm radio-info"
