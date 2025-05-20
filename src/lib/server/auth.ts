@@ -15,6 +15,15 @@ export async function login(userName: string, password: string, cookies: Cookies
         // Fetch data from API
         const userResponse = await fetchToApi(encodedSQL);
 
+        if (userResponse.data[0].Droits < 2) {
+            return { success: false, error: "User is not authorized" };
+        }
+
+        if (userResponse.data[0] && userResponse.data[0].MotDePasse != password) {
+            return { success: false, error: "Invalid password" };
+        }
+    
+
         if (!userResponse.success) {
             return { success: false, error: "API request failed" };
         }
@@ -25,15 +34,19 @@ export async function login(userName: string, password: string, cookies: Cookies
         if (!user) {
             return { success: false, error: "Invalid username or password" };
         }
-
-        // Get user without password
-        const { MotDePasse, ...userData } = user;
+    
 
         // Generate JWT secretKey (necessary for signing JWT token)
         const secretKey = new TextEncoder().encode(JWT_SECRET);
 
+        const tokenPayload = {
+            userId: user.IDUtilisateur,
+            email: user.Email,
+            role: user.Droits
+        };
+
         // 🔹 Generate JWT Token
-        const token = await new jose.SignJWT(userData)
+        const token = await new jose.SignJWT(tokenPayload)
             .setProtectedHeader({ alg: "HS256" }) // Algorithm
             .setExpirationTime("1h") // Expiry
             .sign(secretKey); // Sign with key
@@ -48,7 +61,7 @@ export async function login(userName: string, password: string, cookies: Cookies
             maxAge: 3600 * 24, // 1 hour
         });
 
-        return { success: true, user: userData }; // Send user data back (excluding password)
+        return { success: true, user: tokenPayload }; // Send user data back (excluding password)
 
     } catch (error) {
         return { success: false, error: "An unexpected error occurred" };

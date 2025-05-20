@@ -31,7 +31,7 @@ export function sendRdvEmail(user: WebdevUser, rdv: RendezVous, motif: Motif) {
         const response = sendEmail(email, name, html);
         return { success: true, response }
     } catch (error) {
-        console.log(error)
+        console.error(error)
         return { success: false, error }
     }
 

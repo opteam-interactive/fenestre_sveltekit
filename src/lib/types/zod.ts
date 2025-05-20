@@ -16,10 +16,6 @@ z.setErrorMap(zodI18nMap);
 // export configured zod instance
 export { z }
 
-export const loginSchema = z.object({
-  userName: z.string().min(2, { message: "Nom d'utilisateur trop court" }).max(50),
-  password: z.string().min(2, { message: "Mot de passe trop court" }).max(50)
-})
 
 export const userSchema = z.object({
   id: z.number().optional(),
@@ -44,29 +40,7 @@ export const userSchema = z.object({
     message: 'Mot de passe ou confirmation incorrect',
   })
 
-  export const registerSchema = z.object({
-    id: z.number().nullable(),
-    email: z.string().email().min(2).max(50),
-    password: z.string().min(6).max(50),
-    passwordConfirm: z.string().min(6).max(50),
-    category: z.enum(['particulier', 'societe']),
-    societe: z.string().default(""),
-    lastName: z.string().min(2).max(50).default(""),
-    firstName: z.string().min(2).max(50).default(""),
-    telephone: z.string().regex(new RegExp("^[0-9]*$")).min(6).max(12),
-    address: z.string().min(2).max(100),
-    zipcode: z.string().min(2).max(10).regex(new RegExp("^[0-9]*$")),
-    city: z.string().min(2).max(50),
-  }).refine(data => {
-    const valid = data.password === data.passwordConfirm;
-    if (!valid) console.log("Password mismatch error triggered!");
-    return valid;
-  }
-    , {
-      path: ['passwordConfirm'],
-      message: 'Mot de passe ou confirmation incorrect',
-    })
-
+  
   const motifSchema = z.object({
 
       IDMotifRDV:z.number(),
@@ -80,6 +54,8 @@ export const userSchema = z.object({
       NbRDVParJour: z.number()
 
   })
+
+
 export const rdvSchema = z.object({
   brand: z.string().min(2).max(20),
   model: z.string().min(2).max(20),
@@ -98,16 +74,10 @@ export const rdvSchema = z.object({
 })
 
 export const rdvWebdevSchema = z.object({
-  // IDRendezVous: z.number().nullable(),
+ IDRendezVous: z.number().nullable(),
   NomSite: z.enum(["PEUGEOT"]),
   DateRécept : z.string(),
-  // DateRécept: z.string().length(17).regex(/^\d+$/, {
-  //   message: "Invalid format. Use exactly 8 digits (yyyymmdd).",
-  // }),
   DateRestit: z.string(),
-  // DateRestit: z.string().length(17).regex(/^\d+$/, {
-  //   message: "Invalid format. Use exactly 17 digits (yyyymmddhhmmssccc).",
-  // }),
   Client: z.string(),
   Téléphone: z.string(),
   Mobile: z.string(),

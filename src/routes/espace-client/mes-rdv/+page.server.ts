@@ -1,30 +1,41 @@
-import { checkAuth } from '$lib/server/jwt.js';
-import { getUserRdvs } from '$lib/server/rdv.js';
-import type { WebdevUser } from '$lib/types/types.js';
+
+import { getRdvsByUSer } from '$lib/services/rdvServices';
 import { redirect } from '@sveltejs/kit';
-import { cp } from 'fs';
+import type { WebdevRendezVous } from '$lib/types/types';
+import type { PageServerLoad } from './$types';
+
 
 
 // Get user RDV
-export async function load({ cookies }) {
+export  const load: PageServerLoad = async ({locals }) => {
     try {
-        const data = await checkAuth(cookies);
+       
+        const userPayload = locals.user;
+        console.log(userPayload);
 
-        if (!data.authenticated) {
+        if (!userPayload || !userPayload.userId) {
+            console.error('Error 1');
             throw redirect(303, '/');
         }
-        if (!data.user) {
+        const rdvResponse = await getRdvsByUSer(userPayload.userId);
+        
+        if (!rdvResponse.success || !rdvResponse.data) {
+            console.error('Error 2');
+
             throw redirect(303, '/');
         }
-        
-        const userRdvs = await getUserRdvs((data.user as WebdevUser).IDUtilisateur);
-        
+
+        const userRdvs: WebdevRendezVous[] | null = rdvResponse.data;
         if (!userRdvs) {
+            console.error('Error 3');
+
             throw redirect(303, '/');
         }
         return { userRdvs };
 
     } catch (error) {
+        console.error(error);
+        throw redirect(303, '/');
 
     }
 

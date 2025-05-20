@@ -1,6 +1,6 @@
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { registerSchema } from '$lib/types/zod';
+import { registerSchema } from './RegisterSchema';
 import { type Infer, message } from 'sveltekit-superforms';
 import { fail } from '@sveltejs/kit';
 import { createUser } from '$lib/server/user';
@@ -18,11 +18,9 @@ export const load = async () => {
 //POST_ACTION
 export const actions = {
     register: async ({ request }) => {
-        console.log("register")
+        
         //Validate on the client
         const form = await superValidate(request, zod(registerSchema));
-
-
         if (!form.valid) {
             return fail(400, { form });
         }

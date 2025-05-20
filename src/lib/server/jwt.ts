@@ -2,7 +2,7 @@
 import * as jose from "jose";
 import type { Cookies } from "@sveltejs/kit";
 import { JWT_SECRET } from "$env/static/private";
-import type { ResponseNoData, User, WebdevUser } from "$lib/types/types";
+import type { ResponseNoData, User, UserJwtPayload, WebdevUser } from "$lib/types/types";
 
 
 export async function getToken(cookies: Cookies) {
@@ -19,7 +19,7 @@ export async function updateToken(cookies: Cookies, user: WebdevUser): Promise<R
 
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         return { success: false, error: "Failed to update token" };
     }
 
@@ -33,12 +33,10 @@ export async function checkAuth(cookies: Cookies) {
     if (!token) {
         return { authenticated: false, user: null };
     }
-
-
     try {
         const secretKey = new TextEncoder().encode(JWT_SECRET);
         const { payload } = await jose.jwtVerify(token, secretKey);
-        return { authenticated: true, user: payload };
+        return { authenticated: true, user: payload as UserJwtPayload };
 
     } catch (error) {
         console.error("JWT validation error:", error);

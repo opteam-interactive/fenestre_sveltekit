@@ -3,7 +3,7 @@
     import LoginForm from "./LoginForm.svelte";
     import { superForm } from "sveltekit-superforms";
     import SuperDebug from "sveltekit-superforms";
-
+    import InputText from "$components/forms/InputText.svelte";
     let { data } = $props();
     // Client API:
     const { form, errors, constraints, message, enhance } = superForm(data.form);

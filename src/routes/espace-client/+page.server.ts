@@ -5,22 +5,34 @@ import { redirect } from '@sveltejs/kit';
 import { checkAuth } from '$lib/server/jwt.js';
 import { webDevUserToUser } from '$lib/utils/convertTypes';
 import type { WebdevUser, User, ResponseWithData } from '$lib/types/types';
-import { register } from '$lib/server/auth';
+import type { PageServerLoad } from './$types';
+
 import { message } from 'sveltekit-superforms';
 import { fail } from '@sveltejs/kit';
 import { updateUser } from '$lib/server/user'
 import { error } from '@sveltejs/kit';
-import { invalidateAll } from '$app/navigation';
+import { getUserById } from '$lib/services/userServices';
 
 // Initialize superforms
-export async function load({ cookies, parent, request }) {
-    const { user } = await checkAuth(cookies);
+export const load: PageServerLoad = async({  locals }) => {
+    const userPayload = locals.user;
+    console.log(userPayload);
+    if (!userPayload) {
+        throw redirect(303, '/');
+    }
 
-    const webdevUser: User = webDevUserToUser(user);
+    const userResponse = await getUserById(userPayload.userId);
+
+    if (!userResponse.success || !userResponse.data) {
+        throw error(400, userResponse.error);
+    }
+    const webdevUser: WebdevUser | null = userResponse.data;
+    const user: User = webDevUserToUser(webdevUser);
+
 
     //Initiate form
-    const form = await superValidate(webdevUser, zod(userSchema));
-    return { form: webdevUser ? webdevUser : form };
+    const form = await superValidate(user, zod(userSchema));
+    return { form, user };
 };
 
 //POST_ACTIONS
@@ -46,7 +58,7 @@ export const actions = {
             const response: ResponseWithData<WebdevUser> = await updateUser(cookies, form.data)
             console.log("response", response)
             if (!response.success) {
-                throw error(400, response.error);
+                throw error(400, response.errors);
             }
         } catch (error) {
             console.error("Unexpected error:", error);

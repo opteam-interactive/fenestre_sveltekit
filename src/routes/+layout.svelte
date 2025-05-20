@@ -5,12 +5,12 @@
 </script>
 
 <div
-    class="bg-[url($lib/assets/images/background.png)] bg-cover font-poppins relative min-h-screen"
+    class="bg-[url($lib/assets/images/background.png)] bg-cover font-poppins relative min-h-screen flex flex-col"
 >
-    <header>
+    <header >
  
     </header>
-    <main>
+    <main class=" grow flex flex-col">
         {@render children()}
     </main>
     <footer>

@@ -1,7 +1,7 @@
 import { superValidate } from 'sveltekit-superforms';
 import { convertUtfToLocale } from '$lib/utils/date.js';
 import { zod } from 'sveltekit-superforms/adapters';
-import { rdvSchema, rdvWebdevSchema } from '$lib/types/zod';
+import { rdvSchema } from './rdvSchema';
 import type { WebdevRendezVous, WebdevUser } from '$lib/types/types'
 import { type Infer, message } from 'sveltekit-superforms';
 import { getMotifs } from '$lib/utils/requests';

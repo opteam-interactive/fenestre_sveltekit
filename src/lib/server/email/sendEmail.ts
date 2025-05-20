@@ -28,7 +28,6 @@ export async function sendEmail(email: string, name:string, html: string):Promis
 
     try {
         const info  = await transporter.sendMail(mailOptions);
-        console.log('Message sent: %s', info.messageId);
         return { success: true, data: info  };
 
 

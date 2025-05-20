@@ -1,6 +1,6 @@
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { loginSchema } from '$lib/types/zod';
+import { loginSchema } from './LoginSchema';
 import { redirect } from '@sveltejs/kit';
 import { login } from '$lib/server/auth.js';
 import { fail } from '@sveltejs/kit';

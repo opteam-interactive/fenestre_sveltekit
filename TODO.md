@@ -3,4 +3,6 @@
 - check update
 - handle register more gracefully
 - handle rdv more gracefully
-- 
+
+
+refractor forms

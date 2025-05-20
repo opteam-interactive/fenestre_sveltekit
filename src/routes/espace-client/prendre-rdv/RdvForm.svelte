@@ -2,6 +2,8 @@
     //Superforms
     import { superForm } from "sveltekit-superforms";
     import SuperDebug from "sveltekit-superforms";
+    import { page } from "$app/state";
+
     //Utils
     import { generateTimeSlots } from "$lib/utils/date";
     import { format } from "date-fns";
@@ -18,6 +20,7 @@
     import FormFeedback from "$lib/components/forms/FormFeedback.svelte";
     import Pikaday from "../../../lib/components/Pikaday.svelte";
     import ModalRdv from "$lib/components/ModalRdv.svelte";
+
     // Types
     import type { Motif, RendezVous } from "$lib/types/types";
     import RadioWrapper from "$lib/components/forms/RadioWrapper.svelte";
@@ -25,9 +28,10 @@
     let isModalVisible = $state(false);
     const allTimeSlots: string[] = generateTimeSlots(8, 10, 15);
 
-    const { formProps, motifs }: { formProps: any; motifs: Motif[] } = $props();
+    const motifs = page.data.motifs;
     const { form, errors, constraints, message, enhance } =
-        superForm<RendezVous>(formProps);
+        superForm<RendezVous>(page.data.form);
+
     let availableTimeSlots = $state(allTimeSlots);
     const afterSubmit = () => {
         setTimeout(() => {

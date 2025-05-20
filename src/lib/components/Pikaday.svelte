@@ -25,7 +25,6 @@
                 disableWeekends: true,
 
                 onSelect: (date) => {
-                    console.log("Raw Selected Date (Local):", date);
                     const utcMidnight = new Date(
                         Date.UTC(
                             date.getFullYear(),
@@ -33,9 +32,7 @@
                             date.getDate()
                         )
                     );
-                    console.log("UTC Midnight:", utcMidnight.toISOString()); // Log ISO string
                     value = format(utcMidnight, "yyyy-MM-dd");
-                    console.log("Stored Date (yyyy-MM-dd):", value);
                     localValue = format(utcMidnight, "dd/MM/yyyy");
                 },
                 firstDay: 1,

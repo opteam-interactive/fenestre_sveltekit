@@ -130,7 +130,6 @@ ${rdv.Blacklistage === "" ? "NULL" : `'${rdv.Blacklistage}'`}
         const encodedSQL = encodeBase64(SQL);
 
         const apiResponse = await fetchToApi(encodedSQL);
-        console.log(apiResponse)
         if (!apiResponse.success) {
             // Gestion des erreurs de l'API externe
             throw error(500, apiResponse.error);
