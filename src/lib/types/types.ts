@@ -1,6 +1,15 @@
 import { z, rdvSchema, userSchema, rdvWebdevSchema } from "$lib/types/zod"
 
 export type Message = { status: 'error' | 'success' | 'warning'; text: string };
+export type ForfaitLocation = {
+    journalier: number,
+    kilometrique: number
+}
+
+export type Timeslot = {
+    id: number,
+    startHour: string,
+}
 
 export type Motif = {
     IDMotifRDV: number,

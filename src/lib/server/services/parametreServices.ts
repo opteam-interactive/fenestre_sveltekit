@@ -1,9 +1,9 @@
-import { encodeBase64, fetchToApi } from "$lib/utils/utils"
+import { encodeBase64, fetchToApi } from "$lib/server/utils/utils"
 import type { FormattedResponse, WebdevUser } from "$lib/types/types"
-
-export const getUserById = async (id: number): Promise<FormattedResponse<WebdevUser>> => {
+import type { ForfaitLocation } from "$lib/types/types"
+export const getForfaitLocation = async (): Promise<FormattedResponse<ForfaitLocation>> => {
     try {
-        const SQL = `SELECT * FROM Utilisateur WHERE IDUtilisateur = ${id}`
+        const SQL = `SELECT Libellé, VarMonétaire FROM Parametres WHERE Libellé = 'MtForfaitJournPEU' OR Libellé = 'MtForfaitKmsPEU'`
         const encodedSQL = encodeBase64(SQL)
 
         const response = await fetchToApi(encodedSQL)
@@ -15,16 +15,22 @@ export const getUserById = async (id: number): Promise<FormattedResponse<WebdevU
             }
         }
 
-        if(!response.data[0]) {
+        if (!response.data[0]) {
             return {
                 success: false,
                 error: "User not found"
             }
         }
 
+
+        const forfait = {
+            journalier: response.data[0]["VarMonétaire"],
+            kilometrique: response.data[1]["VarMonétaire"]
+        }
+
         return {
             success: true,
-            data: response.data[0]
+            data: forfait
         }
     } catch (error) {
         console.error(error)

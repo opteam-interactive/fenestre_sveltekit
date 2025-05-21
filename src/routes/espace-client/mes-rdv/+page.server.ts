@@ -1,5 +1,5 @@
 
-import { getRdvsByUSer } from '$lib/services/rdvServices';
+import { getRdvsByUser } from '$lib/server/services/rdvServices';
 import { redirect } from '@sveltejs/kit';
 import type { WebdevRendezVous } from '$lib/types/types';
 import type { PageServerLoad } from './$types';
@@ -7,9 +7,9 @@ import type { PageServerLoad } from './$types';
 
 
 // Get user RDV
-export  const load: PageServerLoad = async ({locals }) => {
+export const load: PageServerLoad = async ({ locals }) => {
     try {
-       
+
         const userPayload = locals.user;
         console.log(userPayload);
 
@@ -17,8 +17,8 @@ export  const load: PageServerLoad = async ({locals }) => {
             console.error('Error 1');
             throw redirect(303, '/');
         }
-        const rdvResponse = await getRdvsByUSer(userPayload.userId);
-        
+        const rdvResponse = await getRdvsByUser(userPayload.userId);
+
         if (!rdvResponse.success || !rdvResponse.data) {
             console.error('Error 2');
 

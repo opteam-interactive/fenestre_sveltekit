@@ -1,5 +1,5 @@
 import { JWT_SECRET } from '$env/static/private';
-import { encodeBase64, fetchToApi } from "../utils/utils";
+import { encodeBase64, fetchToApi } from "./utils/utils";
 import * as jose from 'jose'
 
 import type { WebdevUser, User } from "$lib/types/types";
@@ -22,7 +22,7 @@ export async function login(userName: string, password: string, cookies: Cookies
         if (userResponse.data[0] && userResponse.data[0].MotDePasse != password) {
             return { success: false, error: "Invalid password" };
         }
-    
+
 
         if (!userResponse.success) {
             return { success: false, error: "API request failed" };
@@ -34,7 +34,7 @@ export async function login(userName: string, password: string, cookies: Cookies
         if (!user) {
             return { success: false, error: "Invalid username or password" };
         }
-    
+
 
         // Generate JWT secretKey (necessary for signing JWT token)
         const secretKey = new TextEncoder().encode(JWT_SECRET);
@@ -52,7 +52,7 @@ export async function login(userName: string, password: string, cookies: Cookies
             .sign(secretKey); // Sign with key
 
         // 🔹 Set JWT token in cookie
-        
+
         cookies.set("auth_token", token, {
             path: "/",
             httpOnly: true,

@@ -3,7 +3,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { userSchema } from '$lib/types/zod';
 import { redirect } from '@sveltejs/kit';
 import { checkAuth } from '$lib/server/jwt.js';
-import { webDevUserToUser } from '$lib/utils/convertTypes';
+import { webDevUserToUser } from '$lib/server/utils/convertTypes';
 import type { WebdevUser, User, ResponseWithData } from '$lib/types/types';
 import type { PageServerLoad } from './$types';
 
@@ -11,12 +11,11 @@ import { message } from 'sveltekit-superforms';
 import { fail } from '@sveltejs/kit';
 import { updateUser } from '$lib/server/user'
 import { error } from '@sveltejs/kit';
-import { getUserById } from '$lib/services/userServices';
+import { getUserById } from '$lib/server/services/userServices';
 
 // Initialize superforms
-export const load: PageServerLoad = async({  locals }) => {
+export const load: PageServerLoad = async ({ locals }) => {
     const userPayload = locals.user;
-    console.log(userPayload);
     if (!userPayload) {
         throw redirect(303, '/');
     }
@@ -46,12 +45,12 @@ export const actions = {
 
     //UPDATE_ACTION
     updateUser: async ({ request, cookies }) => {
-       
+
         const form = await superValidate(request, zod(userSchema));
 
         if (!form.valid) {
             console.log("form not valid", form)
-            return fail(400, { form  });
+            return fail(400, { form });
         }
 
         try {
@@ -68,7 +67,7 @@ export const actions = {
             });
         }
         console.log("success !")
-        
+
         // Return the form with a status message
         return message(form, {
             status: "success",

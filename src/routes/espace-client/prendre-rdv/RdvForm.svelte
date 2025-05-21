@@ -5,11 +5,10 @@
     import { page } from "$app/state";
 
     //Utils
-    import { generateTimeSlots } from "$lib/utils/date";
-    import { format } from "date-fns";
-    import { fetchRdvForDate } from "$lib/utils/date";
     import { slide } from "svelte/transition";
     import { goto } from "$app/navigation";
+    import { PUBLIC_SITE_URL } from "$env/static/public";
+
     //Form components
     import InputText from "$lib/components/forms/InputText.svelte";
     import FormColumns from "$lib/components/forms/FormColumns.svelte";
@@ -22,17 +21,20 @@
     import ModalRdv from "$lib/components/ModalRdv.svelte";
 
     // Types
-    import type { Motif, RendezVous } from "$lib/types/types";
+    import type { PageData } from "./$types";
+    import type { Motif, RendezVous, Timeslot } from "$lib/types/types";
     import RadioWrapper from "$lib/components/forms/RadioWrapper.svelte";
 
     let isModalVisible = $state(false);
-    const allTimeSlots: string[] = generateTimeSlots(8, 10, 15);
+    // const allTimeSlots: string[] = generateTimeSlots(8, 10, 15);
 
-    const motifs = page.data.motifs;
+    const pageData = page.data as PageData;
+    const motifs = pageData.motifs;
+    const forfait = pageData.forfait;
     const { form, errors, constraints, message, enhance } =
-        superForm<RendezVous>(page.data.form);
+        superForm<RendezVous>(pageData.form);
 
-    let availableTimeSlots = $state(allTimeSlots);
+    let availableTimeSlots = $state<Timeslot[]>([]);
     const afterSubmit = () => {
         setTimeout(() => {
             isModalVisible = false;
@@ -45,14 +47,17 @@
         //On Mount and when date is modified, fetch available time slots
         const fetchAvailableTimeSlots = async () => {
             if ($form.appointmentDate) {
-                const remainingTimeSlots = await fetchRdvForDate(
-                    allTimeSlots,
-                    $form.appointmentDate
+                const remainingTimeSlotsResponse = await fetch(
+                    `${PUBLIC_SITE_URL}/api/rdv/filter/${$form.appointmentDate}`
                 );
+                const remainingTimeSlots:Timeslot[] = await remainingTimeSlotsResponse.json();
+                console.log("remainingTimeSlots", remainingTimeSlots);
+
                 if (remainingTimeSlots) {
                     availableTimeSlots = remainingTimeSlots;
                 }
             }
+            console.log("return from api");
         };
         fetchAvailableTimeSlots();
     });
@@ -145,14 +150,14 @@
                     error={$errors.rentalCategory}
                 >
                     <InputRadio
-                        label="Eco (5€ + 0.22€/km)"
+                        label={`Eco (${forfait.journalier}€ + ${forfait.kilometrique}€/km)`}
                         name="rentalCategory"
                         value="eco"
                         bind:group={$form.rentalCategory}
                         fieldError={$errors.rentalCategory}
                     />
                     <InputRadio
-                        label="Standard (35€ + 0.22€/km)"
+                        label={`Standard (35€ + ${forfait.kilometrique}€/km)`}
                         name="rentalCategory"
                         value="standard"
                         bind:group={$form.rentalCategory}
@@ -201,18 +206,18 @@
 
         <!-- HEURE_DU_RDV -->
         <InputSelect
-            label="Heure du RDV"
+            label="Heure du RDV (créneaux disponibles)"
             placeholder="Heure du RDV"
             name="appointmentTime"
             bind:value={$form.appointmentTime}
             fieldError={$errors.appointmentTime}
         >
             {#each availableTimeSlots as timeSlot}
-                <option value={timeSlot}>{timeSlot}</option>
+                <option value={timeSlot.startHour}>{timeSlot.startHour}</option>
             {/each}
         </InputSelect>
 
-        <!-- Type de transmission -->
+        <!-- Depot du vehicule -->
 
         <RadioWrapper label="Dépôt du véhicule" error={$errors.contactless}>
             <InputRadio

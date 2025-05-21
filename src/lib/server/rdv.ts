@@ -1,7 +1,7 @@
 import type { Motif, RendezVous, ResponseWithData, WebdevRendezVous, User, WebdevUser } from "$lib/types/types";
 import { error } from '@sveltejs/kit';
-import { convertUtfToLocale } from "$lib/utils/date";
-import { fetchToApi, encodeBase64 } from "$lib/utils/utils";
+import { convertUtfToLocale } from "$lib/server/utils/date";
+import { fetchToApi, encodeBase64 } from "$lib/server/utils/utils";
 import { format } from 'date-fns';
 import { rdvWebdevSchema } from "$lib/types/zod";
 import { sendRdvEmail } from "$lib/server/email/RdvEmail";

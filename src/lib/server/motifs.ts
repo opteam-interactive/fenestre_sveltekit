@@ -1,4 +1,4 @@
-import { encodeBase64, fetchToApi } from "$lib/utils/utils"
+import { encodeBase64, fetchToApi } from "$lib/server/utils/utils"
 
 const getMotifByID = async (id: number) => {
     const SQL = `SELECT * FROM Motif WHERE IDMotifRDV = ${id}`

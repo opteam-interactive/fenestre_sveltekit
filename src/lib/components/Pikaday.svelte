@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { getHolidays, getCalendarEndBound } from "$lib/utils/date";
+    import { getHolidays, getCalendarEndBound } from "$lib/client/helpers/date";
     import { format } from "date-fns";
 
     let { value = $bindable(), name, ariaInvalid } = $props(); // Expect value as a prop

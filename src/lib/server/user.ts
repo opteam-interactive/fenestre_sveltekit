@@ -1,11 +1,11 @@
 
 import { jwtVerify, decodeJwt } from "jose";
-import {error} from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import type { User, ResponseWithData, WebdevUser, RegisterUser } from "$lib/types/types";
 import { JWT_SECRET } from '$env/static/private';
 import type { Cookies } from "@sveltejs/kit";
 import { checkAuth, updateToken } from "./jwt";
-import { encodeBase64, fetchToApi } from "$lib/utils/utils";
+import { encodeBase64, fetchToApi } from "$lib/server/utils/utils";
 
 
 const secretKey = new TextEncoder().encode(JWT_SECRET);
@@ -40,9 +40,9 @@ export async function getUser(cookies: Cookies): Promise<WebdevUser | null> {
 
 export async function updateUser(cookies: Cookies, formData: User): Promise<ResponseWithData<WebdevUser>> {
     try {
-     
+
         if (!formData) {
-            throw error(400,"No form data provided");
+            throw error(400, "No form data provided");
         }
 
         // TODO : GET_CURRENT_USER
@@ -65,22 +65,22 @@ export async function updateUser(cookies: Cookies, formData: User): Promise<Resp
             cp: formData.zipcode ?? '',
             Téléphone: formData.telephone ?? '',
             Email: formData.email ?? '',
-            Droits: user.Droits as number?? 2,
+            Droits: user.Droits as number ?? 2,
             Autre1: formData.other1 ?? '',
             Autre2: formData.other2 ?? '',
             Autre3: formData.other3 ?? ''
         }
-        
+
         const SQL = `
         UPDATE UTILISATEUR
         SET
             Utilisateur = '${formattedData.Utilisateur}',
             Nom = '${formattedData.Nom}',
             Prénom = '${formattedData.Prénom}',
-            Société = '${formattedData.Société }',
+            Société = '${formattedData.Société}',
             Adresse = '${formattedData.Adresse}',
             Ville = '${formattedData.Ville}',
-            cp = '${formattedData.cp }',
+            cp = '${formattedData.cp}',
             Téléphone = '${formattedData.Téléphone}',
             Email = '${formattedData.Email}',
             Droits = '${user.Droits || ''}',
@@ -97,7 +97,7 @@ export async function updateUser(cookies: Cookies, formData: User): Promise<Resp
         if (!userResponse.success) {
             throw error(500, "API request failed");
         }
-        
+
         //update the cookie
         const cookieUpdateResponse = await updateToken(cookies, formattedData);
         if (!cookieUpdateResponse.success) {
@@ -131,7 +131,7 @@ export async function createUser(formData: RegisterUser): Promise<ResponseWithDa
         }
 
         //Send email
-        
+
 
         return { success: true, data: user };
 
