@@ -23,7 +23,7 @@ export const load: PageServerLoad = async ({ locals }) => {
     const userResponse = await getUserById(userPayload.userId);
 
     if (!userResponse.success || !userResponse.data) {
-        throw error(400, userResponse.error);
+        throw error(400, userResponse?.error || "User not found");
     }
     const webdevUser: WebdevUser | null = userResponse.data;
     const user: User = webDevUserToUser(webdevUser);

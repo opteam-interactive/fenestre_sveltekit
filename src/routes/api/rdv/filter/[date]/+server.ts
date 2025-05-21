@@ -3,6 +3,7 @@ import type { RequestHandler } from '../../[date]/$types';
 import { getRdvsByDate } from '$lib/server/services/rdvServices';
 import { format } from 'date-fns'
 import { allTimeSlots } from "$lib/server/utils/constants";
+import type { FormattedResponse, Timeslot } from '$lib/types/types';
 
 export const GET: RequestHandler = async ({ url, params }) => {
 
@@ -16,11 +17,41 @@ export const GET: RequestHandler = async ({ url, params }) => {
 
         //GET RDVs
         const rdvResponse = await getRdvsByDate(date);
+       
+
         if (!rdvResponse.success || !Array.isArray(rdvResponse.data)) {
             // If no appointments found, send all time slots
-            return new Response(JSON.stringify(allTimeSlots), { status: 200 });
+            const responseData: FormattedResponse = {
+                success: true,
+                data: allTimeSlots
+            }
+            return new Response(JSON.stringify(responseData), { status: 200 });
         }
+
         const rdvs = rdvResponse.data;
+
+        let maxCapacityAtelierP = 16;
+        let maxCapacityCarrosserieP = 12;
+        //now check remaining capacity
+        rdvs.forEach(rdv => {
+            if (rdv.NomActivité === "AtelierP") {
+                maxCapacityAtelierP -= rdv.NbHeureTx;
+            }
+
+            if (rdv.NomActivité === "CarrosserieP") {
+                maxCapacityCarrosserieP -= rdv.NbHeureTx;
+            }
+        });
+
+        // console.log("maxCapacityAtelierP", maxCapacityAtelierP);
+        // console.log("maxCapacityCarrosserieP", maxCapacityCarrosserieP);
+        if (maxCapacityAtelierP <= 0 || maxCapacityCarrosserieP <= 0) {
+            const responseData: FormattedResponse = {
+                success: false,
+                error: "Tous les créneaux sont remplis pour ce jour, merci de sélectionner une autre date."
+            }
+            return new Response(JSON.stringify(responseData), { status: 200 });
+        }
 
     
 
@@ -40,14 +71,23 @@ export const GET: RequestHandler = async ({ url, params }) => {
                 availableSlots.splice(index, 1); // Remove only one matching slot
             }
         }
+
+        const responseData: FormattedResponse<Timeslot[]> = {
+            success: true,
+            data: availableSlots,
+        }
         //return filtered array
-        return new Response(JSON.stringify(availableSlots), { status: 200 });
+        return new Response(JSON.stringify(responseData), { status: 200 });
 
 
     }
     catch (error) {
         console.error(error);
-        return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500 });
+        const responseData: FormattedResponse = {
+            success: false,
+            error: "Internal server error",
+        }
+        return new Response(JSON.stringify(responseData), { status: 500 });
 
     }
 

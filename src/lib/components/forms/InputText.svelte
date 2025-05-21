@@ -1,12 +1,13 @@
 <script lang="ts">
     type Props = {
         label: string;
+        type?: string;
         placeholder: string;
         name: string;
         value: any;
         fieldError: string[] | undefined;
     }
-let { label, placeholder, name, value = $bindable(), fieldError, ...others } : Props = $props();
+let { label, placeholder, name, type="text", value = $bindable(), fieldError, ...others } : Props = $props();
 </script>
 
 <div>
@@ -14,7 +15,7 @@ let { label, placeholder, name, value = $bindable(), fieldError, ...others } : P
         >{label}</label
     >
     <input
-        type="text"
+        type={type}
         class="input w-full rounded-full"
         placeholder={placeholder}
         name={name}

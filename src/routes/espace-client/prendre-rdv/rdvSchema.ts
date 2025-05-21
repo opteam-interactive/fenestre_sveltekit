@@ -13,6 +13,9 @@ export const rdvSchema = z.object({
   rentalCategory: z.enum(['eco', 'standard']).default('eco').nullable(),
   rentalDrive: z.enum(['manual', 'auto']).default('manual').nullable(),
   contactless: z.enum(['true', 'false']).nullable().default("false"),
-  chiffrage: z.boolean()
+  chiffrage: z.boolean(),
+  kilometers: z.string(),
   //Complete with more info
 })
+
+export type rdvSchemaType = z.infer<typeof rdvSchema>

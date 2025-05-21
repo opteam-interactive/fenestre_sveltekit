@@ -4,7 +4,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { rdvSchema } from './rdvSchema';
 import type { WebdevRendezVous, WebdevUser } from '$lib/types/types'
 import { type Infer, message } from 'sveltekit-superforms';
-import { getMotifs } from '$lib/server/utils/requests';
+import { getMotifs } from '$lib/server/services/motifServices';
 import { format, parseISO } from 'date-fns'
 import { fetchToApi, encodeBase64 } from '$lib/server/utils/utils.js';
 import { redirect } from '@sveltejs/kit';
@@ -17,6 +17,8 @@ import { createRdv } from '$lib/server/rdv.js';
 
 import type { PageServerLoad } from './$types';
 import { getForfaitLocation } from '$lib/server/services/parametreServices';
+import { getMotifByID } from '$lib/server/services/motifServices';
+import { getUserById } from '$lib/server/services/userServices';
 type Message = { status: 'error' | 'success' | 'warning'; text: string };
 
 // Initialize superforms
@@ -30,7 +32,13 @@ export const load: PageServerLoad = async () => {
         kilometrique: forfaitResponse.data.kilometrique
     }
 
-    const motifs: Motif[] = await getMotifs();
+    const motifsResponse = await getMotifs();
+
+    if (!motifsResponse || !motifsResponse.success || !motifsResponse.data) {
+        throw new Error(motifsResponse.error);
+    }
+
+    const motifs: Motif[] = motifsResponse.data;
     const form = await superValidate<Infer<typeof rdvSchema>, Message>(zod(rdvSchema));
 
     return { form, motifs, forfait };
@@ -41,10 +49,11 @@ export const load: PageServerLoad = async () => {
 
 //POST_ACTION
 export const actions = {
-    default: async ({ request, cookies }) => {
+    default: async ({ request, cookies, locals }) => {
 
         const form = await superValidate(request, zod(rdvSchema));
         const formData = form.data
+    
 
 
         if (!form.valid) {
@@ -56,14 +65,34 @@ export const actions = {
             });
         }
 
-        const { authenticated, user } = await checkAuth(cookies)
-        if (!authenticated || !user) {
-            throw redirect(303, '/');
+        //Get motif from id 
+        const motifResponse = await getMotifByID(form.data.task);
+        if (!motifResponse || !motifResponse.success || !motifResponse.data) {
+            return message(form, {
+                status: 'error',
+                text: 'Le motif n\'existe pas'
+            });
         }
 
-        const webdevUser = user as WebdevUser
+        //Get user from id
+        const userId = locals.user?.userId;
+        if (!userId) {
+            return message(form, {
+                status: 'error',
+                text: 'ID Utilisateur non trouvé'
+            });
+        }        
+        const userResponse = await getUserById(userId);
 
-        const response = await createRdv(formData, motifs, webdevUser)
+        if (!userResponse || !userResponse.success || !userResponse.data) {
+            return message(form, {
+                status: 'error',
+                text: 'Erreur lors de la recherche de l\'utilisateur'
+            });
+        }
+        
+
+        const response = await createRdv(formData, motifResponse.data, userResponse.data);
         if (!response.success) {
             return message(form, {
                 status: 'error',

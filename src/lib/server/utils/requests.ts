@@ -6,12 +6,6 @@ export const fetchTestRequest = 'U0VMRUNUIFVUSUxJU0FURVVSLkRyb2l0cyBGUk9NIFVUSUx
 
 //Fetch ALL motifs
 //SELECT * FROM motifrdv 
-export async function getMotifs() {
-    const motifRequest = "U0VMRUNUICogRlJPTSBtb3RpZnJkdg=="
-    const motifList = await fetchToApi(motifRequest)
-
-    return motifList.data
-}
 
 
 

@@ -1,8 +1,4 @@
-- check emails
-- check auth
-- check update
-- handle register more gracefully
-- handle rdv more gracefully
-
-
-refractor forms
+- refactor forms
+- vérifier si le filtre par capacité est séparé pour les deux ou non
+- vérifier méthode createRDV
+- modifier interface form

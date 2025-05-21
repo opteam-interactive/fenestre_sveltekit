@@ -1,14 +1,12 @@
 <script lang="ts">
     //Superforms
-    import { superForm } from "sveltekit-superforms";
+    import { setError, superForm } from "sveltekit-superforms";
     import SuperDebug from "sveltekit-superforms";
     import { page } from "$app/state";
-
     //Utils
     import { slide } from "svelte/transition";
     import { goto } from "$app/navigation";
     import { PUBLIC_SITE_URL } from "$env/static/public";
-
     //Form components
     import InputText from "$lib/components/forms/InputText.svelte";
     import FormColumns from "$lib/components/forms/FormColumns.svelte";
@@ -19,22 +17,56 @@
     import FormFeedback from "$lib/components/forms/FormFeedback.svelte";
     import Pikaday from "../../../lib/components/Pikaday.svelte";
     import ModalRdv from "$lib/components/ModalRdv.svelte";
-
     // Types
     import type { PageData } from "./$types";
-    import type { Motif, RendezVous, Timeslot } from "$lib/types/types";
+    import type {
+        FormattedResponse,
+        Motif,
+        RendezVous,
+        Timeslot,
+    } from "$lib/types/types";
     import RadioWrapper from "$lib/components/forms/RadioWrapper.svelte";
+    import type { rdvSchemaType } from "./rdvSchema";
 
-    let isModalVisible = $state(false);
-    // const allTimeSlots: string[] = generateTimeSlots(8, 10, 15);
+    const fetchAvailableTimeSlots = async () => {
+        if ($form.appointmentDate) {
+            const remainingTimeSlotsResponse = await fetch(
+                `${PUBLIC_SITE_URL}/api/rdv/filter/${$form.appointmentDate}`
+            );
+            const jsonResponse: FormattedResponse<Timeslot[]> =
+                await remainingTimeSlotsResponse.json();
+
+            if (!jsonResponse.success && jsonResponse.error) {
+                console.error(jsonResponse.error);
+                capacityFullError = jsonResponse.error;
+                return [];
+            }
+            const remainingTimeSlots = jsonResponse.data;
+            if (remainingTimeSlots) {
+                return remainingTimeSlots;
+            } else {
+                return [];
+            }
+        }
+    };
 
     const pageData = page.data as PageData;
     const motifs = pageData.motifs;
     const forfait = pageData.forfait;
     const { form, errors, constraints, message, enhance } =
-        superForm<RendezVous>(pageData.form);
+        superForm<rdvSchemaType>(pageData.form);
+    let isModalVisible = $state(false);
+    let selectedDay = $state(new Date());
+    let capacityFullError = $state<string>("");
+    $effect(() => {
+        if (selectedDay !== $form.appointmentDate) {
+            selectedDay = $form.appointmentDate;
+            $form.appointmentTime = "";
+            capacityFullError = "";
+        }
+    });
+    let availableTimeSlots = $derived(fetchAvailableTimeSlots());
 
-    let availableTimeSlots = $state<Timeslot[]>([]);
     const afterSubmit = () => {
         setTimeout(() => {
             isModalVisible = false;
@@ -42,25 +74,6 @@
         goto("#top");
         // alert("Rendez-vous réservé avec succès");
     };
-
-    $effect(() => {
-        //On Mount and when date is modified, fetch available time slots
-        const fetchAvailableTimeSlots = async () => {
-            if ($form.appointmentDate) {
-                const remainingTimeSlotsResponse = await fetch(
-                    `${PUBLIC_SITE_URL}/api/rdv/filter/${$form.appointmentDate}`
-                );
-                const remainingTimeSlots:Timeslot[] = await remainingTimeSlotsResponse.json();
-                console.log("remainingTimeSlots", remainingTimeSlots);
-
-                if (remainingTimeSlots) {
-                    availableTimeSlots = remainingTimeSlots;
-                }
-            }
-            console.log("return from api");
-        };
-        fetchAvailableTimeSlots();
-    });
 </script>
 
 <FormFeedback message={$message} />
@@ -90,7 +103,6 @@
 
         <FormColumns>
             <!-- IMMATRICULATION -->
-
             <InputText
                 label="Immatriculation"
                 placeholder="Ex: 345FC34"
@@ -100,19 +112,35 @@
                 {...$constraints.plateNumber}
             />
 
-            <InputSelect
-                label="Type d'intervention"
-                placeholder="Type d'intervention"
-                name="rdvCategory"
-                bind:value={$form.rdvCategory}
-                fieldError={$errors.rdvCategory}
-            >
-                <option value="AtelierP">Mécanique</option>
-                <option value="CarrosserieP">Carrosserie</option>
-            </InputSelect>
+            <!-- KILOMETRAGE -->
+            <InputText
+                label="Kilométrage"
+                placeholder="Ex: 3000"
+                name="kilometers"
+                type="number"
+                bind:value={$form.kilometers}
+                fieldError={$errors.kilometers}
+                {...$constraints.kilometers}
+            />
         </FormColumns>
 
+        <InputSelect
+            label="Type d'intervention"
+            placeholder="Type d'intervention"
+            name="rdvCategory"
+            bind:value={$form.rdvCategory}
+            fieldError={$errors.rdvCategory}
+        >
+            <option value="AtelierP">Mécanique</option>
+            <option value="CarrosserieP">Carrosserie</option>
+        </InputSelect>
+
         <!-- TRAVAUX -->
+         <!-- DIAGNOSTIC -->
+          
+        <!-- Controle technique -->
+         <!-- pneus -->
+          <!-- freinage -->
         <InputSelect
             label="Travaux à effectuer"
             placeholder="Travaux à effectuer"
@@ -190,35 +218,7 @@
             </div>
         {/if}
 
-        <!-- DATE_DU_RDV -->
-        <div>
-            <label class="fieldset-label text-info" for="plateNumber"
-                >Date du RDV</label
-            >
-            <Pikaday
-                bind:value={$form.appointmentDate}
-                name="appointmentDate"
-                ariaInvalid={$errors.plateNumber ? "true" : undefined}
-                {...$constraints.plateNumber}
-            />
-            <FieldErrors fieldError={$errors.appointmentDate} />
-        </div>
-
-        <!-- HEURE_DU_RDV -->
-        <InputSelect
-            label="Heure du RDV (créneaux disponibles)"
-            placeholder="Heure du RDV"
-            name="appointmentTime"
-            bind:value={$form.appointmentTime}
-            fieldError={$errors.appointmentTime}
-        >
-            {#each availableTimeSlots as timeSlot}
-                <option value={timeSlot.startHour}>{timeSlot.startHour}</option>
-            {/each}
-        </InputSelect>
-
         <!-- Depot du vehicule -->
-
         <RadioWrapper label="Dépôt du véhicule" error={$errors.contactless}>
             <InputRadio
                 label="Sur nos horaires d'ouverture"
@@ -237,6 +237,56 @@
             />
         </RadioWrapper>
         <FieldErrors fieldError={$errors.contactless} />
+
+        {#if $form.contactless === "false"}
+            <!-- DATE_DU_RDV -->
+            <div>
+                <label class="fieldset-label text-info" for="plateNumber"
+                    >Date du RDV</label
+                >
+                <Pikaday
+                    bind:value={$form.appointmentDate}
+                    name="appointmentDate"
+                    ariaInvalid={$errors.plateNumber ? "true" : undefined}
+                    {...$constraints.plateNumber}
+                />
+                <FieldErrors fieldError={$errors.appointmentDate} />
+            </div>
+
+            <!-- HEURE_DU_RDV -->
+            {#if capacityFullError.length > 0}
+                <FieldErrors fieldError={capacityFullError} />
+            {:else}
+                <InputSelect
+                    label="Heure du RDV (créneaux disponibles)"
+                    placeholder="Heure du RDV"
+                    name="appointmentTime"
+                    bind:value={$form.appointmentTime}
+                    fieldError={$errors.appointmentTime}
+                >
+                    {#await availableTimeSlots}
+                        <option disabled>Loading data...</option>
+                    {:then availableTimeSlots}
+                        {#if availableTimeSlots !== undefined}
+                            {#each availableTimeSlots as timeSlot}
+                                <option value={timeSlot.startHour}
+                                    >{timeSlot.startHour}</option
+                                >
+                            {/each}
+                        {:else if availableTimeSlots.length === 0}
+                            <option disabled>Aucun créneau disponible</option>
+                        {/if}
+                    {:catch reason}
+                        <span>Oops! - {reason}</span>
+                    {/await}
+                </InputSelect>
+            {/if}
+        {:else}
+            <p class="text-red-500 text-sm">
+                Pour les dépôts sans contact, nous vous recontacterons par SMS
+                pour convenir des détails
+            </p>
+        {/if}
 
         <!-- MODAL_DE_VALIDATION -->
         <button

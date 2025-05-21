@@ -106,9 +106,10 @@ export type ResponseNoData = {
     message?: string
 };
 
-export type FormattedResponse<T> = {
+export type FormattedResponse<T = unknown> = {
     success: boolean;
     error?: string;
     message?: string
-    data?: T
+    data?: T 
 }
+
