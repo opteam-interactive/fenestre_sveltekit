@@ -13,7 +13,7 @@ import { checkAuth } from '$lib/server/jwt';
 import { sendRdvEmail } from '$lib/server/email/RdvEmail.js';
 
 import { fr } from 'date-fns/locale/fr';
-import { createRdv } from '$lib/server/rdv.js';
+import { createRdv } from '$lib/server/services/rdvServices';
 
 import type { PageServerLoad } from './$types';
 import { getForfaitLocation } from '$lib/server/services/parametreServices';
