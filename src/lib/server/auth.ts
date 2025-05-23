@@ -14,6 +14,10 @@ export async function login(userName: string, password: string, cookies: Cookies
         const encodedSQL = encodeBase64(SQL);
         // Fetch data from API
         const userResponse = await fetchToApi(encodedSQL);
+        console.log(userResponse);
+        if (!userResponse.success || userResponse.data.erreur) {
+            return { success: false, error: "Erreur de connexion, veuillez vérifier votre email et mot de passe et réessayer" };
+        }
 
         if (userResponse.data[0].Droits < 2) {
             return { success: false, error: "User is not authorized" };

@@ -11,7 +11,7 @@ import { redirect } from '@sveltejs/kit';
 import type { Motif } from '$lib/types/types';
 import { checkAuth } from '$lib/server/jwt';
 import { sendRdvEmail } from '$lib/server/email/RdvEmail.js';
-
+import {fail} from '@sveltejs/kit';
 import { fr } from 'date-fns/locale/fr';
 import { createRdv } from '$lib/server/services/rdvServices';
 
@@ -52,9 +52,6 @@ export const actions = {
     default: async ({ request, cookies, locals }) => {
 
         const form = await superValidate(request, zod(rdvSchema));
-        const formData = form.data
-    
-
 
         if (!form.valid) {
             console.log(form.errors)
@@ -67,6 +64,7 @@ export const actions = {
 
         //Get motif from id 
         const motifResponse = await getMotifByID(form.data.task);
+        
         if (!motifResponse || !motifResponse.success || !motifResponse.data) {
             return message(form, {
                 status: 'error',
@@ -92,7 +90,7 @@ export const actions = {
         }
         
 
-        const response = await createRdv(formData, motifResponse.data, userResponse.data);
+        const response = await createRdv(form.data, motifResponse.data, userResponse.data);
         if (!response.success) {
             return message(form, {
                 status: 'error',

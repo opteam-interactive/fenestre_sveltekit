@@ -7,9 +7,12 @@ let { message } : { message: Message } = $props();
 </script>
 
 {#if message}
-    <h3
-        class={message.status == "success" ? "text-green-400" : "text-red-400"}
-    >
-        {message.text}
-    </h3>
+  <div class="w-full text-center ">
+        <h3
+            class="{message.status == "success" ? "text-green-400" : "text-red-400"} mx-auto max-w-3/4"
+        >
+        
+            {message.text}
+        </h3>
+  </div>
 {/if}

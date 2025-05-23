@@ -1,11 +1,11 @@
 import { error } from '@sveltejs/kit';
-import type { RequestHandler } from '../../[date]/$types';
+import type { RequestHandler } from './$types';
 import { getRdvsByDate } from '$lib/server/services/rdvServices';
 import { format } from 'date-fns'
 import { allTimeSlots } from "$lib/server/utils/constants";
 import type { FormattedResponse, Timeslot } from '$lib/types/types';
 
-export const GET: RequestHandler = async ({ url, params }) => {
+export const GET: RequestHandler = async ({ url, params } : { url: URL, params: { date: string } }) => {
 
     try {
         const date = params.date;

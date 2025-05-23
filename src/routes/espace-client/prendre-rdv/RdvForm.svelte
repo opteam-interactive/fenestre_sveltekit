@@ -19,12 +19,14 @@
     import ModalRdv from "$lib/components/ModalRdv.svelte";
     // Types
     import type { PageData } from "./$types";
+
     import type {
         FormattedResponse,
         Motif,
         RendezVous,
         Timeslot,
     } from "$lib/types/types";
+    
     import RadioWrapper from "$lib/components/forms/RadioWrapper.svelte";
     import type { rdvSchemaType } from "./rdvSchema";
 

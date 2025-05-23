@@ -6,6 +6,7 @@
         name: string;
         value: any;
         fieldError: string[] | undefined;
+        disabled ?: boolean
     }
 let { label, placeholder, name, type="text", value = $bindable(), fieldError, ...others } : Props = $props();
 </script>
@@ -20,10 +21,10 @@ let { label, placeholder, name, type="text", value = $bindable(), fieldError, ..
         placeholder={placeholder}
         name={name}
         bind:value={value}
-        {...others}
         aria-invalid={fieldError ? "true" : undefined}
+        {...others}
     />
     {#if fieldError}
-        <span class="invalid">{fieldError}</span>
+        <span class="text-red-500 ps-2 font-bold">{fieldError}</span>
     {/if}
 </div>

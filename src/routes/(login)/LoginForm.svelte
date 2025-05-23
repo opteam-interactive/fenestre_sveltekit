@@ -1,59 +1,55 @@
 <script lang="ts">
+    import InputText from "$lib/components/forms/InputText.svelte";
     import { superForm } from "sveltekit-superforms";
     import SuperDebug from "sveltekit-superforms";
+    import { page } from "$app/state";
 
-    const { formProps } = $props();
+    import type { PageData } from "./$types";
+    import type { LoginSchematype } from "./LoginSchema";
+    import FormFeedback from "$lib/components/forms/FormFeedback.svelte";
 
-    // Client API:
-    const { form, errors, constraints, message, enhance } =
-        superForm(formProps);
+    const pageData = page.data as PageData;
+    const { form, errors, constraints, message, enhance } = superForm<LoginSchematype>(pageData.form);
+
+        $effect(() => {
+            console.log("form", $form)
+            console.log("errors", $errors)
+            console.log("message", $message)
+        })
+
+    
 </script>
 
 <!-- <LoginForm /> -->
 
-{#if $message}
-    <h3
-        class={$message.status == "success" ? "text-green-400" : "text-red-400"}
-    >
-        {$message.text}
-    </h3>
-{/if}
+<FormFeedback message={$message } />
+
 
 <form method="POST" use:enhance class="w-full px-8">
     <fieldset class="fieldset gap-4">
-        <div>
-            <label class="fieldset-label" for="userName">Nom d'utilisateur</label>
-            <input
-                type="text"
-                class="input w-full rounded-full"
-                placeholder="Identifiant"
-                name="userName"
-                bind:value={$form.userName}
-                {...$constraints.userName}
-                aria-invalid={$errors.userName ? "true" : undefined}
+            <InputText
+            label="Nom d'utilisateur"
+            name="userName"
+            placeholder="Identifiant"
+            bind:value={$form.userName}
+            fieldError={$errors.userName}
+            {...$constraints.userName}
             />
-            {#if $errors.userName}
-                <span class="invalid">{$errors.userName}</span>
-            {/if}
-        </div>
+          
+        
 
-        <div>
-            <label class="fieldset-label" for="password">Mot de passe</label>
-            <input
-                type="password"
-                class="input w-full rounded-full"
-                placeholder="Mot de passe"
-                name="password"
-                bind:value={$form.password}
-                {...$constraints.password}
-                aria-invalid={$errors.password ? "true" : undefined}
-            />
-            {#if $errors.userName}
-                <span class="invalid">{$errors.userName}</span>
-            {/if}
-        </div>
+        <InputText
+            label="Mot de passe"
+            name="password"
+            type="password"
+            placeholder="Mot de passe"
+            bind:value={$form.password}
+            fieldError={$errors.password}
+            {...$constraints.password}
+        />
+       
 
-        <button class="btn btn-info mt-4 rounded-full">Login</button>
+        <button type="submit" class="btn btn-info mt-4 rounded-full">Login</button>
     </fieldset>
-    <!-- <SuperDebug data={$form} /> -->
+
 </form>

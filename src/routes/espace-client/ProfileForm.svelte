@@ -1,19 +1,20 @@
 <script lang="ts">
-    import FormWrapper from "$lib/components/FormWrapper.svelte";
     import { superForm } from "sveltekit-superforms";
     import SuperDebug from "sveltekit-superforms";
     import { page } from "$app/state";
-    
-    import type { User } from "$lib/types/types";
-    import type {PageData} from "./$types"; 
+    import type { PageData } from "./$types";
+    import type { ProfileSchemaType } from "./profileSchema";
+    import InputText from "$lib/components/forms/InputText.svelte";
+    import InputRadio from "$lib/components/forms/InputRadio.svelte";
+    import InputCheckbox from "$lib/components/forms/InputCheckbox.svelte";
 
-    const pageData = page.data as PageData
+    const pageData = page.data as PageData;
 
     // Get logged user from data of the layout
-    const { form, errors, constraints, message, enhance } = superForm<User>(
-        pageData.form
-    );
-
+    const { form, errors, constraints, message, enhance } =
+        superForm<ProfileSchemaType>(pageData.form, {
+            invalidateAll: "force",
+        });
 </script>
 
 {#if $message}
@@ -23,195 +24,137 @@
         {$message.text}
     </h3>
 {/if}
+
 <form method="POST" action="?/updateUser" use:enhance class="w-full md-px-8">
     <fieldset class="fieldset gap-4">
         <!-- Email -->
-        <div>
-            <label class="fieldset-label text-info" for="email">Email</label>
-            <input
-                type="email"
-                class="input w-full rounded-full"
-                placeholder="Email"
-                name="email"
-                bind:value={$form.email}
-                {...$constraints.email}
-                aria-invalid={$errors.email ? "true" : undefined}
+        <InputText
+            label="Email"
+            placeholder="Ex: example@domain.com"
+            name="email"
+            type="email"
+            bind:value={$form.email}
+            fieldError={$errors.email}
+            {...$constraints.email}
+        />
+
+        <!-- Mot de passe -->
+        <div class="grid md:grid-cols-2 gap-4 md-gap-8 items-center">
+          
+            <!-- MDP -->
+            <InputText
+                label="Mot de passe"
+                type="password"
+                placeholder="xxxxxxxx"
+                name="password"
+                bind:value={$form.password}
+                fieldError={$errors.password}
+                {...$constraints.password}
             />
-            {#if $errors.email}
-                <span class="invalid">{$errors.email}</span>
-            {/if}
+
+            <!-- Confirm -->
+            <InputText
+                label="Confirmation du mot de passe"
+                  type="password"
+                placeholder="SARL xxxxx"
+                name="passwordConfirm"
+                bind:value={$form.passwordConfirm}
+                fieldError={$errors.passwordConfirm}
+                {...$constraints.passwordConfirm}
+
+            />
         </div>
 
         <!-- Category -->
-        <div class="grid md-grid-cols-2 gap-4 md-gap-8 items-end">
-            <div>
-                <label class="fieldset-label text-info" for="category"
-                    >Vous êtes...</label
-                >
-                <div class="flex flex-col gap-2">
-                    <div>
-                        <input
-                            type="radio"
-                            class="radio radio-sm radio-info"
-                            placeholder="Identifiant"
-                            name="category"
-                            value="particulier"
-                            bind:group={$form.category}
-                        />
-                        <label for="userCategory">Un particulier</label>
-                    </div>
 
-                    <div>
-                        <input
-                            type="radio"
-                            class="radio radio-sm radio-info"
-                            placeholder="Identifiant"
-                            name="category"
-                            value="societe"
-                            bind:group={$form.category}
-                        />
-                        <label for="userCategory">Une entreprise</label>
-                    </div>
-                </div>
-                {#if $errors.category}
-                    <span class="invalid">{$errors.category}</span>
-                {/if}
+        <label for="category" class="fieldset-label text-info"
+            >Type de compte</label
+        >
+
+        <div class="grid md:grid-cols-2 gap-4 md-gap-8 items-center">
+            <div>
+                <InputCheckbox
+                    label="Je représente une société"
+                    name="isSociete"
+                    bind:checked={$form.isSociete}
+                    fieldError={$errors.isSociete}
+                />
             </div>
 
             <!-- SOCIETE -->
-            {#if $form.category == "societe"}
-                <div>
-                    <label class="fieldset-label text-info" for="societe"
-                        >Nom de l'entreprise</label
-                    >
-                    <input
-                        type="text"
-                        class="input w-full rounded-full"
-                        placeholder="Nom de l'entreprise"
-                        name="societe"
-                        bind:value={$form.societe}
-                        {...$constraints.societe}
-                        aria-invalid={$errors.societe ? "true" : undefined}
-                    />
-                    {#if $errors.societe}
-                        <span class="invalid">{$errors.societe}</span>
-                    {/if}
-                </div>
-            {/if}
-        </div>
-        <!-- NOM -->
-        <div class="grid md-grid-cols-2 gap-4 md-gap-8 items-end">
-            <div>
-                <label class="fieldset-label text-info" for="lastName"
-                    >Nom</label
-                >
-                <input
-                    type="text"
-                    class="input w-full rounded-full"
-                    placeholder="Ex: Dupont"
-                    name="lastName"
-                    bind:value={$form.lastName}
-                    {...$constraints.lastName}
-                    aria-invalid={$errors.lastName ? "true" : undefined}
-                />
-                {#if $errors.lastName}
-                    <span class="invalid">{$errors.lastName}</span>
-                {/if}
-            </div>
 
-            <!-- PRENOM -->
-            <div>
-                <label class="fieldset-label text-info" for="firstName"
-                    >Prénom</label
-                >
-                <input
-                    type="text"
-                    class="input w-full rounded-full"
-                    placeholder="Ex: Eric"
-                    name="firstName"
-                    bind:value={$form.firstName}
-                    {...$constraints.firstName}
-                    aria-invalid={$errors.firstName ? "true" : undefined}
-                />
-                {#if $errors.firstName}
-                    <span class="invalid">{$errors.firstName}</span>
-                {/if}
-            </div>
+            <InputText
+                label="Nom de la societe"
+                placeholder="SARL xxxxx"
+                name="societe"
+                bind:value={$form.societe}
+                fieldError={$errors.societe}
+                {...$constraints.societe}
+                disabled={!$form.isSociete}
+            />
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-4 md-gap-8 items-end">
+            <!-- NOM -->
+            <InputText
+                label="Nom"
+                placeholder="Ex: Dupont"
+                name="lastName"
+                bind:value={$form.lastName}
+                fieldError={$errors.lastName}
+                {...$constraints.lastName}
+            />
+
+            <InputText
+                label="Prénom"
+                placeholder="Ex: Eric"
+                name="firstName"
+                bind:value={$form.firstName}
+                fieldError={$errors.firstName}
+                {...$constraints.firstName}
+            />
         </div>
 
         <!-- TELEPHONE -->
-        <div>
-            <label class="fieldset-label text-info" for="telephone"
-                >Téléphone</label
-            >
-            <input
-                type="tel"
-                class="input w-full rounded-full"
-                placeholder="Ex: 02 00 00 00 00"
-                name="telephone"
-                bind:value={$form.telephone}
-                {...$constraints.telephone}
-                aria-invalid={$errors.telephone ? "true" : undefined}
-            />
-            {#if $errors.telephone}
-                <span class="invalid">{$errors.telephone}</span>
-            {/if}
-        </div>
+        <InputText
+            label="Téléphone"
+            placeholder="Ex: 02 00 00 00 00"
+            name="telephone"
+            bind:value={$form.telephone}
+            fieldError={$errors.telephone}
+            {...$constraints.telephone}
+        />
 
         <!-- ADRESSE -->
-        <div>
-            <label class="fieldset-label text-info" for="address">Adresse</label
-            >
-            <input
-                type="text"
-                class="input w-full rounded-full"
-                placeholder="Ex: 12 rue des Lilas"
-                name="address"
-                bind:value={$form.address}
-                {...$constraints.address}
-                aria-invalid={$errors.address ? "true" : undefined}
-            />
-            {#if $errors.address}
-                <span class="invalid">{$errors.address}</span>
-            {/if}
-        </div>
+        <InputText
+            label="Adresse"
+            placeholder="Ex: 12 rue des Lilas"
+            name="address"
+            bind:value={$form.address}
+            fieldError={$errors.address}
+            {...$constraints.address}
+        />
 
-        <div class="grid md-grid-cols-2 gap-4 md-gap-8 items-end">
+        <div class="grid md:grid-cols-2 gap-4 md-gap-8 items-end">
             <!-- CODE_POSTAL -->
-            <div>
-                <label class="fieldset-label text-info" for="zipcode"
-                    >Code Postal</label
-                >
-                <input
-                    type="text"
-                    class="input w-full rounded-full"
-                    placeholder="Ex: 76600"
-                    name="zipcode"
-                    bind:value={$form.zipcode}
-                    {...$constraints.zipcode}
-                    aria-invalid={$errors.zipcode ? "true" : undefined}
-                />
-                {#if $errors.zipcode}
-                    <span class="invalid">{$errors.zipcode}</span>
-                {/if}
-            </div>
+            <InputText
+                label="Code Postal"
+                placeholder="Ex: 76600"
+                name="zipcode"
+                bind:value={$form.zipcode}
+                fieldError={$errors.zipcode}
+                {...$constraints.zipcode}
+            />
 
             <!-- Ville -->
-            <div>
-                <label class="fieldset-label text-info" for="city">Ville</label>
-                <input
-                    type="text"
-                    class="input w-full rounded-full"
-                    placeholder="Ex: Le Havre"
-                    name="city"
-                    bind:value={$form.city}
-                    {...$constraints.city}
-                    aria-invalid={$errors.city ? "true" : undefined}
-                />
-                {#if $errors.city}
-                    <span class="invalid">{$errors.city}</span>
-                {/if}
-            </div>
+            <InputText
+                label="Ville"
+                placeholder="Ex: Le Havre"
+                name="city"
+                bind:value={$form.city}
+                fieldError={$errors.city}
+                {...$constraints.city}
+            />
         </div>
 
         <button class="btn btn-info mt-4 rounded-full"
@@ -219,4 +162,4 @@
         >
     </fieldset>
 </form>
-<!-- <SuperDebug data={$form} /> -->
+<SuperDebug data={$form} />

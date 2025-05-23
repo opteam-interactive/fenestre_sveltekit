@@ -29,14 +29,12 @@ export const actions = {
         }
 
         try {
-            const loginValidation = loginSchema.safeParse(form.data)
-            if (!loginValidation.success) {
-                return fail(400, { form });
-            }
+            
             const response = await login(form.data.userName, form.data.password, cookies)
 
 
             if (!response.success) {
+                console.log(response.error)
                 return message(form, {
                     status: "error",
                     text: response.error // Show the appropriate error message
