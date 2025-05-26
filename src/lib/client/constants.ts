@@ -1,15 +1,15 @@
 
-import type { MotifConditions } from "$lib/types/types"
-export const motifConditions: MotifConditions[] = [
+import type { MotifQuestions } from "$lib/types/types"
+export const motifQuestions: MotifQuestions[] = [
     {
         idMotifRDV: 2,
         Motif: "REVISION",
         textInput:false,
-        conditions: [
+        questions: [
             {
                 label: "Nombre de kilomètres",
                 slug: "kilometrage",
-                options: [
+                answers: [
                     "5000",
                     "10000",
                     "20000",
@@ -36,7 +36,7 @@ export const motifConditions: MotifConditions[] = [
             {
                 label: "Type de contrat",
                 slug: "type_contrat",
-                options: [
+                answers: [
                     "AUCUN CONTRAT",
                     "MAINTENANCE PEUGEOT",
                     "ARVAL SERVICE LEASE",
@@ -57,11 +57,11 @@ export const motifConditions: MotifConditions[] = [
         Motif: "DIAG - VOYANT 90€",
         textInput: true,
         textInputLabel: "Description des symptômes",
-        conditions: [
+        questions: [
             {
                 label: "Type de voyant",
                 slug: "type",
-                options: [
+                answers: [
                     'Moteur',
                     'ABS',
                     'Urée',
@@ -71,7 +71,7 @@ export const motifConditions: MotifConditions[] = [
             {
                 label: "Fréquence du problème",
                 slug: "frequence",
-                options: [
+                answers: [
                     "Permanent",
                     "Intermittent"
                 ]
@@ -79,7 +79,7 @@ export const motifConditions: MotifConditions[] = [
             {
                 label: "Perte de puissance",
                 slug: "perte_puissance",
-                options: [
+                answers: [
                     "Avec perte de puissance",
                     "Sans perte de puissance"
                 ]
@@ -91,11 +91,11 @@ export const motifConditions: MotifConditions[] = [
         Motif: "DIAG - BRUIT 90€",
         textInput: true,
         textInputLabel: "Description des symptômes",
-        conditions: [
+        questions: [
             {
                 label: "Type de bruit",
                 slug: "type",
-                options: [
+                answers: [
                     "Couinement",
                     "Grincement",
                     "Claquement",
@@ -107,7 +107,7 @@ export const motifConditions: MotifConditions[] = [
             {
                 label: "Position du bruit",
                 slug: "position",
-                options: [
+                answers: [
                     "Avant",
                     "Arriere",
                 ]
@@ -115,7 +115,7 @@ export const motifConditions: MotifConditions[] = [
             {
                 label: "Fréquence du problème",
                 slug: "frequence",
-                options: [
+                answers: [
                     "Permanent",
                     "Intermittent"
                 ]
@@ -123,7 +123,7 @@ export const motifConditions: MotifConditions[] = [
             {
                 label: "Type de route",
                 slug: "type_route",
-                options: [
+                answers: [
                     "Route accidentée",
                     "Sur parking"
                 ]
@@ -151,11 +151,11 @@ export const motifConditions: MotifConditions[] = [
         Motif: "Pneus x2",
         textInput: true,
         textInputLabel: "Taille obligatoire ex: 225/45-R17-91W",
-        conditions: [
+        questions: [
             {
                 label: "Position",
                 slug: "position",
-                options: [
+                answers: [
                     "Avant",
                     "Arriere",
                 ]
@@ -163,7 +163,7 @@ export const motifConditions: MotifConditions[] = [
             {
                 label: "Type de pneu",
                 slug: "type_pneu",
-                options: [
+                answers: [
                     "Été",
                     "Hivers",
                     "Toutes saisons"
@@ -177,11 +177,11 @@ export const motifConditions: MotifConditions[] = [
         Motif: "Pneus x4",
         textInput: true,
         textInputLabel: "Taille obligatoire ex: 225/45-R17-91W",
-        conditions: [
+        questions: [
             {
                 label: "Type de pneu",
                 slug: "type_pneu",
-                options: [
+                answers: [
                     "Été",
                     "Hivers",
                     "Toutes saisons"
@@ -193,11 +193,11 @@ export const motifConditions: MotifConditions[] = [
         idMotifRDV: 11,
         Motif: "Freinage Plaquettes x2",
         textInput: false,
-        conditions: [
+        questions: [
             {
                 label: "Position",
                 slug: "position",
-                options: [
+                answers: [
                     "Avant",
                     "Arriere",
                 ]
@@ -208,11 +208,11 @@ export const motifConditions: MotifConditions[] = [
         idMotifRDV: 12,
         Motif: "Freinage Disques/Plaquettes x2",
         textInput: false,
-        conditions: [
+        questions: [
             {
                 label: "Position",
                 slug: "position",
-                options: [
+                answers: [
                     "Avant",
                     "Arriere",
                 ]
@@ -233,11 +233,11 @@ export const motifConditions: MotifConditions[] = [
         idMotifRDV: 15,
         textInput: false,
         Motif: "Expertise",
-        conditions: [
+        questions: [
             {
                 label: "Type d'expertise",
                 slug: "type_expertise",
-                options: [
+                answers: [
                     "BCA",
                     "Creativ Expertise",
                     "Référence Expertise",
@@ -253,11 +253,11 @@ export const motifConditions: MotifConditions[] = [
         Motif: "DIAG - FUITE 90€",
         textInput: true,
         textInputLabel: "Description des symptômes",
-        conditions: [
+        questions: [
             {
                 label: "Type de fuite",
                 slug: "type_fuite",
-                options: [
+                answers: [
                     "Huile",
                     "Huile moteur",
                     "Liquide refroidissement",

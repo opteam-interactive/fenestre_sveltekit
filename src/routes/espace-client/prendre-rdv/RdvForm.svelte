@@ -7,8 +7,10 @@
     import { slide } from "svelte/transition";
     import { goto } from "$app/navigation";
     import { PUBLIC_SITE_URL } from "$env/static/public";
-    import { motifConditions } from "$lib/client/constants";
+    import { motifQuestions } from "$lib/client/constants";
+
     //Form components
+    import RadioWrapper from "$lib/components/forms/RadioWrapper.svelte";
     import InputText from "$lib/components/forms/InputText.svelte";
     import FormColumns from "$lib/components/forms/FormColumns.svelte";
     import InputSelect from "$lib/components/forms/InputSelect.svelte";
@@ -20,18 +22,10 @@
     import ModalRdv from "$lib/components/ModalRdv.svelte";
     // Types
     import type { PageData } from "./$types";
-
-    import type {
-        FormattedResponse,
-        Motif,
-        MotifConditions,
-        RendezVous,
-        Timeslot,
-    } from "$lib/types/types";
-
-    import RadioWrapper from "$lib/components/forms/RadioWrapper.svelte";
+    import type { FormattedResponse, Timeslot } from "$lib/types/types";
     import type { rdvSchemaType } from "./rdvSchema";
 
+    //METHODS
     const fetchAvailableTimeSlots = async () => {
         if ($form.appointmentDate) {
             const remainingTimeSlotsResponse = await fetch(
@@ -54,31 +48,36 @@
         }
     };
 
+    //DATA & states
+    //_Get data fetched at the page level (page.server.ts)
     const pageData = page.data as PageData;
     const motifs = pageData.motifs;
     const forfait = pageData.forfait;
+    //Setup superform object
     const { form, errors, constraints, message, enhance } =
         superForm<rdvSchemaType>(pageData.form);
+    //Utility states
     let isModalVisible = $state(false);
     let selectedDay = $state(new Date());
     let capacityFullError = $state<string>("");
+    let availableTimeSlots = $derived(fetchAvailableTimeSlots());
+    let selectedMotifQuestions = $derived(
+        motifQuestions.filter(
+            (question) => question.idMotifRDV === $form.task
+        )
+    );
+    let finalMotifQuestions = $state<{ [slug: string]: string }>({}); //stores all the complementary info for the selected motif
 
-    let notesRdv = $state<string>("");
     $effect(() => {
+        finalMotifQuestions = {};
         if (selectedDay !== $form.appointmentDate) {
             selectedDay = $form.appointmentDate;
             $form.appointmentTime = "";
             capacityFullError = "";
         }
     });
-    let availableTimeSlots = $derived(fetchAvailableTimeSlots());
 
-    let currentConditions = $derived(
-        motifConditions.filter(
-            (condition) => condition.idMotifRDV === $form.task
-        )
-    );
-
+    //When form is submitted
     const afterSubmit = () => {
         setTimeout(() => {
             isModalVisible = false;
@@ -86,6 +85,8 @@
         goto("#top");
         // alert("Rendez-vous réservé avec succès");
     };
+
+    $inspect(finalMotifQuestions);
 </script>
 
 <FormFeedback message={$message} />
@@ -147,7 +148,7 @@
             <option value="CarrosserieP">Carrosserie</option>
         </InputSelect> -->
 
-        <!-- TRAVAUX -->
+        <!-- Motif de RDV -->
         <InputSelect
             label="Motif du rendez-vous"
             placeholder="Motif du rendez-vous"
@@ -160,30 +161,36 @@
             {/each}
         </InputSelect>
 
-       
-            {#each currentConditions as currentCondition}
-                {#if currentCondition.conditions}
-                <div class="grid grid-cols-2 gap-4 px-8 py-4 bg-white rounded-md">
-                    {#each currentCondition.conditions as condition}
-                        <InputSelect 
-                        name={condition.slug}
-                        label={condition.label}
-                        
+        <!-- Pour ce motif, affiche les différentes questions complémentaires -->
+        {#each selectedMotifQuestions as selectedMotifQuestion}
+            {#if selectedMotifQuestion.questions}
+                <div
+                    class="grid grid-cols-2 gap-4 px-8 py-4 bg-white rounded-md"
+                    transition:slide
+                >
+                    {#each selectedMotifQuestion.questions as question}
+                        <InputSelect
+                            name={question.slug}
+                            label={question.label}
+                            bind:value={finalMotifQuestions[question.label]}
                         >
-                            {#each condition.options as option}
-                                <option value={option}>{option}</option>
+                            {#each question.answers as answer}
+                                <option value={answer}>{answer}</option>
                             {/each}
                         </InputSelect>
-                       
                     {/each}
                 </div>
-                {/if}
-            {/each}
-      
-
-        <div>
-            <p>{notesRdv}</p>
-        </div>
+            {/if}
+            <!-- Pour ce motif, affiche le champs texte s'il est présent -->
+            {#if selectedMotifQuestion.textInput && selectedMotifQuestion.textInputLabel}
+                <InputText
+                    label={selectedMotifQuestion.textInputLabel}
+                    placeholder={selectedMotifQuestion.textInputLabel}
+                    name={"notes " + selectedMotifQuestion.Motif}
+                    bind:value={finalMotifQuestions["Notes"]}
+                />
+            {/if}
+        {/each}
 
         <!-- CHIFFRAGE_? -->
         <InputCheckbox
@@ -329,6 +336,7 @@
             <ModalRdv
                 onclick={() => (isModalVisible = !isModalVisible)}
                 form={$form}
+                motifQuestions = {finalMotifQuestions}
                 {motifs}
                 {afterSubmit}
             />

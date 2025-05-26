@@ -75,17 +75,17 @@ export type WebdevUser = {
 
 
 
-export type MotifConditions = {
+export type MotifQuestions = {
     idMotifRDV: number,
     Motif: string,    
     textInput: boolean,
     textInputLabel ?: string,
-    conditions?: Condition[]
+    questions?: Condition[]
 }
 type Condition = {
     label: string,
     slug: string,
-    options: string[]
+    answers: string[]
 }
 
 

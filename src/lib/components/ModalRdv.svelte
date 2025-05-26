@@ -1,12 +1,21 @@
 <script lang="ts">
     import type { rdvSchemaType } from "$routes/espace-client/prendre-rdv/rdvSchema";
     import type { Motif } from "$lib/types/types";
+
+    type Props = {
+        onclick: () => void;
+        afterSubmit: () => void;
+        form: rdvSchemaType;
+        motifs: Motif[];
+        motifQuestions: { [key: string]: string };
+    }
     const {
         onclick,
         afterSubmit,
         form,
         motifs,
-    }: { onclick: () => void; afterSubmit: () => void; form: rdvSchemaType; motifs: Motif[] } = $props();
+        motifQuestions
+    }: Props = $props();
 </script>
 
 <div
@@ -20,12 +29,12 @@
         aria-hidden="true"
     ></div>
 
-    <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+    <div class="fixed inset-0 z-10 w-screen overflow-y-auto ">
         <div
-            class="flex min-h-full items-center justify-center p-4 text-center sm:items-center sm:p-0"
+            class="flex min-h-full items-center justify-center p-4 text-center sm:items-center sm:p-0 "
         >
             <div
-                class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
+                class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all "
             >
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <div class="sm:flex sm:items-start">
@@ -38,7 +47,7 @@
                             >
                                 Bilan de la réservation
                             </h3>
-                            <div class="mt-2 text-base grid grid-cols-2  ">
+                            <div class="mt-2 text-base grid grid-cols-2 gap-2  ">
                               
                                     <p>Véhicule : </p>
                                     <p>{form.brand} - {form.model}</p>
@@ -60,6 +69,21 @@
                                         (motif) =>
                                             motif.IDMotifRDV === form.task
                                     )?.Motif || "Non défini"}</p>
+
+                                    <p>Précisions :</p>
+                                    {#if motifQuestions && Object.keys(motifQuestions).length > 0}
+                                    <div>
+                                        <ul>
+                                            {#each Object.entries(motifQuestions) as [key, value]}
+                                                <li><span class="font-semibold">{key}</span> : {value}</li>
+                                            {/each}
+                                        </ul>
+                                    </div>
+                                    {:else}
+                                    <p>Aucune</p>
+                                    {/if}
+                                    
+                            
                                     <p>
                                         Devis :
                                     </p>

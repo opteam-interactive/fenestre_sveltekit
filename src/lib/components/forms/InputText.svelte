@@ -5,7 +5,7 @@
         placeholder: string;
         name: string;
         value: any;
-        fieldError: string[] | undefined;
+        fieldError ?: string[] | undefined;
         disabled ?: boolean
     }
 let { label, placeholder, name, type="text", value = $bindable(), fieldError, ...others } : Props = $props();
