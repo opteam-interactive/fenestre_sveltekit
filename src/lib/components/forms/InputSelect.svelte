@@ -5,7 +5,7 @@
         placeholder: string;
         name: string;
         value: any;
-        fieldError: string[] | undefined;
+        fieldError?: string[] | undefined;
         children: Snippet;
     };
     

@@ -26,7 +26,7 @@
         RendezVous,
         Timeslot,
     } from "$lib/types/types";
-    
+
     import RadioWrapper from "$lib/components/forms/RadioWrapper.svelte";
     import type { rdvSchemaType } from "./rdvSchema";
 
@@ -60,6 +60,8 @@
     let isModalVisible = $state(false);
     let selectedDay = $state(new Date());
     let capacityFullError = $state<string>("");
+    let motifCategory = $state<string>("");
+    let notesRdv = $state<string>("");
     $effect(() => {
         if (selectedDay !== $form.appointmentDate) {
             selectedDay = $form.appointmentDate;
@@ -126,7 +128,7 @@
             />
         </FormColumns>
 
-        <InputSelect
+        <!-- <InputSelect
             label="Type d'intervention"
             placeholder="Type d'intervention"
             name="rdvCategory"
@@ -135,27 +137,107 @@
         >
             <option value="AtelierP">Mécanique</option>
             <option value="CarrosserieP">Carrosserie</option>
-        </InputSelect>
+        </InputSelect> -->
 
         <!-- TRAVAUX -->
-         <!-- DIAGNOSTIC -->
-          
-        <!-- Controle technique -->
-         <!-- pneus -->
-          <!-- freinage -->
         <InputSelect
-            label="Travaux à effectuer"
-            placeholder="Travaux à effectuer"
+            label="Motif du rendez-vous"
+            placeholder="Motif du rendez-vous"
             name="task"
-            bind:value={$form.task}
-            fieldError={$errors.task}
+            bind:value={motifCategory}
         >
-            {#each motifs as motif}
-                {#if motif.NomActivité === $form.rdvCategory}
-                    <option value={motif.IDMotifRDV}>{motif.Motif}</option>
-                {/if}
-            {/each}
+            <option value="diagnostic">Diagnostic</option>
+            <option value="controle_technique">Contrôle technique</option>
+            <option value="pneus">Pneus</option>
+            <option value="freinage">Freinage</option>
+            <option value="autres"
+                >Autres (distribution, expertise, pare-brise, revisions... )</option
+            >
         </InputSelect>
+
+        <!-- DIAGNOSTIC -->
+        {#if motifCategory === "diagnostic"}
+            <InputSelect
+                label="Diagnostic"
+                placeholder="Diagnostic"
+                name="task"
+                bind:value={$form.task}
+                fieldError={$errors.task}
+            >
+                {#each pageData.motifsDiag as motifDiag}
+                    <option value={motifDiag.IDMotifRDV}
+                        >{motifDiag.Motif}</option
+                    >
+                {/each}
+            </InputSelect>
+        {:else if motifCategory === "controle_technique"}
+            <!-- Controle technique -->
+            <InputSelect
+                label="Controle technique"
+                placeholder="Controle technique"
+                name="task"
+                bind:value={$form.task}
+                fieldError={$errors.task}
+            >
+                {#each pageData.motifsControleTechnique as motifControleTechnique}
+                    <option value={motifControleTechnique.IDMotifRDV}
+                        >{motifControleTechnique.Motif}</option
+                    >
+                {/each}
+            </InputSelect>
+
+            <!-- pneus -->
+        {:else if motifCategory === "pneus"}
+            <InputSelect
+                label="Pneus"
+                placeholder="Pneus"
+                name="task"
+                bind:value={$form.task}
+                fieldError={$errors.task}
+            >
+                {#each pageData.motifsPneus as motifPneus}
+                    <option value={motifPneus.IDMotifRDV}
+                        >{motifPneus.Motif}</option
+                    >
+                {/each}
+            </InputSelect>
+
+            <!-- freinage -->
+        {:else if motifCategory === "freinage"}
+            <InputSelect
+                label="Freinage"
+                placeholder="Freinage"
+                name="task"
+                bind:value={$form.task}
+                fieldError={$errors.task}
+            >
+                {#each pageData.motifsFreinage as motifFreinage}
+                    <option value={motifFreinage.IDMotifRDV}
+                        >{motifFreinage.Motif}</option
+                    >
+                {/each}
+            </InputSelect>
+
+            <!-- Autres motifs -->
+        {:else if motifCategory === "autres"}
+            <InputSelect
+                label="Autres motifs"
+                placeholder="Autres motifs"
+                name="task"
+                bind:value={$form.task}
+                fieldError={$errors.task}
+            >
+                {#each pageData.motifsAutres as motifAutres}
+                    <option value={motifAutres.IDMotifRDV}
+                        >{motifAutres.Motif}</option
+                    >
+                {/each}
+            </InputSelect>
+        {/if}
+
+        <div>
+            <p>{notesRdv}</p>
+        </div>
 
         <!-- CHIFFRAGE_? -->
         <InputCheckbox

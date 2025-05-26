@@ -1,11 +1,12 @@
 <script lang="ts">
-    import type { RendezVous, Motif } from "$lib/types/types";
+    import type { rdvSchemaType } from "$routes/espace-client/prendre-rdv/rdvSchema";
+    import type { Motif } from "$lib/types/types";
     const {
         onclick,
         afterSubmit,
         form,
         motifs,
-    }: { onclick: () => void; afterSubmit: () => void; form: RendezVous; motifs: Motif[] } = $props();
+    }: { onclick: () => void; afterSubmit: () => void; form: rdvSchemaType; motifs: Motif[] } = $props();
 </script>
 
 <div
@@ -43,6 +44,8 @@
                                     <p>{form.brand} - {form.model}</p>
                                     <p>Immatriculation : </p>
                                     <p>{form.plateNumber}</p>
+                                    <p>Kilométrage : </p>
+                                    <p>{form.kilometers}</p>
                                     <p> Intervention : </p>
                                     <p>
                                         {form.rdvCategory ===

@@ -11,7 +11,7 @@ import { redirect } from '@sveltejs/kit';
 import type { Motif } from '$lib/types/types';
 import { checkAuth } from '$lib/server/jwt';
 import { sendRdvEmail } from '$lib/server/email/RdvEmail.js';
-import {fail} from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
 import { fr } from 'date-fns/locale/fr';
 import { createRdv } from '$lib/server/services/rdvServices';
 
@@ -45,10 +45,17 @@ export const load: PageServerLoad = async () => {
     const motifsControleTechnique = motifs.filter((motif) => motif.Motif.includes("Contrôle Technique"));
     const motifsPneus = motifs.filter((motif) => motif.Motif.includes("Pneus"));
     const motifsFreinage = motifs.filter((motif) => motif.Motif.includes("Freinage"));
+    const motifsAutres = motifs.filter((motif) => 
+        !motif.Motif.startsWith("DIAG")
+        && !motif.Motif.includes("Contrôle Technique")
+        && !motif.Motif.includes("Pneus")
+        && !motif.Motif.includes("Freinage")
+        && !motif.NomActivité.includes("AucunP")
+    )
 
     const form = await superValidate<Infer<typeof rdvSchema>, Message>(zod(rdvSchema));
 
-    return { form, motifs, forfait };
+    return { form, motifs, forfait, motifsDiag, motifsControleTechnique, motifsPneus, motifsFreinage, motifsAutres };
 };
 
 
@@ -71,7 +78,7 @@ export const actions = {
 
         //Get motif from id 
         const motifResponse = await getMotifByID(form.data.task);
-        
+
         if (!motifResponse || !motifResponse.success || !motifResponse.data) {
             return message(form, {
                 status: 'error',
@@ -86,7 +93,7 @@ export const actions = {
                 status: 'error',
                 text: 'ID Utilisateur non trouvé'
             });
-        }        
+        }
         const userResponse = await getUserById(userId);
 
         if (!userResponse || !userResponse.success || !userResponse.data) {
@@ -95,7 +102,7 @@ export const actions = {
                 text: 'Erreur lors de la recherche de l\'utilisateur'
             });
         }
-        
+
 
         const response = await createRdv(form.data, motifResponse.data, userResponse.data);
         if (!response.success) {

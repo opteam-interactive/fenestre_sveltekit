@@ -19,7 +19,7 @@ export type Motif = {
     MemoDesConditions: string,
     CaseLibre: string,
     DemandeChiffrageON: boolean,
-    NomActivité: 'AtelierP'  | 'CarrosserieP' ,
+    NomActivité: 'AtelierP'  | 'CarrosserieP' | 'AucunP',
     NbRDVParJour: number
 }
 export type RendezVous = z.infer<typeof rdvSchema>
