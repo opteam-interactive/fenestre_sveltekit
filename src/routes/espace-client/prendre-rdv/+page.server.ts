@@ -38,24 +38,17 @@ export const load: PageServerLoad = async () => {
         throw new Error(motifsResponse.error);
     }
 
-    const motifs: Motif[] = motifsResponse.data;
+    const motifList: Motif[] = motifsResponse.data;
 
 
-    const motifsDiag = motifs.filter((motif) => motif.Motif.startsWith("DIAG"));
-    const motifsControleTechnique = motifs.filter((motif) => motif.Motif.includes("Contrôle Technique"));
-    const motifsPneus = motifs.filter((motif) => motif.Motif.includes("Pneus"));
-    const motifsFreinage = motifs.filter((motif) => motif.Motif.includes("Freinage"));
-    const motifsAutres = motifs.filter((motif) => 
-        !motif.Motif.startsWith("DIAG")
-        && !motif.Motif.includes("Contrôle Technique")
-        && !motif.Motif.includes("Pneus")
-        && !motif.Motif.includes("Freinage")
-        && !motif.NomActivité.includes("AucunP")
+    
+    const motifs = motifList.filter((motif) => 
+      !motif.NomActivité.includes("AucunP")
     )
 
     const form = await superValidate<Infer<typeof rdvSchema>, Message>(zod(rdvSchema));
 
-    return { form, motifs, forfait, motifsDiag, motifsControleTechnique, motifsPneus, motifsFreinage, motifsAutres };
+    return { form, motifs, forfait };
 };
 
 

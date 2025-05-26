@@ -7,6 +7,7 @@
     import { slide } from "svelte/transition";
     import { goto } from "$app/navigation";
     import { PUBLIC_SITE_URL } from "$env/static/public";
+    import { motifConditions } from "$lib/client/constants";
     //Form components
     import InputText from "$lib/components/forms/InputText.svelte";
     import FormColumns from "$lib/components/forms/FormColumns.svelte";
@@ -23,6 +24,7 @@
     import type {
         FormattedResponse,
         Motif,
+        MotifConditions,
         RendezVous,
         Timeslot,
     } from "$lib/types/types";
@@ -60,7 +62,7 @@
     let isModalVisible = $state(false);
     let selectedDay = $state(new Date());
     let capacityFullError = $state<string>("");
-    let motifCategory = $state<string>("");
+
     let notesRdv = $state<string>("");
     $effect(() => {
         if (selectedDay !== $form.appointmentDate) {
@@ -70,6 +72,12 @@
         }
     });
     let availableTimeSlots = $derived(fetchAvailableTimeSlots());
+
+    let currentConditions = $derived(
+        motifConditions.filter(
+            (condition) => condition.idMotifRDV === $form.task
+        )
+    );
 
     const afterSubmit = () => {
         setTimeout(() => {
@@ -144,96 +152,34 @@
             label="Motif du rendez-vous"
             placeholder="Motif du rendez-vous"
             name="task"
-            bind:value={motifCategory}
+            bind:value={$form.task}
+            fieldError={$errors.task}
         >
-            <option value="diagnostic">Diagnostic</option>
-            <option value="controle_technique">Contrôle technique</option>
-            <option value="pneus">Pneus</option>
-            <option value="freinage">Freinage</option>
-            <option value="autres"
-                >Autres (distribution, expertise, pare-brise, revisions... )</option
-            >
+            {#each motifs as motif}
+                <option value={motif.IDMotifRDV}>{motif.Motif}</option>
+            {/each}
         </InputSelect>
 
-        <!-- DIAGNOSTIC -->
-        {#if motifCategory === "diagnostic"}
-            <InputSelect
-                label="Diagnostic"
-                placeholder="Diagnostic"
-                name="task"
-                bind:value={$form.task}
-                fieldError={$errors.task}
-            >
-                {#each pageData.motifsDiag as motifDiag}
-                    <option value={motifDiag.IDMotifRDV}
-                        >{motifDiag.Motif}</option
-                    >
-                {/each}
-            </InputSelect>
-        {:else if motifCategory === "controle_technique"}
-            <!-- Controle technique -->
-            <InputSelect
-                label="Controle technique"
-                placeholder="Controle technique"
-                name="task"
-                bind:value={$form.task}
-                fieldError={$errors.task}
-            >
-                {#each pageData.motifsControleTechnique as motifControleTechnique}
-                    <option value={motifControleTechnique.IDMotifRDV}
-                        >{motifControleTechnique.Motif}</option
-                    >
-                {/each}
-            </InputSelect>
-
-            <!-- pneus -->
-        {:else if motifCategory === "pneus"}
-            <InputSelect
-                label="Pneus"
-                placeholder="Pneus"
-                name="task"
-                bind:value={$form.task}
-                fieldError={$errors.task}
-            >
-                {#each pageData.motifsPneus as motifPneus}
-                    <option value={motifPneus.IDMotifRDV}
-                        >{motifPneus.Motif}</option
-                    >
-                {/each}
-            </InputSelect>
-
-            <!-- freinage -->
-        {:else if motifCategory === "freinage"}
-            <InputSelect
-                label="Freinage"
-                placeholder="Freinage"
-                name="task"
-                bind:value={$form.task}
-                fieldError={$errors.task}
-            >
-                {#each pageData.motifsFreinage as motifFreinage}
-                    <option value={motifFreinage.IDMotifRDV}
-                        >{motifFreinage.Motif}</option
-                    >
-                {/each}
-            </InputSelect>
-
-            <!-- Autres motifs -->
-        {:else if motifCategory === "autres"}
-            <InputSelect
-                label="Autres motifs"
-                placeholder="Autres motifs"
-                name="task"
-                bind:value={$form.task}
-                fieldError={$errors.task}
-            >
-                {#each pageData.motifsAutres as motifAutres}
-                    <option value={motifAutres.IDMotifRDV}
-                        >{motifAutres.Motif}</option
-                    >
-                {/each}
-            </InputSelect>
-        {/if}
+       
+            {#each currentConditions as currentCondition}
+                {#if currentCondition.conditions}
+                <div class="grid grid-cols-2 gap-4 px-8 py-4 bg-white rounded-md">
+                    {#each currentCondition.conditions as condition}
+                        <InputSelect 
+                        name={condition.slug}
+                        label={condition.label}
+                        
+                        >
+                            {#each condition.options as option}
+                                <option value={option}>{option}</option>
+                            {/each}
+                        </InputSelect>
+                       
+                    {/each}
+                </div>
+                {/if}
+            {/each}
+      
 
         <div>
             <p>{notesRdv}</p>
