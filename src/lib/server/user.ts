@@ -1,13 +1,14 @@
 
 import { jwtVerify, decodeJwt } from "jose";
 import { error } from '@sveltejs/kit';
-import type { User, ResponseWithData, WebdevUser, RegisterUser } from "$lib/types/types";
+import type { User, ResponseWithData, WebdevUser } from "$lib/types/types";
+import { registerSchema } from "$routes/register/RegisterSchema";
 import { JWT_SECRET } from '$env/static/private';
 import type { Cookies } from "@sveltejs/kit";
 import { checkAuth, updateToken } from "./jwt";
 import { encodeBase64, fetchToApi } from "$lib/server/utils/utils";
 import type { ProfileSchemaType } from "$routes/espace-client/profileSchema";
-
+import type { RegisterUser } from "$routes/register/RegisterSchema";
 
 const secretKey = new TextEncoder().encode(JWT_SECRET);
 
@@ -45,7 +46,19 @@ export async function createUser(formData: RegisterUser): Promise<ResponseWithDa
         //Set the role as user (default)
         const defaultRole = 2
 
-        const SQL = `INSERT INTO UTILISATEUR (Utilisateur, MotDePasse, Nom, Prénom, Société, Adresse, Ville, cp, Téléphone, Email, Droits, Autre1, Autre2, Autre3) VALUES ('${formData.email || ''}','${formData.password || ''}', '${formData.lastName || ''}', '${formData.firstName || ''}','${formData.societe || ''}', '${formData.address || ''}', '${formData.city || ''}', '${formData.zipcode || ''}', '${formData.telephone || ''}', '${formData.email || ''}', '${defaultRole || ''}', '${formData.other1 || ''}', '${formData.other2 || ''}', '${formData.other3 || ''}')`;
+        const SQL = `INSERT INTO UTILISATEUR (Utilisateur, MotDePasse, Nom, Prénom, Société, Adresse, Ville, cp, Téléphone, Email, Droits) VALUES (
+        '${formData.email || ''}',
+        '${formData.password || ''}', 
+        '${formData.lastName || ''}', 
+        '${formData.firstName || ''}',
+        '${formData.isSociete ? formData.societe : '' }', 
+        '${formData.address || ''}', 
+        '${formData.city || ''}', 
+        '${formData.zipcode || ''}', 
+        '${formData.telephone || ''}', 
+        '${formData.email || ''}', 
+        '${defaultRole || 2}'
+        )`;
 
         const encodedSQL = encodeBase64(SQL);
 
@@ -58,12 +71,10 @@ export async function createUser(formData: RegisterUser): Promise<ResponseWithDa
         }
 
         //Send email
-
-
         return { success: true, data: user };
 
     } catch (err) {
         console.error("Error in register route:", err);
-        return { success: false, error: err?.toString() };
+        return { success: false, errors: err?.toString() };
     }
 }

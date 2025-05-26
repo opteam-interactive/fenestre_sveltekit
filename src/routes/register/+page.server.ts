@@ -32,7 +32,7 @@ export const actions = {
             if (!response.success) {
                 return message(form, {
                     status: "error",
-                    text: response.error // Show the appropriate error message
+                    text: response.errors // Show the appropriate error message
                 });
             }
 
@@ -42,7 +42,7 @@ export const actions = {
             if (!emailResponse.success) {
                 return message(form, {
                     status: "Erreur dans l'envoi de l'email",
-                    text: emailResponse.error // Show the appropriate error message
+                    text: emailResponse.errors // Show the appropriate error message
                 });
             }
             // Return the form with a status message

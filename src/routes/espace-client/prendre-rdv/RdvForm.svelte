@@ -275,7 +275,7 @@
                                     >{timeSlot.startHour}</option
                                 >
                             {/each}
-                        {:else if availableTimeSlots.length === 0}
+                        {:else if availableTimeSlots && availableTimeSlots.length === 0}
                             <option disabled>Aucun créneau disponible</option>
                         {/if}
                     {:catch reason}

@@ -5,11 +5,13 @@
 
 # Checklist
 - rendu le vendredi à 18h
-- new user (+email)
-
-- new rdv (+email)
+- email new user
+- new rdv 
+- email new rdv
 - notif quand création RDV ????
+- optimiser motifs
 
 # Checked
 - login 
 - updateUser
+- new user (+email)

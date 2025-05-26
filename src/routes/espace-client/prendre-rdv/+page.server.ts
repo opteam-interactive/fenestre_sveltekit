@@ -39,6 +39,13 @@ export const load: PageServerLoad = async () => {
     }
 
     const motifs: Motif[] = motifsResponse.data;
+
+
+    const motifsDiag = motifs.filter((motif) => motif.Motif.startsWith("DIAG"));
+    const motifsControleTechnique = motifs.filter((motif) => motif.Motif.includes("Contrôle Technique"));
+    const motifsPneus = motifs.filter((motif) => motif.Motif.includes("Pneus"));
+    const motifsFreinage = motifs.filter((motif) => motif.Motif.includes("Freinage"));
+
     const form = await superValidate<Infer<typeof rdvSchema>, Message>(zod(rdvSchema));
 
     return { form, motifs, forfait };
