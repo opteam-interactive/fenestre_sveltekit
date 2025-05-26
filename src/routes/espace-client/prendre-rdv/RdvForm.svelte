@@ -54,22 +54,42 @@
     const motifs = pageData.motifs;
     const forfait = pageData.forfait;
     //Setup superform object
+    let isSubmitting = $state(false);
     const { form, errors, constraints, message, enhance } =
         superForm<rdvSchemaType>(pageData.form);
     //Utility states
+    let selectedMotifId = $state(0);
     let isModalVisible = $state(false);
     let selectedDay = $state(new Date());
     let capacityFullError = $state<string>("");
     let availableTimeSlots = $derived(fetchAvailableTimeSlots());
     let selectedMotifQuestions = $derived(
         motifQuestions.filter(
-            (question) => question.idMotifRDV === $form.task
+            (question) => question.idMotifRDV === $form.motifId
         )
     );
     let finalMotifQuestions = $state<{ [slug: string]: string }>({}); //stores all the complementary info for the selected motif
+ 
+    $effect(() => {
+        if ($form) {
+            const currentMotifDetailsString =
+                JSON.stringify(finalMotifQuestions);
+
+                //if the motif has changed reset the final motif questions
+                if ($form.motifId !== selectedMotifId && !isSubmitting ) {
+                    console.log("motif changed");
+                    selectedMotifId = $form.motifId;
+                    finalMotifQuestions = {};
+                }
+
+            // Only update if the stringified value has actually changed
+            if ($form.motifDetails !== currentMotifDetailsString) {
+                $form.motifDetails = currentMotifDetailsString;
+            } 
+        }
+    });
 
     $effect(() => {
-        finalMotifQuestions = {};
         if (selectedDay !== $form.appointmentDate) {
             selectedDay = $form.appointmentDate;
             $form.appointmentTime = "";
@@ -85,8 +105,6 @@
         goto("#top");
         // alert("Rendez-vous réservé avec succès");
     };
-
-    $inspect(finalMotifQuestions);
 </script>
 
 <FormFeedback message={$message} />
@@ -153,8 +171,8 @@
             label="Motif du rendez-vous"
             placeholder="Motif du rendez-vous"
             name="task"
-            bind:value={$form.task}
-            fieldError={$errors.task}
+            bind:value={$form.motifId}
+            fieldError={$errors.motifId}
         >
             {#each motifs as motif}
                 <option value={motif.IDMotifRDV}>{motif.Motif}</option>
@@ -191,6 +209,8 @@
                 />
             {/if}
         {/each}
+
+        
 
         <!-- CHIFFRAGE_? -->
         <InputCheckbox
@@ -319,7 +339,7 @@
                 </InputSelect>
             {/if}
         {:else}
-            <p class="text-red-500 text-sm">
+            <p class="text-customblue text-sm border rounded-md p-4">
                 Pour les dépôts sans contact, nous vous recontacterons par SMS
                 pour convenir des détails
             </p>
@@ -336,7 +356,7 @@
             <ModalRdv
                 onclick={() => (isModalVisible = !isModalVisible)}
                 form={$form}
-                motifQuestions = {finalMotifQuestions}
+                motifQuestions={finalMotifQuestions}
                 {motifs}
                 {afterSubmit}
             />

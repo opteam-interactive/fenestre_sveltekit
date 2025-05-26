@@ -41,9 +41,9 @@ export const load: PageServerLoad = async () => {
     const motifList: Motif[] = motifsResponse.data;
 
 
-    
-    const motifs = motifList.filter((motif) => 
-      !motif.NomActivité.includes("AucunP")
+
+    const motifs = motifList.filter((motif) =>
+        !motif.NomActivité.includes("AucunP")
     )
 
     const form = await superValidate<Infer<typeof rdvSchema>, Message>(zod(rdvSchema));
@@ -57,8 +57,8 @@ export const load: PageServerLoad = async () => {
 //POST_ACTION
 export const actions = {
     default: async ({ request, cookies, locals }) => {
-
         const form = await superValidate(request, zod(rdvSchema));
+        console.log(form.data)
 
         if (!form.valid) {
             console.log(form.errors)
@@ -68,9 +68,11 @@ export const actions = {
                 text: 'Formulaire invalide'
             });
         }
+        
+
 
         //Get motif from id 
-        const motifResponse = await getMotifByID(form.data.task);
+        const motifResponse = await getMotifByID(form.data.motifId);
 
         if (!motifResponse || !motifResponse.success || !motifResponse.data) {
             return message(form, {

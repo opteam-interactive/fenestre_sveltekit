@@ -1,5 +1,7 @@
-import type { FormattedResponse, Motif, RendezVous, WebdevRendezVous, WebdevUser } from "$lib/types/types";
+import type { FormattedResponse, Motif, WebdevRendezVous, WebdevUser } from "$lib/types/types";
+import type { rdvSchemaType } from "$routes/espace-client/prendre-rdv/rdvSchema"
 import { encodeBase64, fetchToApi } from "$lib/server/utils/utils";
+import { convertUtfToLocale } from "../utils/date";
 
 export const getRdvsByUser = async (id: number): Promise<FormattedResponse<WebdevRendezVous[]>> => {
     try {
@@ -47,9 +49,9 @@ export const getRdvsByUser = async (id: number): Promise<FormattedResponse<Webde
 
 export const getRdvsByDate = async (date: string): Promise<FormattedResponse<WebdevRendezVous[]>> => {
     try {
-         const lowerBound = `${date}T00:00:00.000`
-         const upperBound = `${date}T23:59:59.999`
-         //Fetch RDVs only for the selected date with motif
+        const lowerBound = `${date}T00:00:00.000`
+        const upperBound = `${date}T23:59:59.999`
+        //Fetch RDVs only for the selected date with motif
         const SQL = `SELECT * FROM RendezVous WHERE DateRécept BETWEEN '${lowerBound}' AND '${upperBound}' `
         // const SQL = `SELECT * FROM RendezVous LEFT JOIN MotifRDV ON RendezVous.IDMotifRDV = MotifRDV.IDMotifRDV WHERE DateRécept BETWEEN '${lowerBound}' AND '${upperBound}' `
         const encodedSQL = encodeBase64(SQL)
@@ -61,7 +63,7 @@ export const getRdvsByDate = async (date: string): Promise<FormattedResponse<Web
                 data: []
             }
         }
-  
+
         //if no appointment, send all time slots
         if (Array.isArray(response.data) && response.data.length == 0) {
             return {
@@ -85,19 +87,44 @@ export const getRdvsByDate = async (date: string): Promise<FormattedResponse<Web
 }
 
 
-export  const createRdv = async(formData: RendezVous, motif: Motif, user: WebdevUser): Promise<FormattedResponse<WebdevRendezVous>> => {
+export const createRdv = async (formData: rdvSchemaType, motif: Motif, user: WebdevUser): Promise<FormattedResponse<WebdevRendezVous>> => {
     try {
-        // Get DateRecept in UTC time
-        const formattedDateRecept = convertUtfToLocale(formData.appointmentDate, formData.appointmentTime)
+        if (!formData) {
+            return {
+                success: false,
+                error: "Missing form data"
+            }
+        }
+        let formattedDateRecept = ""
+        let formattedDateRestit = ""
+        if (formData.appointmentDate && formData.appointmentTime) {
+            // Get DateRecept in UTC time
+            formattedDateRecept = convertUtfToLocale(formData.appointmentDate, formData.appointmentTime)
 
-        // Set DateRestit to 18:00:00.000
-        const formattedDateRestit = convertUtfToLocale(formData.appointmentDate, "18:00")
+            // Set DateRestit to 18:00:00.000
+            formattedDateRestit = convertUtfToLocale(formData.appointmentDate, "18:00")
+        }
+
+        const jsonMotifDetails = JSON.parse(formData.motifDetails);
+        const formattedMotifDetails = Object.entries(jsonMotifDetails)
+            .map(([key, value]) => `${key} - ${value}`)
+            .join('\n'); // or use ', ' if you prefer
 
         // Format Travaux description
-        const formattedTravaux = `${motif?.Motif} - PRET VEHICULE = ${formData.rental ? "OUI" : "NON"
-            } - CHIFFRAGE = ${formData.chiffrage ? "OUI" : "NON"} - TYPE DE VEHICULE SOUHAITE = ${formData.rentalCategory ?? "SANS OBJET"
-            } - TYPE DE TRANSMISSION SOUHAITEE = ${formData.rentalDrive ?? "SANS OBJET"
-            } - SANS CONTACT = ${formData.contactless === "true" ? "OUI" : "NON"}`;
+        const formattedTravaux = `${motif?.Motif} 
+        - PRET VEHICULE = ${formData.rental ? "OUI" : "NON"} 
+        - CHIFFRAGE = ${formData.chiffrage ? "OUI" : "NON"} 
+        - TYPE DE VEHICULE SOUHAITE = ${formData.rentalCategory ?? "SANS OBJET"} 
+        - TYPE DE BOITE DE VITESSE SOUHAITEE = ${formData.rentalDrive ?? "SANS OBJET"} 
+        - SANS CONTACT = ${formData.contactless === "true" ? "OUI" : "NON"}
+        - ${formattedMotifDetails ?? ""}`;
+
+        console.log("formattedTravaux", formattedTravaux);
+
+        return {
+            success: true,
+            data: []
+        }
 
 
         // Build RDV Object
@@ -137,8 +164,7 @@ export  const createRdv = async(formData: RendezVous, motif: Motif, user: Webdev
 
         };
 
-        // Validate Data with ZOD
-        rdvWebdevSchema.parse(rdv);
+
 
         const SQL = `
 INSERT INTO RendezVous (

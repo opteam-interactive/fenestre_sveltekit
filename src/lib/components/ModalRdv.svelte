@@ -102,16 +102,22 @@
                                         </p>
                                         <p>{form.rentalDrive === "manual" ? "Manuelle" : "Automatique"}</p>
                                     {/if}
-                                    <p>
-                                        Date du RDV : 
-                                    </p>
-                                    <p>{new Date(form.appointmentDate).toLocaleDateString("fr-FR")} - {form.appointmentTime}</p>
+
                                     <p>
                                         Type de dépot : 
                                     </p>
                                     <p>{form.contactless
                                         ? "Sans contact"
                                         : "Sur horaires d'ouverture"}</p>
+
+                                    {#if form.contactless === "false"}
+                                    <p>
+                                        Date du RDV : 
+                                    </p>
+                                    <p>{new Date(form.appointmentDate).toLocaleDateString("fr-FR")} - {form.appointmentTime}</p>
+                                    {/if}
+                                   
+                                   
                                
                             </div>
                         </div>
