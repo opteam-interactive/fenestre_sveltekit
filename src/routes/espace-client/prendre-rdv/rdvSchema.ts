@@ -23,7 +23,7 @@ export const rdvSchema = z.object({
   }
   return true;
 }, {
-  message: "Une date est nécessair pour un dépot sur nos horaires d'ouverture",
+  message: "Une date est nécessaire pour un dépot sur nos horaires d'ouverture",
   path: ["appointmentDate"] // You can change this to ["appointmentTime"] or make multiple refinements if needed
 });
 

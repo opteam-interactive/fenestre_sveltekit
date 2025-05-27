@@ -7,6 +7,7 @@
         value: any;
         onchange ?: any;
         fieldError?: string[] | undefined;
+        disabled ?: boolean
 
         children: Snippet;
     };
@@ -18,6 +19,7 @@
         value = $bindable(),
         fieldError,
         onchange,
+        disabled,
         children,
         ...others
     }: Props = $props();
@@ -27,8 +29,9 @@
     <label class="fieldset-label text-info" for={name}>{label}</label>
     <select
         class="select w-full rounded-full"
-        name="rdvCategory"
+        name={name}
         onchange={$onchange}
+        disabled={disabled}
         bind:value
         {...others}
     >

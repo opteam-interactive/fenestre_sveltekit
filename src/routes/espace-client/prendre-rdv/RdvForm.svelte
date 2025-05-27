@@ -69,14 +69,17 @@
         )
     );
     let finalMotifQuestions = $state<{ [slug: string]: string }>({}); //stores all the complementary info for the selected motif
+    let finalMotifQuestionsString = $derived(
+        JSON.stringify(finalMotifQuestions)
+    );
  
     $effect(() => {
-        if ($form) {
+        if ($form && !isSubmitting) {
             const currentMotifDetailsString =
                 JSON.stringify(finalMotifQuestions);
 
                 //if the motif has changed reset the final motif questions
-                if ($form.motifId !== selectedMotifId && !isSubmitting ) {
+                if ($form.motifId !== selectedMotifId ) {
                     console.log("motif changed");
                     selectedMotifId = $form.motifId;
                     finalMotifQuestions = {};
@@ -96,6 +99,7 @@
             capacityFullError = "";
         }
     });
+
 
     //When form is submitted
     const afterSubmit = () => {
@@ -170,7 +174,7 @@
         <InputSelect
             label="Motif du rendez-vous"
             placeholder="Motif du rendez-vous"
-            name="task"
+            name="motifId"
             bind:value={$form.motifId}
             fieldError={$errors.motifId}
         >
@@ -209,13 +213,14 @@
                 />
             {/if}
         {/each}
-
+            <input type="hidden" name="motifDetails" bind:value={finalMotifQuestionsString}>
         
 
         <!-- CHIFFRAGE_? -->
         <InputCheckbox
             label="Je souhaite un devis"
             name="chiffrage"
+            id="1"
             bind:checked={$form.chiffrage}
             fieldError={$errors.chiffrage}
         />
@@ -223,6 +228,7 @@
         <InputCheckbox
             label="Je souhaite un prêt de voiture"
             name="rental"
+             id="2"
             bind:checked={$form.rental}
             fieldError={$errors.rental}
         />

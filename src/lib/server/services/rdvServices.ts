@@ -2,6 +2,7 @@ import type { FormattedResponse, Motif, WebdevRendezVous, WebdevUser } from "$li
 import type { rdvSchemaType } from "$routes/espace-client/prendre-rdv/rdvSchema"
 import { encodeBase64, fetchToApi } from "$lib/server/utils/utils";
 import { convertUtfToLocale } from "../utils/date";
+import {format, nextFriday} from 'date-fns'
 
 export const getRdvsByUser = async (id: number): Promise<FormattedResponse<WebdevRendezVous[]>> => {
     try {
@@ -101,10 +102,14 @@ export const createRdv = async (formData: rdvSchemaType, motif: Motif, user: Web
             // Get DateRecept in UTC time
             formattedDateRecept = convertUtfToLocale(formData.appointmentDate, formData.appointmentTime)
 
-            // Set DateRestit to 18:00:00.000
-            formattedDateRestit = convertUtfToLocale(formData.appointmentDate, "18:00")
+            // Set DateRestit to next friday 18:00:00.000
+            formattedDateRestit = convertUtfToLocale(nextFriday(formData.appointmentDate), "18:00")
+
+            console.log("formattedDateRecept", formattedDateRecept)
+            console.log("formattedDateRestit", formattedDateRestit)
         }
 
+       
         const jsonMotifDetails = JSON.parse(formData.motifDetails);
         const formattedMotifDetails = Object.entries(jsonMotifDetails)
             .map(([key, value]) => `${key} - ${value}`)
@@ -119,13 +124,7 @@ export const createRdv = async (formData: rdvSchemaType, motif: Motif, user: Web
         - SANS CONTACT = ${formData.contactless === "true" ? "OUI" : "NON"}
         - ${formattedMotifDetails ?? ""}`;
 
-        console.log("formattedTravaux", formattedTravaux);
-
-        return {
-            success: true,
-            data: []
-        }
-
+     
 
         // Build RDV Object
         const rdv: WebdevRendezVous = {
@@ -144,7 +143,7 @@ export const createRdv = async (formData: rdvSchemaType, motif: Motif, user: Web
             Version: "",
             immatriculation: formData.plateNumber,
             Travaux: formattedTravaux,
-            NomActivité: formData.rdvCategory || "AucunP",
+            NomActivité: motif.NomActivité || "AucunP",
             NbHeureTx: parseFloat(parseFloat(motif?.TempsEstimé!).toFixed(2)),
             Observations: "",
             IDVoiturePret: 0,
@@ -155,7 +154,7 @@ export const createRdv = async (formData: rdvSchemaType, motif: Motif, user: Web
             CréateurDateh: format(new Date(), "yyyyMMddHHmmssSSS"),
             ModifieurDateh: "",
             ModifieurID: 0,
-            IDMotifRDV: motif?.IDMotifRDV ?? formData.task,
+            IDMotifRDV: motif?.IDMotifRDV ?? formData.motifId,
             IDUtilisateur: user.IDUtilisateur ?? null,
             IDVéhicule: 0,
             SaisieDuClient: "",
@@ -207,21 +206,28 @@ ${rdv.Etat === null ? "NULL" : `'${rdv.Etat}'`},
 ${rdv.Blacklistage === "" ? "NULL" : `'${rdv.Blacklistage}'`}
 );
 `;
+console.log("sql", SQL)
 
         const encodedSQL = encodeBase64(SQL);
 
         const apiResponse = await fetchToApi(encodedSQL);
         if (!apiResponse.success) {
             // Gestion des erreurs de l'API externe
-            throw error(500, apiResponse.error);
+            return {
+                success: false,
+                error: apiResponse.error
+            }
         }
 
         //SEND_CONFIRMATION_EMAIL
-        const response = sendRdvEmail(user, formData, motif!);
+        // const response = sendRdvEmail(user, formData, motif!);
 
-        if (!response.success) {
-            throw error(500, response?.error as string);
-        }
+        // if (!response.success) {
+        //    return {
+        //        success: false,
+        //        error: response.error
+        //    }
+        // }
 
         return {
             success: true,

@@ -1,5 +1,4 @@
 <script lang="ts">
-
     type Props = {
         label: string;
         name: string;
@@ -17,13 +16,16 @@
     }: Props = $props();
 </script>
 
-<div >
-    <input
-        type="radio"
-        class="radio radio-sm radio-info"
-        {name}
-        {value}
-        bind:group
-    />
-    <label for={name}>{label}</label>
+<div>
+    <label for={`${name}-${value}`} >
+        <input
+            type="radio"
+            class="radio radio-sm radio-info"
+            id={`${name}-${value}`}
+            {name}
+            {value}
+            bind:group
+        />
+        {label}
+    </label>
 </div>

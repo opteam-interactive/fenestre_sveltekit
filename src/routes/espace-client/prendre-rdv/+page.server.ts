@@ -56,9 +56,9 @@ export const load: PageServerLoad = async () => {
 
 //POST_ACTION
 export const actions = {
+
     default: async ({ request, cookies, locals }) => {
         const form = await superValidate(request, zod(rdvSchema));
-        console.log(form.data)
 
         if (!form.valid) {
             console.log(form.errors)
@@ -68,7 +68,6 @@ export const actions = {
                 text: 'Formulaire invalide'
             });
         }
-        
 
 
         //Get motif from id 
@@ -98,8 +97,10 @@ export const actions = {
             });
         }
 
-
+        
         const response = await createRdv(form.data, motifResponse.data, userResponse.data);
+
+        
         if (!response.success) {
             return message(form, {
                 status: 'error',
