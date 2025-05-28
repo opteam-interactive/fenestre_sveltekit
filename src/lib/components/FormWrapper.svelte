@@ -5,7 +5,7 @@
         title,
         children,
     }: { customClass: string; title?: string; children?: Snippet } = $props();
-    const appliedClasses = `bg-lightblue flex flex-col items-center gap-8 p-4 rounded-xl  ${customClass}`;
+    const appliedClasses = `bg-lightblue flex flex-col items-center gap-8 p-8 rounded-xl  ${customClass}`;
 </script>
 
 

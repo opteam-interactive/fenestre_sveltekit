@@ -59,14 +59,15 @@
         JSON.stringify(finalMotifQuestions)
     );
 
+  
     $effect(() => {
-        if ($form && !submitting) {
+        if ($form  ) {
             const currentMotifDetailsString =
                 JSON.stringify(finalMotifQuestions);
 
             //if the motif has changed reset the final motif questions
             if ($form.motifId !== selectedMotifId) {
-                console.log("motif changed");
+                // console.log("motif changed");
                 selectedMotifId = $form.motifId;
                 finalMotifQuestions = {};
             }
@@ -127,9 +128,9 @@
                 jsonResponse.data?.remainingCapacityAtelierP;
             const remainingCapacityAtelierM =
                 jsonResponse.data?.remainingCapacityCarrosserieP;
-            console.log("remainingTimeSlots", remainingTimeSlots);
-            console.log("remainingCapacityAtelierP", remainingCapacityAtelierP);
-            console.log("remainingCapacityAtelierM", remainingCapacityAtelierM);
+            // console.log("remainingTimeSlots", remainingTimeSlots);
+            // console.log("remainingCapacityAtelierP", remainingCapacityAtelierP);
+            // console.log("remainingCapacityAtelierM", remainingCapacityAtelierM);
 
             if (!remainingTimeSlots || remainingTimeSlots.length <= 0) {
                 return [];
