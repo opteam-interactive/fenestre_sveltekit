@@ -2,8 +2,6 @@
 
 
 @import 'tailwindcss';
-@plugin '@tailwindcss/forms';
-@plugin '@tailwindcss/typography';
 @plugin "daisyui";
 @plugin "daisyui/theme" {
   name: "light";
@@ -39,3 +37,4 @@
     --font-termina: "TerminaRegular", serif; 
     --font-terminaBold: "TerminaBold", serif; 
   }
+

@@ -88,8 +88,11 @@ type Condition = {
     answers: string[]
 }
 
-
-
+export type TimeSlotResponse = {
+    availableSlots: Timeslot[];
+    remainingCapacityAtelierP: number;
+    remainingCapacityCarrosserieP: number;
+}
 
 
 

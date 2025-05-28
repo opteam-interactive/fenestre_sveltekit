@@ -54,17 +54,25 @@ export const getRdvsByDate = async (date: string): Promise<FormattedResponse<Web
         const upperBound = `${date}T23:59:59.999`
         //Fetch RDVs only for the selected date with motif
         const SQL = `SELECT * FROM RendezVous WHERE DateRécept BETWEEN '${lowerBound}' AND '${upperBound}' `
+        
         // const SQL = `SELECT * FROM RendezVous LEFT JOIN MotifRDV ON RendezVous.IDMotifRDV = MotifRDV.IDMotifRDV WHERE DateRécept BETWEEN '${lowerBound}' AND '${upperBound}' `
         const encodedSQL = encodeBase64(SQL)
         const response = await fetchToApi(encodedSQL)
-        if (!response.success || !Array.isArray(response.data)) {
+        
+        if (!response.success ) {
             return {
                 success: false,
-                error: "empty array",
-                data: []
+                error: response.error,
             }
         }
 
+        if (response.data.erreur) {
+            return {
+                success: true,
+                message: response.data.erreur,
+                data: []
+            }
+        }
         //if no appointment, send all time slots
         if (Array.isArray(response.data) && response.data.length == 0) {
             return {

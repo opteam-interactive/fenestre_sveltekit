@@ -5,6 +5,7 @@ export const rdvSchema = z.object({
   model: z.string().min(2).max(20),
   plateNumber: z.string().min(2).max(20),
   motifId: z.number(),
+  rdvCategory: z.enum(['AtelierP', 'CarrosserieP']).default('AtelierP'),
   motifDetails: z.string(),
   //see about type for date and time
   appointmentDate: z.date().nullable(),

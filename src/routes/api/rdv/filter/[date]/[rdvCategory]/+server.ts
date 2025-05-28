@@ -4,21 +4,33 @@ import { getRdvsByDate } from '$lib/server/services/rdvServices';
 import { format } from 'date-fns'
 import { allTimeSlots } from "$lib/server/utils/constants";
 import type { FormattedResponse, Timeslot } from '$lib/types/types';
+import { getMotifByID } from '$lib/server/services/motifServices';
+interface ResponseData {
+    availableSlots: Timeslot[];
+    remainingCapacityAtelierP: number;
+    remainingCapacityCarrosserieP: number;
+}
 
-export const GET: RequestHandler = async ({ url, params } : { url: URL, params: { date: string } }) => {
+export const GET: RequestHandler = async ({ url, params } : { url: URL, params: { date: string, rdvCategory: string } }) => {
+
 
     try {
-        const date = params.date;
+        const {date, rdvCategory} = params
+       
 
-        if (!date) {
-            error(400, 'Missing date parameter');
+        if (!date || !rdvCategory) {
+            error(400, 'Missing date or category parameter');
+        }
+
+        if (rdvCategory !== "AtelierP" && rdvCategory !== "CarrosserieP" && rdvCategory !== "AucunP") {
+            error(400, 'Invalid category parameter');
         }
 
 
         //GET RDVs
         const rdvResponse = await getRdvsByDate(date);
-       
-
+        console.log("rdvResponse", rdvResponse);
+        
         if (!rdvResponse.success || !Array.isArray(rdvResponse.data)) {
             // If no appointments found, send all time slots
             const responseData: FormattedResponse = {
@@ -30,30 +42,23 @@ export const GET: RequestHandler = async ({ url, params } : { url: URL, params: 
 
         const rdvs = rdvResponse.data;
 
-        let maxCapacityAtelierP = 16;
-        let maxCapacityCarrosserieP = 12;
+        const maxCapacityAtelierP = 16;
+        const maxCapacityCarrosserieP = 12;
+        let remainingCapacityAtelierP = maxCapacityAtelierP;
+        let remainingCapacityCarrosserieP = maxCapacityCarrosserieP;
+      
         //now check remaining capacity
         rdvs.forEach(rdv => {
             if (rdv.NomActivité === "AtelierP") {
-                maxCapacityAtelierP -= rdv.NbHeureTx;
+                remainingCapacityAtelierP -= rdv.NbHeureTx;
             }
 
             if (rdv.NomActivité === "CarrosserieP") {
-                maxCapacityCarrosserieP -= rdv.NbHeureTx;
+                remainingCapacityCarrosserieP -= rdv.NbHeureTx;
             }
         });
 
-        // console.log("maxCapacityAtelierP", maxCapacityAtelierP);
-        // console.log("maxCapacityCarrosserieP", maxCapacityCarrosserieP);
-        if (maxCapacityAtelierP <= 0 || maxCapacityCarrosserieP <= 0) {
-            const responseData: FormattedResponse = {
-                success: false,
-                error: "Tous les créneaux sont remplis pour ce jour, merci de sélectionner une autre date."
-            }
-            return new Response(JSON.stringify(responseData), { status: 200 });
-        }
-
-    
+       
 
         // Clone the array to avoid mutating the original
         const availableSlots = [...allTimeSlots];
@@ -72,10 +77,11 @@ export const GET: RequestHandler = async ({ url, params } : { url: URL, params: 
             }
         }
 
-        const responseData: FormattedResponse<Timeslot[]> = {
+        const responseData: FormattedResponse<ResponseData> = {
             success: true,
-            data: availableSlots,
+            data: {availableSlots, remainingCapacityAtelierP, remainingCapacityCarrosserieP},
         }
+    
         //return filtered array
         return new Response(JSON.stringify(responseData), { status: 200 });
 

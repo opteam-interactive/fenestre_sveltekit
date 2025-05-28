@@ -1,4 +1,5 @@
 import { API_URL, API_TOKEN } from '$env/static/private';
+import type { FormattedResponse } from '$lib/types/types';
 
 
 import { clsx, type ClassValue } from "clsx"
@@ -34,7 +35,7 @@ export async function fetchTest() {
 
     const SQL = "U0VMRUNUICogRlJPTSBtb3RpZnJkdiBXSEVSRSBOb21BY3Rpdml06SA9ICdBdGVsaWVyUCc="
     // const encodedSQL = encodeBase64(SQL)
- 
+
 
     const response = await fetch(url, {
       method: 'POST',
@@ -55,7 +56,9 @@ export async function fetchTest() {
 
 
 // Take a SQL request and send it to the API
-export const fetchToApi = async (sqlRequest: string) => {
+
+
+export const fetchToApi = async (sqlRequest: string): Promise<FormattedResponse<any>>  => {
   console.log()
   try {
     const url = API_URL || 'http://localhost:8024/Requete'
@@ -82,11 +85,10 @@ export const fetchToApi = async (sqlRequest: string) => {
       return {
         success: false,
         error: `Failed to fetch from API. Status: ${response.status}, Message: ${errorText}`,
-        status: response.status,
       };
     }
 
-    const data = await response.json()
+    const data = await response.json() 
 
     return { success: true, data };
   } catch (error) {

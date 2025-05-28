@@ -22,47 +22,27 @@
     import ModalRdv from "$lib/components/ModalRdv.svelte";
     // Types
     import type { PageData } from "./$types";
-    import type { FormattedResponse, Timeslot } from "$lib/types/types";
+    import type { FormattedResponse, Timeslot, TimeSlotResponse } from "$lib/types/types";
     import type { rdvSchemaType } from "./rdvSchema";
-
-    //METHODS
-    const fetchAvailableTimeSlots = async () => {
-        if ($form.appointmentDate) {
-            const remainingTimeSlotsResponse = await fetch(
-                `${PUBLIC_SITE_URL}/api/rdv/filter/${$form.appointmentDate}`
-            );
-            const jsonResponse: FormattedResponse<Timeslot[]> =
-                await remainingTimeSlotsResponse.json();
-
-            if (!jsonResponse.success && jsonResponse.error) {
-                console.error(jsonResponse.error);
-                capacityFullError = jsonResponse.error;
-                return [];
-            }
-            const remainingTimeSlots = jsonResponse.data;
-            if (remainingTimeSlots) {
-                return remainingTimeSlots;
-            } else {
-                return [];
-            }
-        }
-    };
 
     //DATA & states
     //_Get data fetched at the page level (page.server.ts)
     const pageData = page.data as PageData;
+    const { form, errors, constraints, message, enhance, submitting } =
+        superForm<rdvSchemaType>(pageData.form);
     const motifs = pageData.motifs;
+    const filteredMotifs = $derived(
+        motifs.filter((motif) => motif.NomActivité.includes($form.rdvCategory))
+    );
     const forfait = pageData.forfait;
     //Setup superform object
-    let isSubmitting = $state(false);
-    const { form, errors, constraints, message, enhance } =
-        superForm<rdvSchemaType>(pageData.form);
+    
+
     //Utility states
     let selectedMotifId = $state(0);
     let isModalVisible = $state(false);
     let selectedDay = $state(new Date());
     let capacityFullError = $state<string>("");
-    let availableTimeSlots = $derived(fetchAvailableTimeSlots());
     let selectedMotifQuestions = $derived(
         motifQuestions.filter(
             (question) => question.idMotifRDV === $form.motifId
@@ -72,23 +52,23 @@
     let finalMotifQuestionsString = $derived(
         JSON.stringify(finalMotifQuestions)
     );
- 
+
     $effect(() => {
-        if ($form && !isSubmitting) {
+        if ($form && !submitting) {
             const currentMotifDetailsString =
                 JSON.stringify(finalMotifQuestions);
 
-                //if the motif has changed reset the final motif questions
-                if ($form.motifId !== selectedMotifId ) {
-                    console.log("motif changed");
-                    selectedMotifId = $form.motifId;
-                    finalMotifQuestions = {};
-                }
+            //if the motif has changed reset the final motif questions
+            if ($form.motifId !== selectedMotifId) {
+                console.log("motif changed");
+                selectedMotifId = $form.motifId;
+                finalMotifQuestions = {};
+            }
 
             // Only update if the stringified value has actually changed
             if ($form.motifDetails !== currentMotifDetailsString) {
                 $form.motifDetails = currentMotifDetailsString;
-            } 
+            }
         }
     });
 
@@ -100,7 +80,6 @@
         }
     });
 
-
     //When form is submitted
     const afterSubmit = () => {
         setTimeout(() => {
@@ -109,6 +88,44 @@
         goto("#top");
         // alert("Rendez-vous réservé avec succès");
     };
+
+    //METHODS
+    const fetchAvailableTimeSlots = async () => {
+        if ($form.appointmentDate) {
+            const remainingTimeSlotsResponse = await fetch(
+                `${PUBLIC_SITE_URL}/api/rdv/filter/${$form.appointmentDate}/${$form.rdvCategory}`
+            );
+            const jsonResponse: FormattedResponse<TimeSlotResponse> =
+                await remainingTimeSlotsResponse.json();
+
+            if (!jsonResponse.success ) {
+                console.error(jsonResponse.error);
+                return [];
+            }
+
+
+            const remainingTimeSlots = jsonResponse.data?.availableSlots;
+            const remainingCapacityAtelierP = jsonResponse.data?.remainingCapacityAtelierP;
+            const remainingCapacityAtelierM = jsonResponse.data?.remainingCapacityCarrosserieP;
+            console.log("remainingTimeSlots", remainingTimeSlots);
+            console.log("remainingCapacityAtelierP", remainingCapacityAtelierP);
+            console.log("remainingCapacityAtelierM", remainingCapacityAtelierM);
+
+            if (!remainingTimeSlots || remainingTimeSlots.length <= 0) {
+                return [];
+            } else if ($form.rdvCategory === "AtelierP" && remainingCapacityAtelierP && remainingCapacityAtelierP <= 0) {
+                capacityFullError = "Tous les créneaux ateliers sont réservés pour ce jour";
+
+                return [];
+            } else if ($form.rdvCategory === "CarrosserieP" && remainingCapacityAtelierM && remainingCapacityAtelierM <= 0) {
+                capacityFullError = "Tous les créneaux carrosseries sont réservés pour ce jour";
+                return [];
+            } else {
+                return remainingTimeSlots;
+            }
+        }
+    };
+    let availableTimeSlots = $derived(fetchAvailableTimeSlots());
 </script>
 
 <FormFeedback message={$message} />
@@ -170,6 +187,28 @@
             <option value="CarrosserieP">Carrosserie</option>
         </InputSelect> -->
 
+        <div>
+            <h3 class="text-center text-customblue">Type d'intervention</h3>
+            <div class="tabs tabs-box w-1/2 mx-auto">
+                <input
+                    type="radio"
+                    name="rdvCategory"
+                    class="tab w-1/2 text-white hover:text-white [--tab-bg:#00549E] [--tab-border-color:white]"
+                    aria-label="Atelier"
+                    value="AtelierP"
+                    bind:group={$form.rdvCategory}
+                />
+
+                <input
+                    type="radio"
+                    name="rdvCategory"
+                    class="tab w-1/2 text-white hover:text-white [--tab-bg:#00549E] [--tab-border-color:white]"
+                    aria-label="Carrosserie"
+                    value="CarrosserieP"
+                    bind:group={$form.rdvCategory}
+                />
+            </div>
+        </div>
         <!-- Motif de RDV -->
         <InputSelect
             label="Motif du rendez-vous"
@@ -178,7 +217,7 @@
             bind:value={$form.motifId}
             fieldError={$errors.motifId}
         >
-            {#each motifs as motif}
+            {#each filteredMotifs as motif}
                 <option value={motif.IDMotifRDV}>{motif.Motif}</option>
             {/each}
         </InputSelect>
@@ -213,8 +252,11 @@
                 />
             {/if}
         {/each}
-            <input type="hidden" name="motifDetails" bind:value={finalMotifQuestionsString}>
-        
+        <input
+            type="hidden"
+            name="motifDetails"
+            bind:value={finalMotifQuestionsString}
+        />
 
         <!-- CHIFFRAGE_? -->
         <InputCheckbox
@@ -228,7 +270,7 @@
         <InputCheckbox
             label="Je souhaite un prêt de voiture"
             name="rental"
-             id="2"
+            id="2"
             bind:checked={$form.rental}
             fieldError={$errors.rental}
         />
@@ -345,10 +387,25 @@
                 </InputSelect>
             {/if}
         {:else}
-            <p class="text-customblue text-sm border rounded-md p-4">
-                Pour les dépôts sans contact, nous vous recontacterons par SMS
-                pour convenir des détails
-            </p>
+            <div role="alert" class="alert alert-warning">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-6 w-6 shrink-0 stroke-current"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                    />
+                </svg>
+                <span>
+                    Pour les dépôts sans contact, nous vous recontacterons par
+                    SMS pour convenir des détails</span
+                >
+            </div>
         {/if}
 
         <!-- MODAL_DE_VALIDATION -->
