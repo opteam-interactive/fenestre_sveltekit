@@ -30,6 +30,7 @@
     import type { rdvSchemaType } from "./rdvSchema";
     import FormWrapper from "$lib/components/FormWrapper.svelte";
     import RecapRdv from "$lib/components/RecapRdv.svelte";
+    import FormSection from "$lib/components/forms/FormSection.svelte";
 
     //DATA & states
     //_Get data fetched at the page level (page.server.ts
@@ -59,9 +60,8 @@
         JSON.stringify(finalMotifQuestions)
     );
 
-  
     $effect(() => {
-        if ($form  ) {
+        if ($form) {
             const currentMotifDetailsString =
                 JSON.stringify(finalMotifQuestions);
 
@@ -97,7 +97,6 @@
         goto("#top");
         // alert("Rendez-vous réservé avec succès");
     };
-    
 
     // const nextStep = () => {
     //     if (formStep < 5) {
@@ -158,8 +157,6 @@
         }
     };
     let availableTimeSlots = $derived(fetchAvailableTimeSlots());
-
-    
 </script>
 
 <!-- <div class="mt-6">
@@ -180,14 +177,11 @@
     </ul>
 </div> -->
 
-
-<FormWrapper  customClass="md:w-2/3 lg:w-1/2 my-8">
-
+<FormWrapper customClass="md:w-2/3 lg:w-1/2 my-8">
     <FormFeedback message={$message} />
 
-    <form method="POST" onsubmit={handleSubmit} class="w-full md-px-8">
-
-
+    <form method="POST" class="w-full md-px-8">
+        <FormSection title="Informations personnelles">
             <fieldset class="fieldset gap-8">
                 <FormColumns>
                     <!-- MARQUE -->
@@ -233,8 +227,9 @@
                     />
                 </FormColumns>
             </fieldset>
+        </FormSection>
 
-
+        <FormSection title="Motif du rendez-vous">
             <fieldset class="fieldset gap-8">
                 <div>
                     <h3 class="text-center text-customblue">
@@ -311,8 +306,9 @@
                     bind:value={finalMotifQuestionsString}
                 />
             </fieldset>
+        </FormSection>
 
-
+        <FormSection title="Services supplémentaires">
             <fieldset class="fieldset gap-8">
                 <!-- CHIFFRAGE_? -->
                 <InputCheckbox
@@ -379,8 +375,9 @@
                     </div>
                 {/if}
             </fieldset>
+        </FormSection>
 
-
+        <FormSection title="Depot du vehicule">
             <fieldset class="fieldset gap-8">
                 <!-- Depot du vehicule -->
                 <RadioWrapper
@@ -475,21 +472,26 @@
                     </div>
                 {/if}
             </fieldset>
+        </FormSection>
 
-            
+        <FormSection title="Bilan de la reservation">
             <fieldset class="fieldset gap-8">
                 <!-- MODAL_DE_VALIDATION -->
-               
-                    <RecapRdv
-                        onclick={() => (isModalVisible = !isModalVisible)}
-                        form={$form}
-                        motifQuestions={finalMotifQuestions}
-                        {motifs}
-                        {afterSubmit}
-                    />
-              
+
+                <RecapRdv
+                    onclick={() => (isModalVisible = !isModalVisible)}
+                    form={$form}
+                    motifQuestions={finalMotifQuestions}
+                    {motifs}
+                    {afterSubmit}
+                />
             </fieldset>
- 
+        </FormSection>
+        <div class="flex justify-center">
+            <button type="submit" class="btn btn-success" onclick={afterSubmit}
+                >Je valide ce rendez-vous</button
+            >
+        </div>
     </form>
     <!-- <div class="grid grid-cols-2 gap-4">
         <button class={formStep === 1 ? "btn btn-disabled" : "btn"} onclick={prevStep}>Précédent</button>
