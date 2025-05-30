@@ -3,6 +3,7 @@ import type { rdvSchemaType } from "$routes/espace-client/prendre-rdv/rdvSchema"
 import { encodeBase64, fetchToApi } from "$lib/server/utils/utils";
 import { convertUtfToLocale } from "../utils/date";
 import {format, nextFriday} from 'date-fns'
+import { sendRdvEmail } from "../email/RdvEmail";
 
 export const getRdvsByUser = async (id: number): Promise<FormattedResponse<WebdevRendezVous[]>> => {
     try {
@@ -113,8 +114,7 @@ export const createRdv = async (formData: rdvSchemaType, motif: Motif, user: Web
             // Set DateRestit to next friday 18:00:00.000
             formattedDateRestit = convertUtfToLocale(nextFriday(formData.appointmentDate), "18:00")
 
-            console.log("formattedDateRecept", formattedDateRecept)
-            console.log("formattedDateRestit", formattedDateRestit)
+          
         }
 
        
@@ -214,7 +214,6 @@ ${rdv.Etat === null ? "NULL" : `'${rdv.Etat}'`},
 ${rdv.Blacklistage === "" ? "NULL" : `'${rdv.Blacklistage}'`}
 );
 `;
-console.log("sql", SQL)
 
         const encodedSQL = encodeBase64(SQL);
 
@@ -228,7 +227,7 @@ console.log("sql", SQL)
         }
 
         //SEND_CONFIRMATION_EMAIL
-        // const response = sendRdvEmail(user, formData, motif!);
+       const response = sendRdvEmail(user, formData, motif!);
 
         // if (!response.success) {
         //    return {

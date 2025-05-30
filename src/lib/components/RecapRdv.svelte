@@ -52,7 +52,7 @@ class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-x
                     </p>
                     <p>{motifs.find(
                         (motif) =>
-                            motif.IDMotifRDV === form.task
+                            motif.IDMotifRDV === form.motifId
                     )?.Motif || "Non défini"}</p>
 
                     <p>Précisions :</p>

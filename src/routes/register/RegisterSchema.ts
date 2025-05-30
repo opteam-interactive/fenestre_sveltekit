@@ -24,4 +24,4 @@ export const registerSchema = z.object({
       message: 'Mot de passe ou confirmation incorrect',
     })
 
-    export type RegisterUser = z.infer<typeof registerSchema>
+    export type RegisterSchemaType = z.infer<typeof registerSchema>

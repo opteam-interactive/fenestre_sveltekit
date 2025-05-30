@@ -37,7 +37,7 @@
 
             <a href="/espace-client" class="flex gap-2 items-center text-xl px-4 hover:transform hover:scale-105 transition">
                 <img src={logo} alt="" class="w-12" />
-                Garage Fenestre
+                Garage Benoist Fenestre
             </a>
         </div>
 

@@ -44,7 +44,7 @@
     //Setup superform object
 
     //Utility states
-    let formStep = $state(1);
+    // let formStep = $state(1);
     let selectedMotifId = $state(0);
     let isModalVisible = $state(false);
     let selectedDay = $state(new Date());
@@ -97,18 +97,19 @@
         goto("#top");
         // alert("Rendez-vous réservé avec succès");
     };
+    
 
-    const nextStep = () => {
-        if (formStep < 5) {
-            formStep += 1;
-        }
-    }
+    // const nextStep = () => {
+    //     if (formStep < 5) {
+    //         formStep += 1;
+    //     }
+    // }
 
-    const prevStep = () => {
-        if (formStep > 1) {
-            formStep -= 1;
-        }
-    }
+    // const prevStep = () => {
+    //     if (formStep > 1) {
+    //         formStep -= 1;
+    //     }
+    // }
 
     const fetchAvailableTimeSlots = async () => {
         if ($form.appointmentDate) {
@@ -157,9 +158,11 @@
         }
     };
     let availableTimeSlots = $derived(fetchAvailableTimeSlots());
+
+    
 </script>
 
-<div class="mt-6">
+<!-- <div class="mt-6">
     <ul class="steps text-sm">
         <button class={formStep === 1 ? "step step-info" : "step"} onclick={() => (formStep = 1)}>
             Infos personnelles
@@ -175,17 +178,16 @@
             Récapitulatif
         </button>
     </ul>
-</div>
+</div> -->
 
 
 <FormWrapper  customClass="md:w-2/3 lg:w-1/2 my-8">
 
     <FormFeedback message={$message} />
 
-    <form method="POST" use:enhance class="w-full md-px-8">
+    <form method="POST" onsubmit={handleSubmit} class="w-full md-px-8">
 
 
-        {#if formStep === 1}
             <fieldset class="fieldset gap-8">
                 <FormColumns>
                     <!-- MARQUE -->
@@ -233,7 +235,6 @@
             </fieldset>
 
 
-        {:else if formStep === 2}
             <fieldset class="fieldset gap-8">
                 <div>
                     <h3 class="text-center text-customblue">
@@ -312,7 +313,6 @@
             </fieldset>
 
 
-        {:else if formStep === 3}
             <fieldset class="fieldset gap-8">
                 <!-- CHIFFRAGE_? -->
                 <InputCheckbox
@@ -381,7 +381,6 @@
             </fieldset>
 
 
-        {:else if formStep === 4}
             <fieldset class="fieldset gap-8">
                 <!-- Depot du vehicule -->
                 <RadioWrapper
@@ -478,7 +477,6 @@
             </fieldset>
 
             
-        {:else if formStep === 5}
             <fieldset class="fieldset gap-8">
                 <!-- MODAL_DE_VALIDATION -->
                
@@ -491,11 +489,11 @@
                     />
               
             </fieldset>
-        {/if}
+ 
     </form>
-    <div class="grid grid-cols-2 gap-4">
+    <!-- <div class="grid grid-cols-2 gap-4">
         <button class={formStep === 1 ? "btn btn-disabled" : "btn"} onclick={prevStep}>Précédent</button>
         <button class={formStep === 5 ? "btn btn-disabled" : "btn"} onclick={nextStep}>Suivant</button>
-    </div>
+    </div> -->
 </FormWrapper>
 <SuperDebug data={$form} />

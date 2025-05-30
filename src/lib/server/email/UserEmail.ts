@@ -1,9 +1,10 @@
 import { sendEmail } from "$lib/server/email/sendEmail";
-import type { ResponseNoData, ResponseWithData, RegisterUser } from "$lib/types/types";
+import type { ResponseNoData, ResponseWithData, FormattedResponse } from "$lib/types/types";
+import type { RegisterSchemaType } from "$routes/register/RegisterSchema";
 import { error } from "@sveltejs/kit";
 import type { SentMessageInfo } from "nodemailer";
 
-export async function sendRegisterEmail(user: RegisterUser):Promise<ResponseWithData<SentMessageInfo>> {
+export async function sendRegisterEmail(user: RegisterSchemaType):Promise<FormattedResponse<SentMessageInfo>> {
     if (!user) {
         throw error(500, "No user provided");
     }
@@ -25,6 +26,9 @@ export async function sendRegisterEmail(user: RegisterUser):Promise<ResponseWith
         <li>Société : ${user.societe ?? "Non renseigné"}</li>
         <li>Adresse : ${user.address } - ${user.zipcode} ${user.city}</li>
     </ul>
+    <p>Vous pouvez nous contacter au 02 35 46 03 70</p>
+    <p>Cordialement</p>
+    <p>Garage Benoist Fenestre</p>
         `
         const response = await sendEmail(email, name, html);
         if (!response.success) {

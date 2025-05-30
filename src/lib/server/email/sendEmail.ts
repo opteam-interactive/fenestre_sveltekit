@@ -1,10 +1,10 @@
 import nodemailer, { type SentMessageInfo } from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
 import { EMAIL_HOST, EMAIL_PORT, EMAIL_USER, EMAIL_PASSWORD } from '$env/static/private';
-import type { ResponseNoData, ResponseWithData } from '$lib/types/types';
+import type { FormattedResponse, ResponseNoData, ResponseWithData } from '$lib/types/types';
 
 
-export async function sendEmail(email: string, name:string, html: string):Promise<ResponseWithData<SentMessageInfo>> {
+export async function sendEmail(email: string, name:string, html: string): Promise<FormattedResponse<any>> {
    
 
     // create transporter
@@ -27,8 +27,8 @@ export async function sendEmail(email: string, name:string, html: string):Promis
     };
 
     try {
-        const info  = await transporter.sendMail(mailOptions);
-        return { success: true, data: info  };
+        const info = await transporter.sendMail(mailOptions) ;
+        return { success: true, data: info   };
 
 
     } catch (err) {
