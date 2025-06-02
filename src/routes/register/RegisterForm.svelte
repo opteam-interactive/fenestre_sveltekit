@@ -2,7 +2,7 @@
     import { superForm } from "sveltekit-superforms";
     import SuperDebug from "sveltekit-superforms";
     import { page } from "$app/state";
-    import type { RegisterUser } from "./RegisterSchema";
+    import type { RegisterSchemaType } from "./RegisterSchema";
     import InputText from "$lib/components/forms/InputText.svelte";
     import InputRadio from "$lib/components/forms/InputRadio.svelte";
     import InputCheckbox from "$lib/components/forms/InputCheckbox.svelte";
@@ -10,7 +10,7 @@
     import FormSection from "$lib/components/forms/FormSection.svelte";
 
     const { form, errors, constraints, message, enhance } =
-        superForm<RegisterUser>(page.data.form);
+        superForm<RegisterSchemaType>(page.data.form);
 </script>
 
 {#if $message}
@@ -21,7 +21,7 @@
     </h3>
 {/if}
 
-<form action="?/register" method="POST" class="w-full px-8">
+<form method="POST" class="w-full px-8">
     <fieldset class="fieldset gap-4">
         <FormSection title="Informations de connexion">
             <!-- Email -->
@@ -72,6 +72,7 @@
             <FormColumns>
           
                     <InputCheckbox
+                    id="isSociete"
                         label="Je représente une société"
                         name="isSociete"
                         bind:checked={$form.isSociete}
@@ -163,6 +164,13 @@
     </fieldset>
 </form>
 
+{#if $message}
+<div class="toast">
+    <div class="alert alert-info">
+      <span>{$message.text}</span>
+    </div>
+  </div>
+{/if}
 <!-- <SuperDebug data={$form} /> -->
 
 <style>

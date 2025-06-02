@@ -30,7 +30,7 @@ export async function sendRegisterEmail(user: RegisterSchemaType):Promise<Format
     <p>Cordialement</p>
     <p>Garage Benoist Fenestre</p>
         `
-        const response = await sendEmail(email, name, html);
+        const response = await sendEmail(email, name, html, "Confirmation de création de votre compte");
         if (!response.success) {
             throw error(500, "API request failed");
         }

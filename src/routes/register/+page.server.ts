@@ -17,7 +17,7 @@ export const load = async () => {
 
 //POST_ACTION
 export const actions = {
-    register: async ({ request }) => {
+    default: async ({ request }) => {
         
         //Validate on the client
         const form = await superValidate(request, zod(registerSchema));
@@ -48,7 +48,7 @@ export const actions = {
             // Return the form with a status message
             return message(form, {
                 status: "success",
-                text: "Inscription effectuée !"
+                text: "Inscription effectuée, un email de confirmation vous a été envoyé !"
             })
 
         } catch (error) {

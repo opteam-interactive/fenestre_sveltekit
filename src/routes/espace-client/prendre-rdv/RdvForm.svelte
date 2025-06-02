@@ -498,4 +498,12 @@
         <button class={formStep === 5 ? "btn btn-disabled" : "btn"} onclick={nextStep}>Suivant</button>
     </div> -->
 </FormWrapper>
+
+{#if $message}
+<div class="toast">
+    <div class="alert alert-info">
+      <span>{$message.text}</span>
+    </div>
+  </div>
+{/if}
 <SuperDebug data={$form} />

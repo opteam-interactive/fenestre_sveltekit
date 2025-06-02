@@ -4,7 +4,7 @@ import { EMAIL_HOST, EMAIL_PORT, EMAIL_USER, EMAIL_PASSWORD } from '$env/static/
 import type { FormattedResponse, ResponseNoData, ResponseWithData } from '$lib/types/types';
 
 
-export async function sendEmail(email: string, name:string, html: string): Promise<FormattedResponse<any>> {
+export async function sendEmail(email: string, name:string, html: string, title:string): Promise<FormattedResponse<any>> {
    
 
     // create transporter
@@ -17,12 +17,15 @@ export async function sendEmail(email: string, name:string, html: string): Promi
         }
     } as nodemailer.TransportOptions);
 
-    //set up mail options
+
+const senderEmail = process.env.EMAIL_USER ?? 'accueil@garagefenestre.fr';
+const senderName = 'Garage Benoist Fenestre';
+        //set up mail options
     const mailOptions: Mail.Options = {
-        from: 'theo.harber@ethereal.email',
-        to: 'theo.harber@ethereal.email',
+        from: senderEmail,
+        to: email,
         // cc: email, (uncomment this line if you want to send a copy to the sender)
-        subject: `Message from ${name} (${email})`,
+        subject: `Message from ${senderName} : ${title}`,
         html: html,
     };
 
