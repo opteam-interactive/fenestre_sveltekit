@@ -22,6 +22,7 @@ let { label, placeholder, name, type="text", value = $bindable(), fieldError, ..
         name={name}
         bind:value={value}
         aria-invalid={fieldError ? "true" : undefined}
+        min="0"
         {...others}
     />
     {#if fieldError}

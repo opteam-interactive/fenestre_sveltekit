@@ -46,11 +46,10 @@ export async function fetchTest() {
       body: JSON.stringify({ request: SQL }),
     })
 
-    // console.log('RESPONSE'  + response.json())
     return response
 
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -59,7 +58,6 @@ export async function fetchTest() {
 
 
 export const fetchToApi = async (sqlRequest: string): Promise<FormattedResponse<any>>  => {
-  console.log()
   try {
     const url = API_URL || 'http://localhost:8024/Requete'
     const headers = {

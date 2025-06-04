@@ -11,12 +11,6 @@
     const pageData = page.data as PageData;
     const { form, errors, constraints, message, enhance } = superForm<LoginSchematype>(pageData.form);
 
-        $effect(() => {
-            console.log("form", $form)
-            console.log("errors", $errors)
-            console.log("message", $message)
-        })
-
     
 </script>
 

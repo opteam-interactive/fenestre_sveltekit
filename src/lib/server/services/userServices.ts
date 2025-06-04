@@ -1,9 +1,10 @@
-import { encodeBase64, fetchToApi } from "$lib/server/utils/utils"
+import { encodeBase64, fetchToApi } from "$lib/server/utils/webdev"
 import type { FormattedResponse, ResponseWithData, WebdevUser } from "$lib/types/types"
 import { error } from '@sveltejs/kit';
 import type { Cookies } from "@sveltejs/kit";
-import type { ProfileSchemaType } from "$routes/espace-client/profileSchema";
-import { checkAuth } from "../jwt";
+import type { ProfileSchemaType } from "$routes/espace-client/(profile)/profileSchema";
+import { checkAuth } from "$lib/server/utils/jwt";
+import type { RegisterSchemaType } from "$routes/register/RegisterSchema";
 
 export const getUserById = async (id: number): Promise<FormattedResponse<WebdevUser>> => {
     try {
@@ -41,9 +42,46 @@ export const getUserById = async (id: number): Promise<FormattedResponse<WebdevU
 }
 
 
+export async function createUser(formData: RegisterSchemaType): Promise<ResponseWithData<WebdevUser>> {
+    try {
+        //Set the role as user (default)
+        const defaultRole = 2
+
+        const SQL = `INSERT INTO UTILISATEUR (Utilisateur, MotDePasse, Nom, Prénom, Société, Adresse, Ville, cp, Téléphone, Email, Droits) VALUES (
+        '${formData.email || ''}',
+        '${formData.password || ''}', 
+        '${formData.lastName || ''}', 
+        '${formData.firstName || ''}',
+        '${formData.isSociete ? formData.societe : ''}', 
+        '${formData.address || ''}', 
+        '${formData.city || ''}', 
+        '${formData.zipcode || ''}', 
+        '${formData.telephone || ''}', 
+        '${formData.email || ''}', 
+        '${defaultRole || 2}'
+        )`;
+
+        const encodedSQL = encodeBase64(SQL);
+
+        // Fetch data from API
+        const userResponse = await fetchToApi(encodedSQL);
+        const user: WebdevUser = userResponse.data
+
+        if (!userResponse.success) {
+            throw error(500, "API request failed");
+        }
+
+        //Send email
+        return { success: true, data: user };
+
+    } catch (err) {
+        console.error("Error in register route:", err);
+        return { success: false, errors: err?.toString() };
+    }
+}
+
 export async function updateUser(cookies: Cookies, formData: ProfileSchemaType): Promise<ResponseWithData<WebdevUser>> {
     try {
-        console.log(formData);
 
         if (!formData) {
             throw error(400, "No form data provided");
@@ -71,7 +109,7 @@ export async function updateUser(cookies: Cookies, formData: ProfileSchemaType):
             Email: formData.email ?? '',
             Droits: user.role as number ?? 2,
         }
-      
+
 
         const SQL = `
         UPDATE UTILISATEUR

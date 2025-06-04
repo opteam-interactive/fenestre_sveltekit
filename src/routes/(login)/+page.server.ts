@@ -2,7 +2,7 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { loginSchema } from './LoginSchema';
 import { redirect } from '@sveltejs/kit';
-import { login } from '$lib/server/auth.js';
+import { login } from '$lib/server/services/authServices';
 import { fail } from '@sveltejs/kit';
 
 import { type Infer, message } from 'sveltekit-superforms';
@@ -34,7 +34,7 @@ export const actions = {
 
 
             if (!response.success) {
-                console.log(response.error)
+                console.error(response.error)
                 return message(form, {
                     status: "error",
                     text: response.error // Show the appropriate error message

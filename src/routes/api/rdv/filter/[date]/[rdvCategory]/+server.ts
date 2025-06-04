@@ -29,7 +29,6 @@ export const GET: RequestHandler = async ({ url, params } : { url: URL, params: 
 
         //GET RDVs
         const rdvResponse = await getRdvsByDate(date);
-        console.log("rdvResponse", rdvResponse);
         
         if (!rdvResponse.success || !Array.isArray(rdvResponse.data)) {
             // If no appointments found, send all time slots

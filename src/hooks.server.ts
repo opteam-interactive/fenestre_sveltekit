@@ -1,6 +1,6 @@
 import type { Handle } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
-import { checkAuth } from '$lib/server/jwt.js';
+import { checkAuth } from '$lib/server/utils/jwt';
 
 export const handle: Handle = async ({ event, resolve }) => {
 

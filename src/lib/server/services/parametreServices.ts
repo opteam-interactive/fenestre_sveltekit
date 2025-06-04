@@ -1,4 +1,4 @@
-import { encodeBase64, fetchToApi } from "$lib/server/utils/utils"
+import { encodeBase64, fetchToApi } from "$lib/server/utils/webdev"
 import type { FormattedResponse, WebdevUser } from "$lib/types/types"
 import type { ForfaitLocation } from "$lib/types/types"
 export const getForfaitLocation = async (): Promise<FormattedResponse<ForfaitLocation>> => {

@@ -16,7 +16,7 @@ export const registerSchema = z.object({
     city: z.string().min(2).max(50),
   }).refine(data => {
     const valid = data.password === data.passwordConfirm;
-    if (!valid) console.log("Password mismatch error triggered!");
+    if (!valid) console.error("Password mismatch error triggered!");
     return valid;
   }
     , {

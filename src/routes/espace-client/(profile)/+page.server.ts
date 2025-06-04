@@ -60,14 +60,12 @@ export const actions = {
         const form = await superValidate(request, zod(profileSchema));
 
         if (!form.valid) {
-            console.log("form not valid", form)
+            console.error("form not valid", form)
             return fail(400, { form });
         }
 
         try {
-            console.log("form data from server.ts", form.data)
             const response: ResponseWithData<WebdevUser> = await updateUser(cookies, form.data)
-            console.log("response", response)
             if (!response.success) {
                 throw error(400, response.errors);
             }
@@ -78,7 +76,6 @@ export const actions = {
                 text: "Une erreur est survenue. Veuillez réessayer."
             });
         }
-        console.log("success !")
 
         // Return the form with a status message
         return message(form, {

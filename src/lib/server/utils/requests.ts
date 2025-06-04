@@ -35,7 +35,7 @@ export async function getRdv() {
     const rdvListData = await fetchToApi(rdvRequest)
     const rdvList = rdvListData.data
     if (!Array.isArray(rdvList)) {
-        console.log('error from request', rdvList)
+        console.error('error from request', rdvList)
         return []
     }
 

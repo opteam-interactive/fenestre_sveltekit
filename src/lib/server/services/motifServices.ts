@@ -1,4 +1,4 @@
-import { encodeBase64 , fetchToApi} from "$lib/server/utils/utils"
+import { encodeBase64 , fetchToApi} from "$lib/server/utils/webdev"
 import type { FormattedResponse, Motif } from "$lib/types/types"
 
 export const getMotifs = async () : Promise<FormattedResponse<Motif[]>> => {

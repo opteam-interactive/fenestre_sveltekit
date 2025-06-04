@@ -36,7 +36,7 @@ export function formatDate(inputDate: string) {
         return `${day}/${month}/${year} - ${hours}:${minutes}`;
     }
     catch (error) {
-        console.log(error)
+        console.error(error)
         return inputDate
     }
 

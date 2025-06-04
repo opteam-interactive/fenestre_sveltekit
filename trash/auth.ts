@@ -1,5 +1,5 @@
 import { JWT_SECRET } from '$env/static/private';
-import { encodeBase64, fetchToApi } from "./utils/utils";
+import { encodeBase64, fetchToApi } from "./utils";
 import * as jose from 'jose'
 
 import type { WebdevUser, User } from "$lib/types/types";
@@ -14,7 +14,6 @@ export async function login(userName: string, password: string, cookies: Cookies
         const encodedSQL = encodeBase64(SQL);
         // Fetch data from API
         const userResponse = await fetchToApi(encodedSQL);
-        console.log(userResponse);
         if (!userResponse.success || userResponse.data.erreur) {
             return { success: false, error: "Erreur de connexion, veuillez vérifier votre email et mot de passe et réessayer" };
         }

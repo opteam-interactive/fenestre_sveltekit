@@ -1,6 +1,6 @@
 import type { FormattedResponse, Motif, WebdevRendezVous, WebdevUser } from "$lib/types/types";
 import type { rdvSchemaType } from "$routes/espace-client/prendre-rdv/rdvSchema"
-import { encodeBase64, fetchToApi } from "$lib/server/utils/utils";
+import { encodeBase64, fetchToApi } from "$lib/server/utils/webdev";
 import { convertUtfToLocale } from "../utils/date";
 import {format, nextFriday} from 'date-fns'
 import { sendRdvEmail } from "../email/RdvEmail";

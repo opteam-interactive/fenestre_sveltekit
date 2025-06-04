@@ -3,8 +3,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { registerSchema } from './RegisterSchema';
 import { type Infer, message } from 'sveltekit-superforms';
 import { fail } from '@sveltejs/kit';
-import { createUser } from '$lib/server/user';
-import { redirect } from '@sveltejs/kit';
+import { createUser } from '$lib/server/services/userServices';
 import { sendRegisterEmail } from '$lib/server/email/UserEmail';
 type Message = { status: 'error' | 'success' | 'warning'; text: string };
 
@@ -42,7 +41,7 @@ export const actions = {
             if (!emailResponse.success) {
                 return message(form, {
                     status: "Erreur dans l'envoi de l'email",
-                    text: emailResponse.errors // Show the appropriate error message
+                    text: emailResponse.error // Show the appropriate error message
                 });
             }
             // Return the form with a status message

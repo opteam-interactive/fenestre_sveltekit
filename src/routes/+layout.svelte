@@ -2,7 +2,12 @@
     import "../app.css";
     import Footer from "$lib/components/Footer.svelte";
     let { children } = $props();
+    import logo from "$lib/assets/images/logo_peugeot.png"
 </script>
+
+<svelte:head>
+    <link rel="icon" type="image/png" href={logo} />
+</svelte:head>
 
 <div
     class="bg-[url($lib/assets/images/background.png)] bg-cover font-poppins relative min-h-screen flex flex-col"

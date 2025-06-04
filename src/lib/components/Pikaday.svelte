@@ -20,7 +20,7 @@
             const picker = new Pikaday({
                 field: myDatepicker,
                 format: "YYYY-MM-DD",
-                // minDate: new Date(),
+                minDate: new Date(),
                 // maxDate: endBound,
                 disableWeekends: true,
 

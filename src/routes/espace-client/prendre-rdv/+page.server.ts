@@ -1,18 +1,9 @@
 import { superValidate } from 'sveltekit-superforms';
-import { convertUtfToLocale } from '$lib/server/utils/date.js';
 import { zod } from 'sveltekit-superforms/adapters';
 import { rdvSchema } from './rdvSchema';
-import type { WebdevRendezVous, WebdevUser } from '$lib/types/types'
 import { type Infer, message } from 'sveltekit-superforms';
 import { getMotifs } from '$lib/server/services/motifServices';
-import { format, parseISO } from 'date-fns'
-import { fetchToApi, encodeBase64 } from '$lib/server/utils/utils.js';
-import { redirect } from '@sveltejs/kit';
 import type { Motif } from '$lib/types/types';
-import { checkAuth } from '$lib/server/jwt';
-import { sendRdvEmail } from '$lib/server/email/RdvEmail.js';
-import { fail } from '@sveltejs/kit';
-import { fr } from 'date-fns/locale/fr';
 import { createRdv } from '$lib/server/services/rdvServices';
 
 import type { PageServerLoad } from './$types';
@@ -61,7 +52,7 @@ export const actions = {
         const form = await superValidate(request, zod(rdvSchema));
 
         if (!form.valid) {
-            console.log(form.errors)
+            console.error(form.errors)
             // Return { form } and things will just work.
             return message(form, {
                 status: 'error',
