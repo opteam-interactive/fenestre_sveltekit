@@ -46,16 +46,16 @@
 
     //Utility states
     // let formStep = $state(1);
-    let selectedMotifId = $state(0);
+    let selectedMotifId: number = $state(0);
     let isModalVisible = $state(false);
-    let selectedDay = $state(new Date());
-    let capacityFullError = $state<string>("");
+    let selectedDay: Date = $state(new Date());
+    let capacityFullError: string = $state("");
     let selectedMotifQuestions = $derived(
         motifQuestions.filter(
             (question) => question.idMotifRDV === $form.motifId
         )
     );
-    let finalMotifQuestions = $state<{ [slug: string]: string }>({}); //stores all the complementary info for the selected motif
+    let finalMotifQuestions: { [slug: string]: string } = $state({});
     let finalMotifQuestionsString = $derived(
         JSON.stringify(finalMotifQuestions)
     );
@@ -97,17 +97,6 @@
         // alert("Rendez-vous réservé avec succès");
     };
 
-    // const nextStep = () => {
-    //     if (formStep < 5) {
-    //         formStep += 1;
-    //     }
-    // }
-
-    // const prevStep = () => {
-    //     if (formStep > 1) {
-    //         formStep -= 1;
-    //     }
-    // }
 
     const fetchAvailableTimeSlots = async () => {
         if ($form.appointmentDate) {
@@ -153,6 +142,7 @@
             }
         }
     };
+    
     let availableTimeSlots = $derived(fetchAvailableTimeSlots());
 </script>
 
@@ -177,7 +167,7 @@
 <FormWrapper customClass="md:w-2/3 lg:w-1/2 my-8">
     <FormFeedback message={$message} />
 
-    <form method="POST" class="w-full md-px-8">
+    <form use:enhance method="POST" class="w-full md-px-8" >
         <FormSection title="Informations personnelles">
             <fieldset class="fieldset gap-8">
                 <FormColumns>
@@ -485,7 +475,7 @@
             </fieldset>
         </FormSection>
         <div class="flex justify-center">
-            <button type="submit" class="btn btn-success" onclick={afterSubmit}
+            <button type="submit" class="btn btn-success" 
                 >Je valide ce rendez-vous</button
             >
         </div>
