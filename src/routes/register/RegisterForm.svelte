@@ -21,7 +21,7 @@
     </h3>
 {/if}
 
-<form method="POST" class="w-full px-8">
+<form method="POST" class="w-full px-8" use:enhance>
     <fieldset class="fieldset gap-4">
         <FormSection title="Informations de connexion">
             <!-- Email -->

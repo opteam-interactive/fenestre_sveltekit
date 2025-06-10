@@ -1,4 +1,4 @@
-import { sendEmail } from "$lib/server/email/sendEmail";
+import { sendEmail } from "$lib/server/services/emailServices";
 import type { ResponseNoData, ResponseWithData, FormattedResponse } from "$lib/types/types";
 import type { RegisterSchemaType } from "$routes/register/RegisterSchema";
 import { error } from "@sveltejs/kit";

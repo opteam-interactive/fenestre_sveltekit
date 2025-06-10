@@ -22,6 +22,11 @@ export type Motif = {
     NomActivité: 'AtelierP'  | 'CarrosserieP' | 'AucunP',
     NbRDVParJour: number
 }
+
+export type MotifName = {
+    IDMotifRDV: number,
+    Motif: string
+}
 export type RendezVous = z.infer<typeof rdvSchema>
 export type WebdevRendezVous = z.infer<typeof rdvWebdevSchema>
 
@@ -106,19 +111,7 @@ export type TimeSlotResponse = {
 
 
 
-export type ResponseWithData<T> = {
-    success: boolean;
-    data?: T;
-    errors?: string;
-    message?: string
-};
 
-
-export type ResponseNoData = {
-    success: boolean;
-    errors?: string;
-    message?: string
-};
 
 export type FormattedResponse<T = unknown> = {
     success: boolean;

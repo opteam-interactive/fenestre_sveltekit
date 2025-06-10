@@ -1,5 +1,5 @@
 import { encodeBase64, fetchToApi } from "$lib/server/utils/webdev"
-import type { FormattedResponse, WebdevUser } from "$lib/types/types"
+import type { FormattedResponse } from "$lib/types/types"
 import type { ForfaitLocation } from "$lib/types/types"
 export const getForfaitLocation = async (): Promise<FormattedResponse<ForfaitLocation>> => {
     try {
@@ -9,17 +9,11 @@ export const getForfaitLocation = async (): Promise<FormattedResponse<ForfaitLoc
         const response = await fetchToApi(encodedSQL)
 
         if (!response.success) {
-            return {
-                success: false,
-                error: response.error
-            }
+            throw new Error(response.error)
         }
 
         if (!response.data[0]) {
-            return {
-                success: false,
-                error: "User not found"
-            }
+           throw new Error("No data found")
         }
 
 
@@ -34,10 +28,10 @@ export const getForfaitLocation = async (): Promise<FormattedResponse<ForfaitLoc
         }
     } catch (error) {
         console.error(error)
-        return {
-            success: false,
-            error: "Unexpected error"
+        if (error instanceof Error) {
+           throw new Error(error.message)
         }
+        throw new Error("An unexpected error occurred in the getForfaitLocation function")
     }
 
 }

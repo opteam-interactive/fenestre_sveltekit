@@ -1,4 +1,4 @@
-import { sendEmail } from "$lib/server/email/sendEmail";
+import { sendEmail } from "$lib/server/services/emailServices";
 import type { RendezVous, WebdevUser, Motif, FormattedResponse } from "$lib/types/types";
 import type { rdvSchemaType } from "$routes/espace-client/prendre-rdv/rdvSchema";
 

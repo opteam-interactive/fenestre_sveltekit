@@ -4,8 +4,10 @@ import { loginSchema } from './LoginSchema';
 import { redirect } from '@sveltejs/kit';
 import { login } from '$lib/server/services/authServices';
 import { fail } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 
 import { type Infer, message } from 'sveltekit-superforms';
+import { goto } from '$app/navigation';
 
 
 type Message = { status: 'error' | 'success' | 'warning'; text: string };
@@ -21,43 +23,41 @@ export const load = async () => {
 export const actions = {
 
     default: async ({ request, cookies }) => {
-
         const form = await superValidate(request, zod(loginSchema));
 
-        if (!form.valid) {
-            return fail(400, { form });
-        }
-
         try {
-            
+
+            if (!form.valid) {
+                return fail(400, { form });
+            }
+
             const response = await login(form.data.userName, form.data.password, cookies)
 
-
             if (!response.success) {
-                console.error(response.error)
-                return message(form, {
-                    status: "error",
-                    text: response.error // Show the appropriate error message
-                });
+                return message(form, "Utilisateur ou mot de passe incorrect.");
+                throw error(400, "Utilisateur ou mot de passe incorrect.");
             }
+
 
             // If you ever need to return instead of redirect
             // return message(form, {
             //     status: "success",
             //     text: "Connexion réussie !"
             // });
+            // If all successful, redirect
 
-        } catch (error) {
-            console.error("Unexpected error:", error);
-            return message(form, {
-                status: "error",
-                text: "Une erreur est survenue. Veuillez réessayer."
-            });
+
+        } catch (err) {
+            console.error(err);
+            if (err instanceof Error) {
+                return message(form, {
+                    status: "error",
+                    text: err.message
+                });
+            }
+            throw error(400, "Une erreur est survenue lors de l'action login. Veuillez réessayer.");
         }
 
-        // If all successful, redirect
-        redirect(303, "/espace-client");
-
-
+        return redirect(302, '/espace-client');
     }
 };

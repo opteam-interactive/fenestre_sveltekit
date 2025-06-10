@@ -1,6 +1,5 @@
 import { encodeBase64, fetchToApi } from "$lib/server/utils/webdev"
-import type { FormattedResponse, ResponseWithData, WebdevUser } from "$lib/types/types"
-import { error } from '@sveltejs/kit';
+import type { FormattedResponse, WebdevUser } from "$lib/types/types"
 import type { Cookies } from "@sveltejs/kit";
 import type { ProfileSchemaType } from "$routes/espace-client/(profile)/profileSchema";
 import { checkAuth } from "$lib/server/utils/jwt";
@@ -14,17 +13,11 @@ export const getUserById = async (id: number): Promise<FormattedResponse<WebdevU
         const response = await fetchToApi(encodedSQL)
 
         if (!response.success) {
-            return {
-                success: false,
-                error: response.error
-            }
+            throw new Error(response.error)
         }
 
         if (!response.data[0]) {
-            return {
-                success: false,
-                error: "User not found"
-            }
+            throw new Error("User not found")
         }
 
         return {
@@ -32,17 +25,17 @@ export const getUserById = async (id: number): Promise<FormattedResponse<WebdevU
             data: response.data[0]
         }
     } catch (error) {
-        console.error(error)
-        return {
-            success: false,
-            error: "Unexpected error"
+        console.error(error);
+        if (error instanceof Error) {
+            throw new Error(error.message);
         }
+        throw new Error("An unexpected error occurred in the getUserById function");
     }
 
 }
 
 
-export async function createUser(formData: RegisterSchemaType): Promise<ResponseWithData<WebdevUser>> {
+export async function createUser(formData: RegisterSchemaType): Promise<FormattedResponse<WebdevUser>> {
     try {
         //Set the role as user (default)
         const defaultRole = 2
@@ -68,33 +61,36 @@ export async function createUser(formData: RegisterSchemaType): Promise<Response
         const user: WebdevUser = userResponse.data
 
         if (!userResponse.success) {
-            throw error(500, "API request failed");
+            throw new Error(userResponse.error);
         }
 
         //Send email
+        // //TODO
         return { success: true, data: user };
 
-    } catch (err) {
-        console.error("Error in register route:", err);
-        return { success: false, errors: err?.toString() };
+    } catch (error) {
+        console.error(error);
+        if (error instanceof Error) {
+            throw new Error(error.message);
+        }
+        throw new Error("An unexpected error occurred in the createUser function");
     }
 }
 
-export async function updateUser(cookies: Cookies, formData: ProfileSchemaType): Promise<ResponseWithData<WebdevUser>> {
+export async function updateUser(cookies: Cookies, formData: ProfileSchemaType): Promise<FormattedResponse<WebdevUser>> {
     try {
 
         if (!formData) {
-            throw error(400, "No form data provided");
+            throw new Error("No form data provided");
         }
 
         //  GET_CURRENT_USER
         const { authenticated, user } = await checkAuth(cookies);
         if (!user || !authenticated) {
-            throw error(401, "Unauthorized");
+            throw new Error("User not authenticated");
         }
 
-        // TODO: UPDATE_QUERY
-        // MotDePasse = '${formData.password || ''}',
+
 
         const formattedData = {
             IDUtilisateur: user.userId as number,
@@ -133,7 +129,7 @@ export async function updateUser(cookies: Cookies, formData: ProfileSchemaType):
         const userResponse = await fetchToApi(encodedSQL);
 
         if (!userResponse.success || userResponse.data.erreur) {
-            throw error(500, "API request failed");
+            throw new Error(userResponse.error);
         }
 
         // //update the cookie
@@ -144,8 +140,11 @@ export async function updateUser(cookies: Cookies, formData: ProfileSchemaType):
 
         return { success: true, data: userResponse.data };
 
-    } catch (err) {
-        console.error("Error in register route:", err);
-        return { success: false, errors: err?.toString() || "Internal server error" };
+    } catch (error) {
+        console.error(error);
+        if (error instanceof Error) {
+           throw new Error(error.message);
+        }
+        throw new Error("An unexpected error occurred in the updateUser function");
     }
 }

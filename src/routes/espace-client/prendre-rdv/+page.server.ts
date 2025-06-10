@@ -48,7 +48,7 @@ export const load: PageServerLoad = async () => {
 //POST_ACTION
 export const actions = {
 
-    default: async ({ request, cookies, locals }) => {
+    default: async ({ request, locals }) => {
         const form = await superValidate(request, zod(rdvSchema));
 
         if (!form.valid) {

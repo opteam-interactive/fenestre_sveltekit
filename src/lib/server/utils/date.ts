@@ -1,11 +1,5 @@
 import { format } from "date-fns"
 import { fr } from 'date-fns/locale/fr';
-import { allTimeSlots } from "./constants";
-
-import type { Timeslot, WebdevRendezVous } from "../../types/types";
-interface APIErreur {
-    erreur: string;
-}
 
 
 export function generateTimeSlots(startHour: number, endHour: number, intervalMinutes: number) {
@@ -36,15 +30,19 @@ export function formatDate(inputDate: string) {
         return `${day}/${month}/${year} - ${hours}:${minutes}`;
     }
     catch (error) {
-        console.error(error)
-        return inputDate
+        console.error(error);
+        if (error instanceof Error) {
+            throw new Error(error.message);
+        }
+        throw new Error("An unexpected error occurred");
     }
 
 };
 
 
 export const convertUtfToLocale = (date: Date, time: string) => {
-    // Convert UTC to local date (France)
+    try {
+         // Convert UTC to local date (France)
     const utcDate = new Date(date);
 
     // Set the time from form input
@@ -55,4 +53,12 @@ export const convertUtfToLocale = (date: Date, time: string) => {
     const formattedDate = format(utcDate, "yyyy-MM-dd'T'HH:mm:ss.SSS", { locale: fr });
 
     return formattedDate
+    } catch (error) {
+        console.error(error);
+        if (error instanceof Error) {
+            throw new Error(error.message);
+        }
+        throw new Error("An unexpected error occurred");
+    }
+   
 }

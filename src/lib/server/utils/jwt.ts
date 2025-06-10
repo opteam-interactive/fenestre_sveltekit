@@ -2,15 +2,27 @@
 import * as jose from "jose";
 import type { Cookies } from "@sveltejs/kit";
 import { JWT_SECRET } from "$env/static/private";
-import type { ResponseNoData, User, UserJwtPayload, WebdevUser } from "$lib/types/types";
+import type { FormattedResponse, UserJwtPayload, WebdevUser } from "$lib/types/types";
 
 
 export async function getToken(cookies: Cookies) {
-    return cookies.get("auth_token") || null;
+    try {
+        const cookie = cookies.get("auth_token");
+        if (cookie) {
+            return cookie;
+        }
+        return null;
+    } catch (error) {
+        console.error(error);
+        if (error instanceof Error) {
+            throw new Error(error.message);
+        }
+        throw new Error("An unexpected error occurred in the getToken function");
+    }
 
 }
 
-export async function updateToken(cookies: Cookies, user: WebdevUser): Promise<ResponseNoData> {
+export async function updateToken(cookies: Cookies, user: WebdevUser): Promise<FormattedResponse> {
     try {
         const secretKey = new TextEncoder().encode(JWT_SECRET);
         const token = await new jose.SignJWT(user).setProtectedHeader({ alg: "HS256" }).setExpirationTime("1h").sign(secretKey);
@@ -20,7 +32,10 @@ export async function updateToken(cookies: Cookies, user: WebdevUser): Promise<R
     }
     catch (error) {
         console.error(error);
-        return { success: false, error: "Failed to update token" };
+        if (error instanceof Error) {
+            throw new Error(error.message);
+        }
+        throw new Error("An unexpected error occurred in the updateToken function");
     }
 
 }
@@ -39,11 +54,10 @@ export async function checkAuth(cookies: Cookies) {
         return { authenticated: true, user: payload as UserJwtPayload };
 
     } catch (error) {
-        console.error("JWT validation error:", error);
-
-        // If token is expired or invalid, remove it
-        cookies.delete("auth_token", { path: "/" });
-
-        return { authenticated: false, user: null };
+        console.error(error);
+        if (error instanceof Error) {
+            throw new Error(error.message);
+        }
+        throw new Error("An unexpected error occurred in the getcheckAuthToken function");
     }
 }

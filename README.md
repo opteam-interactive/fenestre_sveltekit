@@ -17,3 +17,6 @@
 - $lib/utils: reusable utility functions are in 
 - $lib/server : actions that need to be done on the server (auth, data management etc...)
 
+## Error handling
+- Services throw Errors with either the error message that was generated, or else (in catch block) a generic message
+- Then +page.ts, +page.server.ts and  API endpoint send back and error using Sveltekit's error utility

@@ -2,7 +2,7 @@ import type { FormattedResponse, Motif, WebdevRendezVous, WebdevUser } from "$li
 import type { rdvSchemaType } from "$routes/espace-client/prendre-rdv/rdvSchema"
 import { encodeBase64, fetchToApi } from "$lib/server/utils/webdev";
 import { convertUtfToLocale } from "../utils/date";
-import {format, nextFriday} from 'date-fns'
+import { format, nextFriday } from 'date-fns'
 import { sendRdvEmail } from "../email/RdvEmail";
 
 export const getRdvsByUser = async (id: number): Promise<FormattedResponse<WebdevRendezVous[]>> => {
@@ -19,10 +19,7 @@ export const getRdvsByUser = async (id: number): Promise<FormattedResponse<Webde
         const response = await fetchToApi(encodedSQL)
 
         if (!response.success || !Array.isArray(response.data)) {
-            return {
-                success: false,
-                error: response.error
-            }
+            throw new Error(response.error)
         }
 
         if (Array.isArray(response.data) && response.data.length == 0) {
@@ -39,11 +36,11 @@ export const getRdvsByUser = async (id: number): Promise<FormattedResponse<Webde
             data: rdvs
         }
     } catch (error) {
-        console.error(error)
-        return {
-            success: false,
-            error: "Unexpected error"
+        console.error(error);
+        if (error instanceof Error) {
+            throw new Error(error.message);
         }
+        throw new Error("An unexpected error occurred in the getRdvsByUser function");
     }
 }
 
@@ -55,16 +52,13 @@ export const getRdvsByDate = async (date: string): Promise<FormattedResponse<Web
         const upperBound = `${date}T23:59:59.999`
         //Fetch RDVs only for the selected date with motif
         const SQL = `SELECT * FROM RendezVous WHERE DateRécept BETWEEN '${lowerBound}' AND '${upperBound}' `
-        
+
         // const SQL = `SELECT * FROM RendezVous LEFT JOIN MotifRDV ON RendezVous.IDMotifRDV = MotifRDV.IDMotifRDV WHERE DateRécept BETWEEN '${lowerBound}' AND '${upperBound}' `
         const encodedSQL = encodeBase64(SQL)
         const response = await fetchToApi(encodedSQL)
-        
-        if (!response.success ) {
-            return {
-                success: false,
-                error: response.error,
-            }
+
+        if (!response.success) {
+            throw new Error(response.error)
         }
 
         if (response.data.erreur) {
@@ -88,11 +82,11 @@ export const getRdvsByDate = async (date: string): Promise<FormattedResponse<Web
             data: rdvs
         }
     } catch (error) {
-        console.error(error)
-        return {
-            success: false,
-            error: "Unexpected error"
+        console.error(error);
+        if (error instanceof Error) {
+            throw new Error(error.message);
         }
+        throw new Error("An unexpected error occurred in the getRdvsByDate function");
     }
 }
 
@@ -100,10 +94,7 @@ export const getRdvsByDate = async (date: string): Promise<FormattedResponse<Web
 export const createRdv = async (formData: rdvSchemaType, motif: Motif, user: WebdevUser): Promise<FormattedResponse<WebdevRendezVous>> => {
     try {
         if (!formData) {
-            return {
-                success: false,
-                error: "Missing form data"
-            }
+            throw new Error("Missing form data");
         }
         let formattedDateRecept = ""
         let formattedDateRestit = ""
@@ -114,10 +105,10 @@ export const createRdv = async (formData: rdvSchemaType, motif: Motif, user: Web
             // Set DateRestit to next friday 18:00:00.000
             formattedDateRestit = convertUtfToLocale(nextFriday(formData.appointmentDate), "18:00")
 
-          
+
         }
 
-       
+
         const jsonMotifDetails = JSON.parse(formData.motifDetails);
         const formattedMotifDetails = Object.entries(jsonMotifDetails)
             .map(([key, value]) => `${key} - ${value}`)
@@ -132,7 +123,7 @@ export const createRdv = async (formData: rdvSchemaType, motif: Motif, user: Web
         - SANS CONTACT = ${formData.contactless === "true" ? "OUI" : "NON"}
         - ${formattedMotifDetails ?? ""}`;
 
-     
+
 
         // Build RDV Object
         const rdv: WebdevRendezVous = {
@@ -220,21 +211,16 @@ ${rdv.Blacklistage === "" ? "NULL" : `'${rdv.Blacklistage}'`}
         const apiResponse = await fetchToApi(encodedSQL);
         if (!apiResponse.success) {
             // Gestion des erreurs de l'API externe
-            return {
-                success: false,
-                error: apiResponse.error
-            }
+            throw new Error(apiResponse.error);
+
         }
 
         //SEND_CONFIRMATION_EMAIL
-       const response = sendRdvEmail(user, formData, motif!);
+        const response = await sendRdvEmail(user, formData, motif!);
 
-        // if (!response.success) {
-        //    return {
-        //        success: false,
-        //        error: response.error
-        //    }
-        // }
+        if (!response.success) {
+            throw new Error(response.error);
+        }
 
         return {
             success: true,
@@ -243,11 +229,11 @@ ${rdv.Blacklistage === "" ? "NULL" : `'${rdv.Blacklistage}'`}
         }
     }
     catch (error) {
-        console.error("Erreur :", error);
-        return {
-            success: false,
-            error: "Une erreur s'est produite lors de la prise de RDV."
+        console.error(error);
+        if (error instanceof Error) {
+            throw new Error(error.message);
         }
+        throw new Error("An unexpected error occurred in the createRdv function");
 
     }
 }

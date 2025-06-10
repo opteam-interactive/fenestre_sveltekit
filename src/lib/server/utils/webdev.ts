@@ -2,7 +2,7 @@ import { API_URL, API_TOKEN } from '$env/static/private';
 import type { FormattedResponse } from '$lib/types/types';
 
 
-import { clsx, type ClassValue } from "clsx"
+
 // import { twMerge } from "tailwind-merge"
 
 // function from Shadcn
@@ -12,19 +12,35 @@ import { clsx, type ClassValue } from "clsx"
 
 // Take a string and encode it in 64 to send to windev64
 export function encodeBase64(input: string) {
+  try {
+    const encoded = btoa(unescape(encodeURIComponent(input)
+      .replace(/%C3%A9/g, "%E9")  // "é" → ISO-8859-1
+      .replace(/%C3%A8/g, "%E8"))); // "è" → ISO-8859-1
+    return encoded
+  } catch (error) {
+    console.error(error);
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+    throw new Error("An unexpected error occurred in the encodeBase64 function");
+  }
   //FUNCTIONAL
-  const encoded = btoa(unescape(encodeURIComponent(input)
-    .replace(/%C3%A9/g, "%E9")  // "é" → ISO-8859-1
-    .replace(/%C3%A8/g, "%E8"))); // "è" → ISO-8859-1
-  return encoded
+
 }
 
 // Take a string and decode it from 64 to send to windev64
 export function decodeBase64(input: string) {
-  //NOT FUNCTIONAL
-  const decoded = decodeURIComponent(escape(atob(input)));
+  try {
+    const decoded = decodeURIComponent(escape(atob(input)));
+    return decoded
+  } catch (error) {
+    console.error(error);
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+    throw new Error("An unexpected error occurred in the decodeBase64 function");
+  }
 
-  return decoded
 }
 
 
@@ -49,7 +65,11 @@ export async function fetchTest() {
     return response
 
   } catch (error) {
-    console.error(error)
+    console.error(error);
+        if (error instanceof Error) {
+            throw new Error(error.message);
+        }
+        throw new Error("An unexpected error occurred in the fetchTest function");
   }
 }
 
@@ -57,7 +77,7 @@ export async function fetchTest() {
 // Take a SQL request and send it to the API
 
 
-export const fetchToApi = async (sqlRequest: string): Promise<FormattedResponse<any>>  => {
+export const fetchToApi = async (sqlRequest: string): Promise<FormattedResponse<any>> => {
   try {
     const url = API_URL || 'http://localhost:8024/Requete'
     const headers = {
@@ -77,21 +97,18 @@ export const fetchToApi = async (sqlRequest: string): Promise<FormattedResponse<
       body: requestBody
     })
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`HTTP error! status: ${response.status}, message: ${errorText}`);
-
-      return {
-        success: false,
-        error: `Failed to fetch from API. Status: ${response.status}, Message: ${errorText}`,
-      };
+      throw new Error(`HTTP error! status: ${response.status}, message: ${response.statusText}`);
     }
 
-    const data = await response.json() 
+    const data = await response.json()
 
     return { success: true, data };
   } catch (error) {
-    console.error("Error in fetchToApi:", error);
-    return { success: false, error: "An unexpected error occurred." };
+    console.error(error);
+    if (error instanceof Error) {
+        throw new Error(error.message);
+    }
+    throw new Error("An unexpected error occurred in the fetchToApi function");
   }
 
 }

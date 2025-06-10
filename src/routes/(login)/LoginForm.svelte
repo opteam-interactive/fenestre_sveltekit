@@ -7,6 +7,7 @@
     import type { PageData } from "./$types";
     import type { LoginSchematype } from "./LoginSchema";
     import FormFeedback from "$lib/components/forms/FormFeedback.svelte";
+    import { goto } from "$app/navigation";
 
     const pageData = page.data as PageData;
     const { form, errors, constraints, message, enhance } = superForm<LoginSchematype>(pageData.form);
@@ -16,7 +17,7 @@
 
 <!-- <LoginForm /> -->
 
-<FormFeedback message={$message } />
+<FormFeedback message={$message} />
 
 
 <form method="POST" use:enhance class="w-full px-8">

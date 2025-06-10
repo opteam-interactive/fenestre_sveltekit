@@ -4,6 +4,10 @@
 
 </script>
 
+
+
+
+  
 <div>
     <section class="flex flex-col items-center justify-center gap-4 p-12">
         <img src={logo} alt="" class="w-32" />
@@ -26,5 +30,5 @@
     </section>
 </div>
 
-<style>
-</style>
+
+
