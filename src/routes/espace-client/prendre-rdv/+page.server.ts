@@ -2,8 +2,8 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { rdvSchema } from './rdvSchema';
 import { type Infer, message } from 'sveltekit-superforms';
-import { getMotifs, getMotifsList, getMotifsWithQuestions } from '$lib/server/services/motifServices';
-import type { Motif, MotifName, MotifWithDetails, MotifWithQuestions } from '$lib/types/types';
+import {  getMotifsWithQuestions } from '$lib/server/services/motifServices';
+import type {  MotifWithDetails } from '$lib/types/types';
 import { createRdv } from '$lib/server/services/rdvServices';
 import { error, fail } from '@sveltejs/kit';
 
