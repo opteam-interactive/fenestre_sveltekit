@@ -1,10 +1,9 @@
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getRdvsByDate } from '$lib/server/services/rdvServices';
-import { format } from 'date-fns'
 import { allTimeSlots } from "$lib/server/utils/constants";
 import type { FormattedResponse, Timeslot } from '$lib/types/types';
-import { getMotifByID } from '$lib/server/services/motifServices';
+import { maxCapacityAtelierP, maxCapacityCarrosserieP } from '$lib/server/utils/constants';
 interface ResponseData {
     availableSlots: Timeslot[];
     remainingCapacityAtelierP: number;
@@ -16,7 +15,6 @@ export const GET: RequestHandler = async ({ url, params } : { url: URL, params: 
 
     try {
         const {date, rdvCategory} = params
-       
 
         if (!date || !rdvCategory) {
             error(400, 'Missing date or category parameter');
@@ -26,12 +24,11 @@ export const GET: RequestHandler = async ({ url, params } : { url: URL, params: 
             error(400, 'Invalid category parameter');
         }
 
-
         //GET RDVs
         const rdvResponse = await getRdvsByDate(date);
         
+        // If no appointments found, send back all time slots
         if (!rdvResponse.success || !Array.isArray(rdvResponse.data)) {
-            // If no appointments found, send all time slots
             const responseData: FormattedResponse = {
                 success: true,
                 data: allTimeSlots
@@ -41,12 +38,10 @@ export const GET: RequestHandler = async ({ url, params } : { url: URL, params: 
 
         const rdvs = rdvResponse.data;
 
-        const maxCapacityAtelierP = 16;
-        const maxCapacityCarrosserieP = 12;
         let remainingCapacityAtelierP = maxCapacityAtelierP;
         let remainingCapacityCarrosserieP = maxCapacityCarrosserieP;
       
-        //now check remaining capacity
+        //Remove used capacity for each category
         rdvs.forEach(rdv => {
             if (rdv.NomActivité === "AtelierP") {
                 remainingCapacityAtelierP -= rdv.NbHeureTx;

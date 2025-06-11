@@ -31,7 +31,6 @@ export const load: PageServerLoad = async () => {
     }
 
     const motifs: MotifWithDetails[] = motifsResponse.data;
-    console.log(motifs[8].details.questions);
 
     const form = await superValidate<Infer<typeof rdvSchema>, Message>(zod(rdvSchema));
 
@@ -59,7 +58,7 @@ export const actions = {
             const motifResponse = await getMotifByID(form.data.motifId);
 
             if (!motifResponse || !motifResponse.success || !motifResponse.data) {
-                return message(form, "'Le motif n\'existe pas'", {
+                return message(form, "Le motif n'existe pas", {
                     status: 404
                 });
             }

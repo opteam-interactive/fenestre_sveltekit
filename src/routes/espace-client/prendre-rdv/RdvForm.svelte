@@ -40,28 +40,30 @@
     const forfait = pageData.forfait;
     const { form, errors, constraints, message, enhance, submitting } =
         superForm<rdvSchemaType>(pageData.form);
-
+            
     //Utility states
     let isModalVisible = $state(false);
+
     let selectedDay: Date = $state(new Date());
     let capacityFullError: string = $state("");
 
+    //Filter motifs by category (atelier / carrosserie)
+    let displayedMotifs = $derived(
+        motifs.filter((motif) => motif.NomActivité == $form.rdvCategory)
+    );
+    //track the currently selected motif
     let selectedMotif: (typeof motifs)[number] | undefined = $derived(
         motifs.find((motif) => motif.IDMotifRDV === $form.motifId)
     );
-
-    // let selectedMotifQuestions = $derived(
-    //     motifQuestions.filter(
-    //         (question) => question.idMotifRDV === $form.motifId
-    //     )
-    // );
+    //keep the answers to the questions that are answered for the currently selected motif
     let finalMotifQuestions: { [slug: string]: string } = $state({});
     let finalMotifQuestionsString = $derived(
         JSON.stringify(finalMotifQuestions)
     );
 
+    //reset the time when the selected day changes
     $effect(() => {
-        if (selectedDay !== $form.appointmentDate) {
+        if ($form.appointmentDate && selectedDay !== $form.appointmentDate) {
             selectedDay = $form.appointmentDate;
             $form.appointmentTime = "";
             capacityFullError = "";
@@ -72,9 +74,6 @@
 
     //When form is submitted
     const afterSubmit = () => {
-        setTimeout(() => {
-            isModalVisible = false;
-        }, 500);
         goto("#top");
         // alert("Rendez-vous réservé avec succès");
     };
@@ -89,44 +88,49 @@
 
             if (!jsonResponse.success) {
                 console.error(jsonResponse.error);
-                return [];
+                return {
+                    slots: [],
+                    error: "Une erreur est survenue",
+                };
+            }
+            const data = jsonResponse.data;
+
+            if (!data?.availableSlots || data.availableSlots.length <= 0) {
+                return {
+                    slots: [],
+                    error: "Aucun rendez-vous disponible pour cette date",
+                };
             }
 
-            const remainingTimeSlots = jsonResponse.data?.availableSlots;
-            const remainingCapacityAtelierP =
-                jsonResponse.data?.remainingCapacityAtelierP;
-            const remainingCapacityAtelierM =
-                jsonResponse.data?.remainingCapacityCarrosserieP;
-
-            if (!remainingTimeSlots || remainingTimeSlots.length <= 0) {
-                return [];
-            } else if (
+            if (
                 $form.rdvCategory === "AtelierP" &&
-                remainingCapacityAtelierP &&
-                remainingCapacityAtelierP <= 0
+                data.remainingCapacityAtelierP <= 0
             ) {
-                capacityFullError =
-                    "Tous les créneaux ateliers sont réservés pour ce jour, merci de choisir un autre jour";
-
-                return [];
-            } else if (
-                $form.rdvCategory === "CarrosserieP" &&
-                remainingCapacityAtelierM &&
-                remainingCapacityAtelierM <= 0
-            ) {
-                capacityFullError =
-                    "Tous les créneaux carrosseries sont réservés pour ce jour, merci de choisir un autre jour";
-                return [];
-            } else {
-                return remainingTimeSlots;
+                return {
+                    slots: [],
+                    error: "Aucun rendez-vous Atelier disponible pour cette date",
+                };
             }
+
+            if (
+                $form.rdvCategory === "CarrosserieP" &&
+                data.remainingCapacityCarrosserieP <= 0
+            ) {
+                return {
+                    slots: [],
+                    error: "Aucun rendez-vous Carrosserie disponible pour cette date",
+                };
+            }
+            return {
+                slots: data.availableSlots,
+                error: "",
+            };
         }
     };
 
     let availableTimeSlots = $derived(fetchAvailableTimeSlots());
 </script>
 
-<svelte:boundary>
     <FormWrapper customClass="md:w-2/3 lg:w-1/2 my-8">
         <FormFeedback message={$message} status={page.status} />
 
@@ -213,7 +217,7 @@
                         bind:value={$form.motifId}
                         fieldError={$errors.motifId}
                     >
-                        {#each motifs as motif}
+                        {#each displayedMotifs as motif}
                             <option value={motif.IDMotifRDV}
                                 >{motif.Motif}</option
                             >
@@ -373,9 +377,12 @@
                         </div>
 
                         <!-- HEURE_DU_RDV -->
-                        {#if capacityFullError.length > 0}
-                            <FieldErrors fieldError={capacityFullError} />
-                        {:else}
+                        {#await availableTimeSlots}
+                            <p>Loading data...</p>
+                        {:then availableTimeSlots}
+                            {#if availableTimeSlots?.error}
+                                <p>{availableTimeSlots.error}</p>
+                            {/if}
                             <InputSelect
                                 label="Heure du RDV (créneaux disponibles)"
                                 placeholder="Heure du RDV"
@@ -383,25 +390,21 @@
                                 bind:value={$form.appointmentTime}
                                 fieldError={$errors.appointmentTime}
                             >
-                                {#await availableTimeSlots}
-                                    <option disabled>Loading data...</option>
-                                {:then availableTimeSlots}
-                                    {#if availableTimeSlots !== undefined}
-                                        {#each availableTimeSlots as timeSlot}
-                                            <option value={timeSlot.startHour}
-                                                >{timeSlot.startHour}</option
-                                            >
-                                        {/each}
-                                    {:else if availableTimeSlots && availableTimeSlots.length === 0}
-                                        <option disabled
-                                            >Aucun créneau disponible</option
+                                {#if availableTimeSlots && !availableTimeSlots?.error}
+                                    {#each availableTimeSlots.slots as timeSlot}
+                                        <option value={timeSlot.startHour}
+                                            >{timeSlot.startHour}</option
                                         >
-                                    {/if}
-                                {:catch reason}
-                                    <span>Oops! - {reason}</span>
-                                {/await}
+                                    {/each}
+                                {:else}
+                                    <option disabled
+                                        >Aucun créneau disponible</option
+                                    >
+                                {/if}
                             </InputSelect>
-                        {/if}
+                        {:catch reason}
+                            <span>Oops! - {reason}</span>
+                        {/await}
                     {:else}
                         <div role="alert" class="alert alert-warning">
                             <svg
@@ -445,12 +448,8 @@
                 >
             </div>
         </form>
-        <!-- <div class="grid grid-cols-2 gap-4">
-        <button class={formStep === 1 ? "btn btn-disabled" : "btn"} onclick={prevStep}>Précédent</button>
-        <button class={formStep === 5 ? "btn btn-disabled" : "btn"} onclick={nextStep}>Suivant</button>
-    </div> -->
+       
     </FormWrapper>
 
     <FormToast message={$message} status={page.status} />
-</svelte:boundary>
-<!-- <SuperDebug data={$form} /> -->
+<SuperDebug data={$form} />

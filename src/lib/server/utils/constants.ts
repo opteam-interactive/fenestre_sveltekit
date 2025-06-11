@@ -1,5 +1,6 @@
 import type { Timeslot } from "$lib/types/types";
-
+export const maxCapacityAtelierP = 16;
+export const maxCapacityCarrosserieP = 12;
 export const allTimeSlots: Timeslot[] = [
 
     {
