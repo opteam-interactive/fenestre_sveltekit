@@ -18,9 +18,19 @@ export const getRdvsByUser = async (id: number): Promise<FormattedResponse<Webde
 
         const response = await fetchToApi(encodedSQL)
 
-        if (!response.success || !Array.isArray(response.data)) {
+        if (!response.success ) {
             throw new Error(response.error)
         }
+
+        //If the api sends back "succes: ERREUR" which means that the user has no rdv{
+        if (response.success && response.data) { 
+            return {
+                success: true,
+                data: []
+            }
+        }
+
+
 
         if (Array.isArray(response.data) && response.data.length == 0) {
             return {

@@ -18,12 +18,14 @@ export const load: PageServerLoad = async ({ locals }) => {
         }
         const rdvResponse = await getRdvsByUser(userPayload.userId);
 
-        if (!rdvResponse.success ) {
+        if (!rdvResponse.success) {
             console.error('Error 2');
 
             return { userRdvs: [] };
         }
-
+        if (!Array.isArray(rdvResponse.data) || rdvResponse.data.length == 0) {
+            return { userRdvs: [] };
+        }
         const userRdvs: WebdevRendezVous[] | null = rdvResponse.data;
         if (!userRdvs) {
             console.error('Error 3');

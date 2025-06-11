@@ -21,7 +21,7 @@
         <h2 class="font-semibold">Pas de RDV en attente</h2>
     {/if}
 
-    {#if userRdvs}
+    {#if userRdvs.length >= 1}
         <section class="flex flex-col gap-4">
             <div>
                 <div>
