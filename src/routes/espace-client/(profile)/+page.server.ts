@@ -88,28 +88,20 @@ export const actions = {
 
             const response: FormattedResponse<WebdevUser> = await updateUser(cookies, form.data)
             if (!response.success) {
-                return message(form, {
-                    status: "error",
-                    text: response.error
-                })
+                return message(form, "Une erreur est survenue lors de l'action updateUser. Veuillez réessayer.", 
+                    {
+                        status: 400
+                    }
+                );
             }
 
 
             // Return the form with a status message
-            return message(form, {
-                status: "success",
-                text: "Mise à jour effectuée !"
-            });
+            return message(form, "Mise à jour effectuée !");
 
         } catch (err) {
-            if (err instanceof Error) {
-                console.error(err.message);
-                return message(form, {
-                    status: "error",
-                    text: err.message
-                })
-            }
-            return error(400, "Une erreur est survenue lors de l'action updateUser. Veuillez réessayer.");
+           console.error(err);
+            throw error(400, "Une erreur est survenue lors de l'action updateUser. Veuillez réessayer.");
         }
     }
 };

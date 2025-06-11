@@ -134,7 +134,7 @@
     <FormWrapper customClass="md:w-2/3 lg:w-1/2 my-8">
         <FormFeedback message={$message} status={page.status} />
 
-        <form use:enhance method="POST" class="w-full md-px-8">
+        <form use:enhance method="POST" class="w-full md-px-8" id="top">
             <FormSection title="Informations personnelles">
                 <fieldset class="fieldset gap-8">
                     <FormColumns>
@@ -452,4 +452,3 @@
     </FormWrapper>
 
     <FormToast message={$message} status={page.status} />
-<SuperDebug data={$form} />

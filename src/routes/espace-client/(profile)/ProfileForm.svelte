@@ -9,6 +9,8 @@
     import InputCheckbox from "$lib/components/forms/InputCheckbox.svelte";
     import FormSection from "$lib/components/forms/FormSection.svelte";
     import FormColumns from "$lib/components/forms/FormColumns.svelte";
+    import FormToast from "$lib/components/forms/FormToast.svelte";
+    import FormFeedback from "$lib/components/forms/FormFeedback.svelte";
 
     const pageData = page.data as PageData;
 
@@ -19,13 +21,7 @@
         });
 </script>
 
-{#if $message}
-    <h3
-        class={$message.status == "success" ? "text-green-400" : "text-red-400"}
-    >
-        {$message.text}
-    </h3>
-{/if}
+<FormFeedback message={$message} status={page.status} />
 
 <form method="POST" action="?/updateUser" use:enhance class="w-full md-px-8">
     <fieldset class="fieldset ">
@@ -161,4 +157,5 @@
         >
     </fieldset>
 </form>
-<SuperDebug data={$form} />
+<FormToast message={$message} status={page.status} />
+<!-- <SuperDebug data={$form} /> -->

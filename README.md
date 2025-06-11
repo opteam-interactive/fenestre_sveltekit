@@ -24,6 +24,15 @@
 
 ### Form actions & api endpoints
 - If expected error and need to show the user some message, use "fail"(sveltekit) or "message"(Superforms), to send back both a message and a response status
+- If using "message", provide the form state, a message and an object with a status:code like so:
+
+```js
+return message(form, "Une erreur est survenue lors de l'action updateUser. Veuillez réessayer.", 
+                    {
+                        status: 400
+                    }
+                );
+```
 - If unexpeted (catch), throw a sveltekit "error" that can be show appropriately using error boundaries and +error pages
 
 ### pages
