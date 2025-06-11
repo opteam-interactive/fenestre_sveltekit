@@ -23,9 +23,8 @@ export type Motif = {
     NbRDVParJour: number
 }
 
-export type MotifName = {
-    IDMotifRDV: number,
-    Motif: string
+export interface MotifWithDetails extends Motif  {
+    details: MotifDetails
 }
 export type RendezVous = z.infer<typeof rdvSchema>
 export type WebdevRendezVous = z.infer<typeof rdvWebdevSchema>
@@ -80,14 +79,14 @@ export type WebdevUser = {
 
 
 
-export type MotifQuestions = {
+export type MotifDetails = {
     idMotifRDV: number,
     Motif: string,    
     textInput: boolean,
     textInputLabel ?: string,
-    questions?: Condition[]
+    questions?: MotifQuestion[]
 }
-type Condition = {
+type MotifQuestion = {
     label: string,
     slug: string,
     answers: string[]

@@ -18,5 +18,13 @@
 - $lib/server : actions that need to be done on the server (auth, data management etc...)
 
 ## Error handling
-- Services throw Errors with either the error message that was generated, or else (in catch block) a generic message
-- Then +page.ts, +page.server.ts and  API endpoint send back and error using Sveltekit's error utility
+### Services
+- throw error with new Error in case of expected error.
+- catch unexpected errors, log them and immediately log and rethrow them
+
+### Form actions & api endpoints
+- If expected error and need to show the user some message, use "fail"(sveltekit) or "message"(Superforms), to send back both a message and a response status
+- If unexpeted (catch), throw a sveltekit "error" that can be show appropriately using error boundaries and +error pages
+
+### pages
+- get the "message" from superforms and the page status and display a message accordingly

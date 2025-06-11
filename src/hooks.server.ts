@@ -4,8 +4,14 @@ import { checkAuth } from '$lib/server/utils/jwt';
 
 export const handle: Handle = async ({ event, resolve }) => {
 
+    const authResponse = await checkAuth(event.cookies)
+    if (!authResponse) {
+        throw new Error('An unexpected error occurred in the checkAuth function');
+    }
+    const { authenticated, user } = authResponse
+   
+
     if (!event.url.pathname.startsWith('/espace-client') && !event.url.pathname.startsWith('/api')) {
-        const { authenticated, user } = await checkAuth(event.cookies)
         if (authenticated && user) {
             throw redirect(303, '/espace-client');
         }
@@ -14,8 +20,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     }
 
     if (event.url.pathname.startsWith('/espace-client')) {
-
-        const { authenticated, user } = await checkAuth(event.cookies)
+       
         if (!authenticated || !user) {
             throw redirect(303, '/');
         }

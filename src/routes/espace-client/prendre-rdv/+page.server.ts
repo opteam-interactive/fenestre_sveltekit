@@ -2,8 +2,8 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { rdvSchema } from './rdvSchema';
 import { type Infer, message } from 'sveltekit-superforms';
-import { getMotifs } from '$lib/server/services/motifServices';
-import type { Motif } from '$lib/types/types';
+import { getMotifs, getMotifsList, getMotifsWithQuestions } from '$lib/server/services/motifServices';
+import type { Motif, MotifName, MotifWithDetails, MotifWithQuestions } from '$lib/types/types';
 import { createRdv } from '$lib/server/services/rdvServices';
 import { error, fail } from '@sveltejs/kit';
 
@@ -24,19 +24,14 @@ export const load: PageServerLoad = async () => {
         kilometrique: forfaitResponse.data.kilometrique
     }
 
-    const motifsResponse = await getMotifs();
+    const motifsResponse = await getMotifsWithQuestions();
 
     if (!motifsResponse || !motifsResponse.success || !motifsResponse.data) {
         throw new Error(motifsResponse.error);
     }
 
-    const motifList: Motif[] = motifsResponse.data;
-
-
-
-    const motifs = motifList.filter((motif) =>
-        !motif.NomActivité.includes("AucunP")
-    )
+    const motifs: MotifWithDetails[] = motifsResponse.data;
+    console.log(motifs[8].details.questions);
 
     const form = await superValidate<Infer<typeof rdvSchema>, Message>(zod(rdvSchema));
 
@@ -58,53 +53,46 @@ export const actions = {
                     return fail(400, { form });
                 }
             }
-    
-    
+
+
             //Get motif from id 
             const motifResponse = await getMotifByID(form.data.motifId);
-    
+
             if (!motifResponse || !motifResponse.success || !motifResponse.data) {
-                return message(form, {
-                    status: 'error',
-                    text: 'Le motif n\'existe pas'
+                return message(form, "'Le motif n\'existe pas'", {
+                    status: 404
                 });
             }
-    
+
             //Get user from id
             const userId = locals.user?.userId;
             if (!userId) {
-                return message(form, {
-                    status: 'error',
-                    text: 'ID Utilisateur non trouvé'
+                return message(form, 'ID Utilisateur non trouvé', {
+                    status: 404
                 });
             }
             const userResponse = await getUserById(userId);
-    
+
             if (!userResponse || !userResponse.success || !userResponse.data) {
-                return message(form, {
-                    status: 'error',
-                    text: 'Erreur lors de la recherche de l\'utilisateur'
+                return message(form, 'Erreur lors de la recherche de l\'utilisateur', {
+                    status: 400
                 });
             }
-    
-    
+
+
             const response = await createRdv(form.data, motifResponse.data, userResponse.data);
-    
-    
+
+
             if (!response.success) {
-                return message(form, {
-                    status: 'error',
-                    text: 'La création de RDV a échoué'
+                return message(form, 'La création de RDV a échoué', {
+                    status: 500
                 });
             }
-            return message(form, {
-                status: 'success',
-                text: 'Votre rendez-vous a bien été pris'
-            })
+            return message(form, 'Votre rendez-vous a bien été pris')
             // redirect (303, '/espace-client/mes-rdv');
         } catch (err) {
-           console.error(err);
-            throw error(400, "Une erreur est survenue lors de l'action de prise de rendez-vous. Veuillez réessayer."); 
+            console.error(err);
+            throw error(400, "Une erreur est survenue lors de l'action de prise de rendez-vous. Veuillez réessayer.");
         }
     }
 };

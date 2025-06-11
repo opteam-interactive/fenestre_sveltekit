@@ -35,12 +35,9 @@ export const getRdvsByUser = async (id: number): Promise<FormattedResponse<Webde
             success: true,
             data: rdvs
         }
-    } catch (error) {
-        console.error(error);
-        if (error instanceof Error) {
-            throw new Error(error.message);
-        }
-        throw new Error("An unexpected error occurred in the getRdvsByUser function");
+    } catch (err) {
+        console.error(err);
+       throw err
     }
 }
 
@@ -228,12 +225,11 @@ ${rdv.Blacklistage === "" ? "NULL" : `'${rdv.Blacklistage}'`}
             data: apiResponse.data
         }
     }
-    catch (error) {
-        console.error(error);
-        if (error instanceof Error) {
-            throw new Error(error.message);
-        }
-        throw new Error("An unexpected error occurred in the createRdv function");
+    catch (err) {
+        console.error(err);
+        throw err
 
     }
 }
+
+

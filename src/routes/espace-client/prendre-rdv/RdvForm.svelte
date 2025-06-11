@@ -1,7 +1,6 @@
 <script lang="ts">
     //Superforms
-    import ErrorSnippet from "$lib/components/ErrorSnippet.svelte";
-    import { setError, superForm } from "sveltekit-superforms";
+    import { superForm } from "sveltekit-superforms";
     import SuperDebug from "sveltekit-superforms";
     import { page } from "$app/state";
     //Utils
@@ -20,7 +19,6 @@
     import FieldErrors from "$lib/components/forms/FieldErrors.svelte";
     import FormFeedback from "$lib/components/forms/FormFeedback.svelte";
     import Pikaday from "../../../lib/components/Pikaday.svelte";
-    import ModalRdv from "$lib/components/ModalRdv.svelte";
     // Types
     import type { PageData } from "./$types";
     import type {
@@ -32,52 +30,35 @@
     import FormWrapper from "$lib/components/FormWrapper.svelte";
     import RecapRdv from "$lib/components/RecapRdv.svelte";
     import FormSection from "$lib/components/forms/FormSection.svelte";
+    import FormToast from "$lib/components/forms/FormToast.svelte";
 
     //DATA & states
     //_Get data fetched at the page level (page.server.ts
     const pageData = page.data as PageData;
+    const motifs = pageData.motifs;
+    //Setup superform
+    const forfait = pageData.forfait;
     const { form, errors, constraints, message, enhance, submitting } =
         superForm<rdvSchemaType>(pageData.form);
-    const motifs = pageData.motifs;
-    const filteredMotifs = $derived(
-        motifs.filter((motif) => motif.NomActivité.includes($form.rdvCategory))
-    );
-    const forfait = pageData.forfait;
-    //Setup superform object
 
     //Utility states
-    // let formStep = $state(1);
-    let selectedMotifId: number = $state(0);
     let isModalVisible = $state(false);
     let selectedDay: Date = $state(new Date());
     let capacityFullError: string = $state("");
-    let selectedMotifQuestions = $derived(
-        motifQuestions.filter(
-            (question) => question.idMotifRDV === $form.motifId
-        )
+
+    let selectedMotif: (typeof motifs)[number] | undefined = $derived(
+        motifs.find((motif) => motif.IDMotifRDV === $form.motifId)
     );
+
+    // let selectedMotifQuestions = $derived(
+    //     motifQuestions.filter(
+    //         (question) => question.idMotifRDV === $form.motifId
+    //     )
+    // );
     let finalMotifQuestions: { [slug: string]: string } = $state({});
     let finalMotifQuestionsString = $derived(
         JSON.stringify(finalMotifQuestions)
     );
-
-    $effect(() => {
-        if ($form) {
-            const currentMotifDetailsString =
-                JSON.stringify(finalMotifQuestions);
-
-            //if the motif has changed reset the final motif questions
-            if ($form.motifId !== selectedMotifId) {
-                selectedMotifId = $form.motifId;
-                finalMotifQuestions = {};
-            }
-
-            // Only update if the stringified value has actually changed
-            if ($form.motifDetails !== currentMotifDetailsString) {
-                $form.motifDetails = currentMotifDetailsString;
-            }
-        }
-    });
 
     $effect(() => {
         if (selectedDay !== $form.appointmentDate) {
@@ -101,7 +82,7 @@
     const fetchAvailableTimeSlots = async () => {
         if ($form.appointmentDate) {
             const remainingTimeSlotsResponse = await fetch(
-                `${PUBLIC_SITE_URL}/api/rdv/filter/${$form.appointmentDate}/${$form.rdvCategory}`
+                `${PUBLIC_SITE_URL}/api/rdv/${$form.appointmentDate}/${$form.rdvCategory}`
             );
             const jsonResponse: FormattedResponse<TimeSlotResponse> =
                 await remainingTimeSlotsResponse.json();
@@ -145,27 +126,9 @@
     let availableTimeSlots = $derived(fetchAvailableTimeSlots());
 </script>
 
-<!-- <div class="mt-6">
-    <ul class="steps text-sm">
-        <button class={formStep === 1 ? "step step-info" : "step"} onclick={() => (formStep = 1)}>
-            Infos personnelles
-        </button>
-        <button class={formStep === 2 ? "step step-info" : "step"} onclick={() => (formStep = 2)}>Motif du rdv</button>
-        <button class={formStep === 3 ? "step step-info" : "step"} onclick={() => (formStep = 3)}>
-            Devis et prêt
-        </button>
-        <button class={formStep === 4 ? "step step-info" : "step"} onclick={() => (formStep = 4)}>
-            Dépôt du véhicule
-        </button>
-        <button class={formStep === 5 ? "step step-info" : "step"} onclick={() => (formStep = 5)}>
-            Récapitulatif
-        </button>
-    </ul>
-</div> -->
-
 <svelte:boundary>
     <FormWrapper customClass="md:w-2/3 lg:w-1/2 my-8">
-        <FormFeedback message={$message} />
+        <FormFeedback message={$message} status={page.status} />
 
         <form use:enhance method="POST" class="w-full md-px-8">
             <FormSection title="Informations personnelles">
@@ -250,7 +213,7 @@
                         bind:value={$form.motifId}
                         fieldError={$errors.motifId}
                     >
-                        {#each filteredMotifs as motif}
+                        {#each motifs as motif}
                             <option value={motif.IDMotifRDV}
                                 >{motif.Motif}</option
                             >
@@ -258,39 +221,37 @@
                     </InputSelect>
 
                     <!-- Pour ce motif, affiche les différentes questions complémentaires -->
-                    {#each selectedMotifQuestions as selectedMotifQuestion}
-                        {#if selectedMotifQuestion.questions}
-                            <div
-                                class="grid grid-cols-2 gap-4 px-8 py-4 bg-white rounded-md"
-                                transition:slide
-                            >
-                                {#each selectedMotifQuestion.questions as question}
-                                    <InputSelect
-                                        name={question.slug}
-                                        label={question.label}
-                                        bind:value={
-                                            finalMotifQuestions[question.label]
-                                        }
-                                    >
-                                        {#each question.answers as answer}
-                                            <option value={answer}
-                                                >{answer}</option
-                                            >
-                                        {/each}
-                                    </InputSelect>
-                                {/each}
-                            </div>
-                        {/if}
+                    {#if selectedMotif?.details.questions}
+                        <div
+                            class="grid grid-cols-2 gap-4 px-8 py-4 bg-white rounded-md"
+                            transition:slide
+                        >
+                            {#each selectedMotif?.details.questions as question}
+                                <InputSelect
+                                    name={question.slug}
+                                    label={question.label}
+                                    bind:value={
+                                        finalMotifQuestions[question.label]
+                                    }
+                                >
+                                    {#each question.answers as answer}
+                                        <option value={answer}>{answer}</option>
+                                    {/each}
+                                </InputSelect>
+                            {/each}
+                        </div>
+
                         <!-- Pour ce motif, affiche le champs texte s'il est présent -->
-                        {#if selectedMotifQuestion.textInput && selectedMotifQuestion.textInputLabel}
+                        {#if selectedMotif?.details.textInput && selectedMotif?.details.textInputLabel}
                             <InputText
-                                label={selectedMotifQuestion.textInputLabel}
-                                placeholder={selectedMotifQuestion.textInputLabel}
-                                name={"notes " + selectedMotifQuestion.Motif}
+                                label={selectedMotif?.details.textInputLabel}
+                                placeholder={selectedMotif?.details
+                                    .textInputLabel}
+                                name={"notes " + selectedMotif?.Motif}
                                 bind:value={finalMotifQuestions["Notes"]}
                             />
                         {/if}
-                    {/each}
+                    {/if}
                     <input
                         type="hidden"
                         name="motifDetails"
@@ -490,16 +451,6 @@
     </div> -->
     </FormWrapper>
 
-    {#if $message}
-        <div class="toast">
-            <div class="alert alert-info">
-                <span>{$message.text}</span>
-            </div>
-        </div>
-    {/if}
-
-    {#snippet failed(error, reset)}
-        <ErrorSnippet {error} {reset} />
-    {/snippet}
+    <FormToast message={$message} status={page.status} />
 </svelte:boundary>
 <!-- <SuperDebug data={$form} /> -->
