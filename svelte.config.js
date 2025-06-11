@@ -16,6 +16,9 @@ const config = {
 			$lib: './src/lib',
 			$routes: './src/routes',
 			'$components': './src/lib/components'
+		},
+		csrf: {
+			checkOrigin: false
 		}
 	}
 };
