@@ -77,9 +77,9 @@ export const actions = {
 
     //UPDATE_ACTION
     updateUser: async ({ request, cookies }) => {
-        try {
-            const form = await superValidate(request, zod(profileSchema));
+        const form = await superValidate(request, zod(profileSchema));
 
+        try {
             if (!form.valid) {
                 console.error("form not valid", form)
                 return fail(400, { form });
@@ -88,7 +88,10 @@ export const actions = {
 
             const response: FormattedResponse<WebdevUser> = await updateUser(cookies, form.data)
             if (!response.success) {
-                error(400, response.error);
+                return message(form, {
+                    status: "error",
+                    text: response.error
+                })
             }
 
 
@@ -101,9 +104,12 @@ export const actions = {
         } catch (err) {
             if (err instanceof Error) {
                 console.error(err.message);
-                error(400, err.message);
+                return message(form, {
+                    status: "error",
+                    text: err.message
+                })
             }
-            error(400, "Une erreur est survenue lors de l'action updateUser. Veuillez réessayer.");
+            return error(400, "Une erreur est survenue lors de l'action updateUser. Veuillez réessayer.");
         }
     }
 };

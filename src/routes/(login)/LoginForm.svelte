@@ -3,11 +3,10 @@
     import { superForm } from "sveltekit-superforms";
     import SuperDebug from "sveltekit-superforms";
     import { page } from "$app/state";
-
     import type { PageData } from "./$types";
     import type { LoginSchematype } from "./LoginSchema";
     import FormFeedback from "$lib/components/forms/FormFeedback.svelte";
-    import { goto } from "$app/navigation";
+    import FormToast from "$lib/components/forms/FormToast.svelte";
 
     const pageData = page.data as PageData;
     const { form, errors, constraints, message, enhance } = superForm<LoginSchematype>(pageData.form);
@@ -17,7 +16,7 @@
 
 <!-- <LoginForm /> -->
 
-<FormFeedback message={$message} />
+<FormFeedback message={$message} status={page.status}/>
 
 
 <form method="POST" use:enhance class="w-full px-8">
@@ -46,5 +45,5 @@
 
         <button type="submit" class="btn btn-info mt-4 rounded-full">Login</button>
     </fieldset>
-
+    <FormToast message={$message} status={page.status} />
 </form>

@@ -4,6 +4,7 @@ import type { Cookies } from "@sveltejs/kit";
 import type { ProfileSchemaType } from "$routes/espace-client/(profile)/profileSchema";
 import { checkAuth } from "$lib/server/utils/jwt";
 import type { RegisterSchemaType } from "$routes/register/RegisterSchema";
+import { sendRegisterEmail } from "../email/UserEmail";
 
 export const getUserById = async (id: number): Promise<FormattedResponse<WebdevUser>> => {
     try {
@@ -24,14 +25,26 @@ export const getUserById = async (id: number): Promise<FormattedResponse<WebdevU
             success: true,
             data: response.data[0]
         }
-    } catch (error) {
-        console.error(error);
-        if (error instanceof Error) {
-            throw new Error(error.message);
-        }
-        throw new Error("An unexpected error occurred in the getUserById function");
+    } catch (err) {
+        console.error("getUserById error:", err);
+        throw err
     }
 
+}
+
+export async function checkExistingUser(email: string): Promise<boolean> {
+    try {
+        const SQL = `SELECT * FROM UTILISATEUR WHERE Email = '${email}'`
+        const encodedSQL = encodeBase64(SQL)
+        const response = await fetchToApi(encodedSQL)
+        if (!response.success) {
+            throw new Error(response.error)
+        }
+        return response.data.length > 0
+    } catch (err) {
+        console.error("checkExistingUser error:", err);
+        throw err
+    }
 }
 
 
@@ -65,15 +78,16 @@ export async function createUser(formData: RegisterSchemaType): Promise<Formatte
         }
 
         //Send email
-        // //TODO
+        // //TODO//SEND_CONFIRMATION_EMAIL
+        const response = await sendRegisterEmail(formData);
+        if (!response.success) {
+            throw new Error(response.error);
+        }
         return { success: true, data: user };
 
-    } catch (error) {
-        console.error(error);
-        if (error instanceof Error) {
-            throw new Error(error.message);
-        }
-        throw new Error("An unexpected error occurred in the createUser function");
+    } catch (err) {
+        console.error("CreateUser error:", err);
+       throw err
     }
 }
 
@@ -140,11 +154,8 @@ export async function updateUser(cookies: Cookies, formData: ProfileSchemaType):
 
         return { success: true, data: userResponse.data };
 
-    } catch (error) {
-        console.error(error);
-        if (error instanceof Error) {
-           throw new Error(error.message);
-        }
-        throw new Error("An unexpected error occurred in the updateUser function");
+    } catch (err) {
+        console.error("UpdateUser error:", err);
+       throw err
     }
 }

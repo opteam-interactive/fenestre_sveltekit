@@ -38,9 +38,9 @@ export async function sendRdvEmail(user: WebdevUser, rdv: rdvSchemaType, motif: 
 
         const response  = await sendEmail(email, name, html, "Confirmation de votre rendez-vous");
         return { success: true, data: response  }
-    } catch (error) {
-        console.error(error)
-        return { success: false, error: "Unexpected error" }
+    } catch (err) {
+        console.error("sendRdvEmail error:", err)
+        throw err
     }
 
 }

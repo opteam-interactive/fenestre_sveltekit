@@ -3,8 +3,9 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { registerSchema } from './RegisterSchema';
 import { type Infer, message } from 'sveltekit-superforms';
 import { fail } from '@sveltejs/kit';
-import { createUser } from '$lib/server/services/userServices';
+import { checkExistingUser, createUser } from '$lib/server/services/userServices';
 import { sendRegisterEmail } from '$lib/server/email/UserEmail';
+import {error}  from '@sveltejs/kit';
 type Message = { status: 'error' | 'success' | 'warning'; text: string };
 
 
@@ -26,36 +27,29 @@ export const actions = {
 
 
         try {
+            const existingUser = await checkExistingUser(form.data.email);
+            if (existingUser) {
+                console.error("L'utilisateur existe deja");
+                return message(form, "L'utilisateur existe deja", {status : 400});
+            }
             const response = await createUser(form.data)
 
             if (!response.success) {
-                return message(form, {
-                    status: "error",
-                    text: response.errors // Show the appropriate error message
-                });
+                return message(form,"Une erreur est survenue lors de l'inscription", {status : 400});
             }
 
 
             const emailResponse = await sendRegisterEmail(form.data)
 
             if (!emailResponse.success) {
-                return message(form, {
-                    status: "Erreur dans l'envoi de l'email",
-                    text: emailResponse.error // Show the appropriate error message
-                });
+                return message(form, "Erreur dans l'envoi de l'email", {status : 400});
             }
             // Return the form with a status message
-            return message(form, {
-                status: "success",
-                text: "Inscription effectuée, un email de confirmation vous a été envoyé !"
-            })
+            return message(form, "Inscription effectuée !");
 
-        } catch (error) {
-            console.error("Unexpected error:", error);
-            return message(form, {
-                status: "error",
-                text: "Une erreur est survenue. Veuillez réessayer."
-            });
+        } catch (err) {
+            console.error(err);
+            throw error(500, "Une erreur est survenue lors de l'inscription. Veuillez réessayer.");
         }
 
 

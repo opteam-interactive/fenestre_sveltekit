@@ -1,18 +1,17 @@
 <script lang="ts">
-    type Message = {
-        status: string;
-        text: string;
-    }
-let { message } : { message: Message } = $props();
+    let { message, status }: { message: string; status: number } = $props();
 </script>
 
-{#if message}
-  <div class="w-full text-center ">
-        <h3
-            class="{message.status == "success" ? "text-green-400" : "text-red-400"} mx-auto max-w-3/4"
-        >
-        
-            {message.text}
-        </h3>
-  </div>
+{#if message && status == 200}
+    <h3 class="text-green-400 mx-auto max-w-3/4 text-sm text-center" >
+        {message}
+    </h3>
+{:else if message && status >= 400}
+    <h3 class="text-red-400 mx-auto max-w-3/4 text-sm text-center">
+        {message}
+    </h3>
+{:else}
+    <h3 class="text-blue-400 mx-auto max-w-3/4 text-sm text-center">
+        {message}
+    </h3>
 {/if}

@@ -15,15 +15,15 @@ export async function login(userName: string, password: string, cookies: Cookies
 
 
         if (!userResponse.success || userResponse.data.erreur) {
-            throw new Error("Erreur de connexion, veuillez vérifier votre email et mot de passe et réessayer");
+            return { success: false, error: "Erreur de connexion, veuillez vérifier votre email et mot de passe et réessayer" };
         }
 
         if (userResponse.data[0].Droits < 2) {
-            throw new Error("User is not authorized");
+            return { success: false, error: "Utilisateur non autorisé" };
         }
 
         if (userResponse.data[0] && userResponse.data[0].MotDePasse != password) {
-            throw new Error("Invalid password");
+            return { success: false, error: "Mot de passe incorrect" };
         }
 
 

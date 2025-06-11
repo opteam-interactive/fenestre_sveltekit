@@ -1,14 +1,14 @@
 import { sendEmail } from "$lib/server/services/emailServices";
-import type { ResponseNoData, ResponseWithData, FormattedResponse } from "$lib/types/types";
+import type { FormattedResponse } from "$lib/types/types";
 import type { RegisterSchemaType } from "$routes/register/RegisterSchema";
-import { error } from "@sveltejs/kit";
 import type { SentMessageInfo } from "nodemailer";
 
-export async function sendRegisterEmail(user: RegisterSchemaType):Promise<FormattedResponse<SentMessageInfo>> {
-    if (!user) {
-        throw error(500, "No user provided");
-    }
+export async function sendRegisterEmail(user: RegisterSchemaType): Promise<FormattedResponse<SentMessageInfo>> {
     try {
+
+        if (!user) {
+            throw new Error("No user provided");
+        }
         const email = user.email
         const name = `${user.lastName} ${user.firstName}`
         const html = `
@@ -24,7 +24,7 @@ export async function sendRegisterEmail(user: RegisterSchemaType):Promise<Format
         <li>Prénom : ${user.firstName}</li>
         <li>Téléphone : ${user.telephone}</li>
         <li>Société : ${user.societe ?? "Non renseigné"}</li>
-        <li>Adresse : ${user.address } - ${user.zipcode} ${user.city}</li>
+        <li>Adresse : ${user.address} - ${user.zipcode} ${user.city}</li>
     </ul>
     <p>Vous pouvez nous contacter au 02 35 46 03 70</p>
     <p>Cordialement</p>
@@ -32,12 +32,12 @@ export async function sendRegisterEmail(user: RegisterSchemaType):Promise<Format
         `
         const response = await sendEmail(email, name, html, "Confirmation de création de votre compte");
         if (!response.success) {
-            throw error(500, "API request failed");
+            throw new Error(response.error)
         }
         return { success: true, data: response }
     } catch (err) {
-        console.error(err)
-        return { success: false, error: err?.toString() }
+        console.error("sendRegisterEmail error", err)
+       throw err;
     }
 
 }

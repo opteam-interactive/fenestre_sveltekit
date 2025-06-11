@@ -1,4 +1,4 @@
-- error handling
-- calendar component (?)
-- client load reduction
-- ESLint
+Login: 
+Register : OK
+Create RDV: 
+Update RDV: 

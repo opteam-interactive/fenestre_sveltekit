@@ -5,9 +5,7 @@ import { redirect } from '@sveltejs/kit';
 import { login } from '$lib/server/services/authServices';
 import { fail } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
-
 import { type Infer, message } from 'sveltekit-superforms';
-import { goto } from '$app/navigation';
 
 
 type Message = { status: 'error' | 'success' | 'warning'; text: string };
@@ -34,8 +32,9 @@ export const actions = {
             const response = await login(form.data.userName, form.data.password, cookies)
 
             if (!response.success) {
-                return message(form, "Utilisateur ou mot de passe incorrect.");
-                throw error(400, "Utilisateur ou mot de passe incorrect.");
+                return message(form, response.error, {
+                    status: 400
+                });
             }
 
 
@@ -49,12 +48,6 @@ export const actions = {
 
         } catch (err) {
             console.error(err);
-            if (err instanceof Error) {
-                return message(form, {
-                    status: "error",
-                    text: err.message
-                });
-            }
             throw error(400, "Une erreur est survenue lors de l'action login. Veuillez réessayer.");
         }
 

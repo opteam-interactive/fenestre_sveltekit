@@ -4,28 +4,28 @@
     import { page } from "$app/state";
     import type { RegisterSchemaType } from "./RegisterSchema";
     import InputText from "$lib/components/forms/InputText.svelte";
-    import InputRadio from "$lib/components/forms/InputRadio.svelte";
     import InputCheckbox from "$lib/components/forms/InputCheckbox.svelte";
     import FormColumns from "$lib/components/forms/FormColumns.svelte";
     import FormSection from "$lib/components/forms/FormSection.svelte";
+    import FormToast from "$lib/components/forms/FormToast.svelte";
+    import FormFeedback from "$lib/components/forms/FormFeedback.svelte";
 
     const { form, errors, constraints, message, enhance } =
         superForm<RegisterSchemaType>(page.data.form);
-</script>
 
-{#if $message}
-    <h3
-        class={$message.status == "success" ? "text-green-400" : "text-red-400"}
-    >
-        {$message.text}
-    </h3>
-{/if}
+            $effect(() => {
+                console.log($message)
+            })
+</script>
+<FormFeedback message={$message} status={page.status}/>
+
+
 
 <form method="POST" class="w-full px-8" use:enhance>
     <fieldset class="fieldset gap-4">
         <FormSection title="Informations de connexion">
             <!-- Email -->
-           <div class="pb-4">
+            <div class="pb-4">
                 <InputText
                     label="Email"
                     placeholder="Ex: example@domain.com"
@@ -35,7 +35,7 @@
                     fieldError={$errors.email}
                     {...$constraints.email}
                 />
-           </div>
+            </div>
 
             <FormColumns>
                 <!-- PASSWORD -->
@@ -70,15 +70,13 @@
             >
 
             <FormColumns>
-          
-                    <InputCheckbox
+                <InputCheckbox
                     id="isSociete"
-                        label="Je représente une société"
-                        name="isSociete"
-                        bind:checked={$form.isSociete}
-                        fieldError={$errors.isSociete}
-                    />
-       
+                    label="Je représente une société"
+                    name="isSociete"
+                    bind:checked={$form.isSociete}
+                    fieldError={$errors.isSociete}
+                />
 
                 <!-- SOCIETE -->
 
@@ -91,10 +89,9 @@
                     {...$constraints.societe}
                     disabled={!$form.isSociete}
                 />
-           
 
-            <!-- NOM -->
-            
+                <!-- NOM -->
+
                 <InputText
                     label="Nom"
                     placeholder="Ex: Dupont"
@@ -117,27 +114,26 @@
 
         <FormSection title="Coordonnées">
             <FormColumns>
-            <!-- TELEPHONE -->
-            <InputText
-                label="Téléphone"
-                placeholder="Ex: 02xxxxxxxx"
-                name="telephone"
-                bind:value={$form.telephone}
-                fieldError={$errors.telephone}
-                {...$constraints.telephone}
-            />
+                <!-- TELEPHONE -->
+                <InputText
+                    label="Téléphone"
+                    placeholder="Ex: 02xxxxxxxx"
+                    name="telephone"
+                    bind:value={$form.telephone}
+                    fieldError={$errors.telephone}
+                    {...$constraints.telephone}
+                />
 
-            <!-- ADRESSE -->
-            <InputText
-                label="Adresse"
-                placeholder="Ex: 12 rue des Lilas"
-                name="address"
-                bind:value={$form.address}
-                fieldError={$errors.address}
-                {...$constraints.address}
-            />
+                <!-- ADRESSE -->
+                <InputText
+                    label="Adresse"
+                    placeholder="Ex: 12 rue des Lilas"
+                    name="address"
+                    bind:value={$form.address}
+                    fieldError={$errors.address}
+                    {...$constraints.address}
+                />
 
-            
                 <!-- CODE_POSTAL -->
                 <InputText
                     label="Code Postal"
@@ -164,13 +160,8 @@
     </fieldset>
 </form>
 
-{#if $message}
-<div class="toast">
-    <div class="alert alert-info">
-      <span>{$message.text}</span>
-    </div>
-  </div>
-{/if}
+<FormToast message={$message} status={page.status} />
+
 <!-- <SuperDebug data={$form} /> -->
 
 <style>

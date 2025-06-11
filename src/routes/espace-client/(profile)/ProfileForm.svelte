@@ -2,7 +2,7 @@
     import { superForm } from "sveltekit-superforms";
     import SuperDebug from "sveltekit-superforms";
     import { page } from "$app/state";
-    import type { PageData } from "../$types";
+    import type { PageData } from "./$types";
     import type { ProfileSchemaType } from "./profileSchema";
     import InputText from "$lib/components/forms/InputText.svelte";
     import InputRadio from "$lib/components/forms/InputRadio.svelte";
