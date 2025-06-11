@@ -1,5 +1,5 @@
 import type { WebdevRendezVous } from "$lib/types/types";
-import { fetchToApi, encodeBase64 } from "$lib/server/utils/utils"; // Your existing fetch function
+import { fetchToApi, encodeBase64 } from "$lib/server/utils/webdev"; // Your existing fetch function
 import type { RequestHandler } from '@sveltejs/kit';
 
 interface Erreur {

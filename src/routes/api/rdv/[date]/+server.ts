@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
+import type { RequestHandler } from './[rdvCategory]/$types';
 import { getRdvsByDate } from '$lib/server/services/rdvServices';
 import { allTimeSlots } from "$lib/server/utils/constants";
 import type { FormattedResponse, Timeslot } from '$lib/types/types';
@@ -10,20 +10,13 @@ interface ResponseData {
     remainingCapacityCarrosserieP: number;
 }
 
-export const GET: RequestHandler = async ({ url, params } : { url: URL, params: { date: string, rdvCategory: string } }) => {
+export const GET: RequestHandler = async ({ url, params } : { url: URL, params: { date: string} }) => {
 
 
     try {
-        const {date, rdvCategory} = params
+        const {date} = params
 
-        if (!date || !rdvCategory) {
-            error(400, 'Missing date or category parameter');
-        }
-
-        if (rdvCategory !== "AtelierP" && rdvCategory !== "CarrosserieP" && rdvCategory !== "AucunP") {
-            error(400, 'Invalid category parameter');
-        }
-
+       
         //GET RDVs
         const rdvResponse = await getRdvsByDate(date);
         

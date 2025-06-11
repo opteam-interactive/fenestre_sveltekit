@@ -7,7 +7,6 @@
     import { slide } from "svelte/transition";
     import { goto } from "$app/navigation";
     import { PUBLIC_SITE_URL } from "$env/static/public";
-    import { motifQuestions } from "$lib/client/constants";
 
     //Form components
     import RadioWrapper from "$lib/components/forms/RadioWrapper.svelte";
@@ -81,7 +80,7 @@
     const fetchAvailableTimeSlots = async () => {
         if ($form.appointmentDate) {
             const remainingTimeSlotsResponse = await fetch(
-                `${PUBLIC_SITE_URL}/api/rdv/${$form.appointmentDate}/${$form.rdvCategory}`
+                `${PUBLIC_SITE_URL}/api/rdv/${$form.appointmentDate}`
             );
             const jsonResponse: FormattedResponse<TimeSlotResponse> =
                 await remainingTimeSlotsResponse.json();
